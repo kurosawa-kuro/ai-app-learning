@@ -10,19 +10,21 @@
 - 添付画像はSupabase Storageの非公開バケットへ保存し、Spring Boot経由で表示。
 - PostgreSQLへ投稿者・投稿の関連を保存し、再読込後も表示。
 
-ログイン・アカウント登録・パスワード管理はありません。投稿者は表示名を持つデータで、認証ユーザーではありません。現在は編集機能・複数画像・Render公開は対象外です。
+ログイン・アカウント登録・パスワード管理はありません。投稿者は表示名を持つデータで、認証ユーザーではありません。現在は編集機能・複数画像は対象外です。Render用の設定は用意済みですが、公開前の認証・DB権限設計は未実施です（[Render](#render)）。
 
 ## 起動
 
-Windows PowerShellでこのフォルダーを開きます。Java 17が必要です。Mavenの別途インストールとDockerは不要です。
+Git Bashでこのフォルダーを開きます。Java 17が必要です。Mavenの別途インストールとDockerは不要です。
 
-```powershell
+```bash
 # 画像なし（Storageキー不要）
-.\run-local.ps1 -Action run
+./run-local.sh -Action run
 
 # 画像あり（Storageキーが必要）
-.\run-local.ps1 -Action run -Images
+./run-local.sh -Action run -Images
 ```
+
+[run-local.sh](run-local.sh)は引数をそのまま [run-local.ps1](run-local.ps1) へ渡す入口です。PowerShellからは `.\run-local.ps1 -Action run` でも同じです。
 
 ブラウザーで http://127.0.0.1:8080/ を開きます。停止はCtrl+Cです。最初に投稿者を追加し、その投稿者で複数の投稿を保存できます。初回起動時にFlywayが専用スキーマとテーブルを作成します。
 
@@ -32,8 +34,8 @@ Windows PowerShellでこのフォルダーを開きます。Java 17が必要で�
 
 接続情報・秘密情報・動作設定は、このフォルダーの `.env` で管理します。`.env` と `.env.*` はGit管理対象外で、値を含まない [.env.example](.env.example) だけを共有します。初めて準備するPCでは以下でコピーし、Dashboardの接続情報を入力します。
 
-```powershell
-if (!(Test-Path .env)) { Copy-Item .env.example .env }
+```bash
+cp -n .env.example .env
 ```
 
 形式は1行に `KEY=value`。空白を含む値は単一または二重引用符で囲めます。`$`・`#`・`=` はそのまま扱い、変数展開・コマンド実行・エスケープ変換はしません。コメントは独立した `#` 行に書き、値の後ろには付けません。複数行の値・重複キーは使いません。
@@ -54,11 +56,23 @@ if (!(Test-Path .env)) { Copy-Item .env.example .env }
 | `APP_DB_SCHEMA` | 通常は `app_template` |
 | `SERVER_PORT` | 既定は8080 |
 
-優先順位は「起動引数・テスト専用設定 → 既存の環境変数 → `.env` → アプリの既定値」です。`-Images` は画像ON、`-Images:$false` はOFFを明示します。`.env` で `APP_IMAGES_ENABLED=true` にすれば通常の起動でも画像を利用できます。画像OFFではStorageへ接続しません。保存済み画像の情報は維持し、画像つき投稿の削除は画像ONで行います。
+優先順位は「起動引数・テスト専用設定 → 既存の環境変数 → `.env` → アプリの既定値」です。`-Images` は画像ON、`APP_IMAGES_ENABLED=false ./run-local.sh -Action run` はOFFを明示します。`.env` で `APP_IMAGES_ENABLED=true` にすれば通常の起動でも画像を利用できます。画像OFFではStorageへ接続しません。保存済み画像の情報は維持し、画像つき投稿の削除は画像ONで行います。
 
 CI・公開先ではサービスの環境変数・シークレット設定を使い、`.env` を配布しません。ローカルスクリプトも必要な環境変数が揃っていれば `.env` なしで動きます。パスワードやキーを変更したら、Supabase側と `.env` または実行環境の設定を揃えて再起動し、接続テストを行います。
 
 JDBCはSession poolerの5432番ポートへ、`sslmode=verify-full` と同梱[公開CA証明書](certs/README.md)を使って接続します。PC・Java全体の信頼ストアは変更しません。接続数の初期上限は3です。現段階ではDashboardの管理用DB接続を使い、公開前にアプリ専用ロール・権限を別途設計します。
+
+## Render
+
+RenderがGitから [Dockerfile](Dockerfile) をビルドします。手元のDockerは不要です。コンテナでは `render` プロファイル（[application-render.properties](src/main/resources/application-render.properties)）が有効になり、`0.0.0.0` と Renderの `PORT`（既定10000）で待ち受け、`DB_HOST` から証明書検証付きのJDBC URLを組み立てます。`.env` と `run-local.sh` はコンテナでは使いません。
+
+1. GitHubへpushします。
+2. Render Dashboardで New → Blueprint を選び、リポジトリと Blueprint Path `src/web-app-starter/template/render.yaml` を指定します。
+3. 作成時に `DB_HOST`・`SPRING_DATASOURCE_USERNAME`・`SPRING_DATASOURCE_PASSWORD` を入力します。値は `.env` と同じです。画像ONにする場合は `APP_IMAGES_ENABLED=true` と `SUPABASE_URL`・`SUPABASE_SECRET_KEY` をDashboardで追加します。
+
+[render.yaml](render.yaml) はfreeプラン・Singapore（Supabase Tokyoに最も近いリージョン）です。Dockerビルドではテストを実行しないため、pushの前に `./run-local.sh -Action test` を通します。`APP_DB_SCHEMA` を変えない限り、ローカルと同じ `app_template` のデータを使います。
+
+公開URLは誰でもアクセスでき、認証なしで全投稿者・投稿の追加・削除と（画像ON時）Storageへのアップロードができます。DBもDashboardの管理用接続のままです。限定的な検証以外で公開し続ける前に、認証とアプリ専用DBロールを設計します。
 
 ## 画像の扱い
 
@@ -73,9 +87,9 @@ JDBCはSession poolerの5432番ポートへ、`sslmode=verify-full` と同梱[�
 
 ### Java・実PostgreSQL
 
-```powershell
-.\run-local.ps1 -Action test
-.\run-local.ps1 -Action package
+```bash
+./run-local.sh -Action test
+./run-local.sh -Action package
 ```
 
 `test` と `package` は `app_template_test` を使います。`package` はテストを含めてJarを作成します。既存データを消すテストはありません。DB接続テストは一時テーブルをロールバックします。画像の内容検証・容量制限・画像OFF時の拒否・失敗時の後片付けはJavaテストで検証します。設定読込みの単独検査は `powershell.exe -NoProfile -File tests/config.test.ps1` で実行できます。
@@ -84,7 +98,7 @@ JDBCはSession poolerの5432番ポートへ、`sslmode=verify-full` と同梱[�
 
 Node.jsが必要です。静的UIサンプル `admin-pico` のテストとは別に、このSpring Bootアプリを検証します。
 
-```powershell
+```bash
 npm ci
 npx playwright install chromium
 
@@ -113,7 +127,7 @@ PlaywrightがSpring Bootを起動して終了します。通常の開発サー�
 - Playwright：画像ON・OFFで計4ケース成功。認証なしの画面、1対多、再読込、絞込み、実Storageへの保存・画像表示・削除、不正画像拒否、CSRF拒否に加え、Pico資産のローカル読込み・モバイルメニュー・横はみ出しを検証。
 - テスト用バケットが非公開で、テスト終了後のオブジェクト数が0であることを確認。
 
-実Storageの正常系と、模擬したDB・Storage障害のテストは区別しています。Render上の動作は未検証です。
+実Storageの正常系と、模擬したDB・Storage障害のテストは区別しています。`render` プロファイルのJarはローカルで起動・DB接続を確認済みですが、Render上のDockerビルドと動作は未検証です。
 
 ## 構成
 
