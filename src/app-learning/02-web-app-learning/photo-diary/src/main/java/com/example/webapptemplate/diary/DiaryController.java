@@ -27,7 +27,7 @@ public class DiaryController {
    var previous=(AiDraftResult)session.getAttribute("diaryDraft");
    if(previous!=null&&previous.requestId().equals(requestId))return ResponseEntity.ok(previous);
    try {var result=ai.generate(requestId,"DIARY: 写真と素材から短い日本語の日記を作成。写真にない事実を足さず、本文だけ返す。",material+"\nタグ："+tags,uploads(photos));session.setAttribute("diaryDraft",result);return ResponseEntity.ok(result);}
-   catch(IllegalArgumentException failure){return ResponseEntity.badRequest().body(Map.of("error",failure.getMessage()));}
+   catch(IllegalArgumentException|IllegalStateException failure){return ResponseEntity.badRequest().body(Map.of("error",failure.getMessage()));}
   }
  }
  @GetMapping("/diary/photos/{id}") @ResponseBody public ResponseEntity<byte[]> photo(@PathVariable UUID id){var p=service.photo(id);try{return ResponseEntity.ok().contentType(MediaType.parseMediaType(p.imageType())).cacheControl(CacheControl.noStore()).body(storage.download(p.imageBucket(),p.imageKey()));}catch(MissingImage e){return ResponseEntity.notFound().build();}catch(IllegalStateException e){return ResponseEntity.status(503).build();}}

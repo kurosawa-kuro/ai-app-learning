@@ -89,7 +89,7 @@ public class PageContext {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public String tooLarge(RedirectAttributes flash, HttpServletRequest request) {
         flash.addFlashAttribute("error", "画像は5MB以下にしてください。");
-        if (request.getRequestURI().matches("/admin/users/[0-9a-f-]{36}/icon|/diary/photos/[0-9a-f-]{36}"))
+        if (request.getRequestURI().matches("/admin/users/[0-9a-f-]{36}/icon"))
             return "redirect:" + request.getRequestURI() + "/edit";
         return "redirect:/posts/new";
     }
