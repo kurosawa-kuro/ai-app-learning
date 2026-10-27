@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
 @Service
 public class LearningService {
  public record Question(String id,String prompt,String answer){}
- public record Entry(UUID id,UUID userId,String kind,String question,String input,String feedback,OffsetDateTime createdAt){}
+ public record Entry(UUID id,UUID userId,String kind,String question,String input,String feedback,OffsetDateTime createdAt){public String createdLabel(){return java.time.format.DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm").withZone(java.time.ZoneId.of("Asia/Tokyo")).format(createdAt);}}
  public record Outcome(String state,String text,String message){}
  private final JdbcClient db;private final AiText ai;private final AuthorOperations users;
  public LearningService(JdbcClient db,AiText ai,AuthorOperations users){this.db=db;this.ai=ai;this.users=users;}

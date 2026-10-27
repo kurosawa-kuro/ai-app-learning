@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
 @Service public class ShopService {
  public record Product(UUID id,String name,String description,long price,boolean active){}
  public record Line(UUID productId,String productName,long unitPrice,int quantity){public long total(){return Math.multiplyExact(unitPrice,quantity);}}
- public record Order(UUID id,UUID userId,String name,OffsetDateTime createdAt,OffsetDateTime cancelledAt,long total){}
+ public record Order(UUID id,UUID userId,String name,OffsetDateTime createdAt,OffsetDateTime cancelledAt,long total){public String createdLabel(){return java.time.format.DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm").withZone(java.time.ZoneId.of("Asia/Tokyo")).format(createdAt);}}
  private final JdbcClient db;private final UnitOfWork tx;private final AuthorOperations users;
  public ShopService(JdbcClient db,UnitOfWork tx,AuthorOperations users){this.db=db;this.tx=tx;this.users=users;}
  public List<Product> products(){return db.sql("select * from shop_products where active order by name,id").query(Product.class).list();}

@@ -2,7 +2,7 @@ package com.example.webapptemplate.janken;
 import com.example.webapptemplate.janken.internal.domain.RoundRules;
 import com.example.webapptemplate.authors.AuthorOperations;import com.example.webapptemplate.ai.*;import com.example.webapptemplate.platform.UnitOfWork;import org.springframework.jdbc.core.simple.JdbcClient;import org.springframework.stereotype.Service;import java.util.*;import java.time.OffsetDateTime;
 @Service public class JankenService {
- public record Round(UUID id,UUID userId,String character,String skill,String hand,String cpu,String outcome,int points,String line,OffsetDateTime createdAt){}
+ public record Round(UUID id,UUID userId,String character,String skill,String hand,String cpu,String outcome,int points,String line,OffsetDateTime createdAt){public String createdLabel(){return java.time.format.DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm").withZone(java.time.ZoneId.of("Asia/Tokyo")).format(createdAt);}}
  private final JdbcClient db;private final UnitOfWork tx;private final AuthorOperations users;private final AiText ai;private final java.security.SecureRandom random=new java.security.SecureRandom();
  public JankenService(JdbcClient db,UnitOfWork tx,AuthorOperations users,AiText ai){this.db=db;this.tx=tx;this.users=users;this.ai=ai;}
  public List<Round> history(UUID user){return user==null?List.of():db.sql("select * from janken_rounds where user_id=:user order by created_at desc,id limit 20").param("user",user).query(Round.class).list();}
