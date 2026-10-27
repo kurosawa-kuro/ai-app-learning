@@ -29,6 +29,8 @@
 
 ## ドキュメント一覧
 
+Webアプリの採用基盤は[ADR 0001](adr/0001-web-app-stack.md)を参照する。Spring Boot＋Thymeleaf＋Render＋Supabaseへの統一は決定済みで、実装・公開・受入状況とは分けて管理する。
+
 | ドキュメント | 役割 |
 |---|---|
 | [01_requirements.md](./01_requirements.md) | 目的・範囲・ユーザー・ユースケース・Critical User Journey / Golden Path |

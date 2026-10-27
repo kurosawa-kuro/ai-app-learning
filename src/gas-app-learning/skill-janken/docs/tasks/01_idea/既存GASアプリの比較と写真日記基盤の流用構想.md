@@ -18,7 +18,7 @@
 | ② 英語トレーナー | `C:\Users\owner\.ssh\dev\gas\ai-english-trainer` | `5d96654` |
 | 移植先 | `C:\Users\owner\.ssh\dev\skill-janken` | 設計段階。`src/` は未実装 |
 
-依頼者による「両方とも実装・動作済み」という実績を前提に、手元のコードを比較した。公開中のGASとローカルHEADが同じかは確認していない。[①のREADME](../../../../gas/ai-photo-diary/README.md)には公開版とその後のローカル変更、[②のREADME](../../../../gas/ai-english-trainer/README.md)には実GASでの受入未実施という記録があり、文書の記録だけでは現在の公開版を断定できない。
+依頼者による「両方とも実装・動作済み」という実績を前提に、手元のコードを比較した。公開中のGASとローカルHEADが同じかは確認していない。[①のREADME](../../../../ai-photo-diary/README.md)には公開版とその後のローカル変更、[②のREADME](../../../../ai-english-trainer/README.md)には実GASでの受入未実施という記録があり、文書の記録だけでは現在の公開版を断定できない。
 
 移植先の判断基準は[構成・API](../../02_architecture.md)、[画像制作](../../04_workflows.md)、[保存・再送](../../05_data_model.md)、[エラー方針](../../06_error_policy.md)、[受入条件](../../07_test_strategy.md)。今回は調査・ローカルテスト・文書化までで、アプリコードのコピーやデプロイは実施していない。
 
@@ -45,20 +45,20 @@
 
 | 部品・用途 | コピー元 | 取り込む内容と必要な変更 |
 |---|---|---|
-| HTML Serviceの入口 | ② [controllers/web.js](../../../../gas/ai-english-trainer/src/server/controllers/web.js) | 小さなdoGet/include_を土台にする。教材用メニュー・初期化は除く。HTMLパスを移植先に合わせる |
-| 初期JSON埋込み | ① [controllers/web.js](../../../../gas/ai-photo-diary/src/server/controllers/web.js) | serializeForScript_のエスケープ処理を利用。日記設定、初回アクセス時のSeeder呼出し、sheetUrlのブラウザ配信は持ち込まない |
-| クライアント通信 | ① [core/api.html](../../../../gas/ai-photo-diary/src/client/core/api.html) | Promise化・成功失敗ハンドラを利用。呼出し先をapi(request)に限定し、version/replayed等を捨てない構造へ変更 |
-| DOM・画面切替 | ① [core/dom.html](../../../../gas/ai-photo-diary/src/client/core/dom.html)、[core/router.html](../../../../gas/ai-photo-diary/src/client/core/router.html) | DOM操作と画面切替の部品を利用。App名前空間や参照を調整し、日記の画面を今回の5画面へ置換 |
-| 非公開Drive取得 | ① [photo/drive-store.js](../../../../gas/ai-photo-diary/src/server/services/photo/drive-store.js) | 所有者・非公開・共有相手・親フォルダー・ゴミ箱判定を利用。IntegrationSettings等を移植先設定へ接続。AssetsのREADY行から内部fileIdを解決する |
-| 画像表示 | ① [core/photo-view.html](../../../../gas/ai-photo-diary/src/client/core/photo-view.html) | base64表示、取得中・失敗・再試行、キャッシュを利用。getAssetとWebPに対応させ、assetIdとversionによる識別、名前付き代替表示を実装 |
-| Sheetsアクセス | ① [db/sheet-store.js](../../../../gas/ai-photo-diary/src/server/db/sheet-store.js) | Spreadsheet取得、ヘッダー確認、型を考慮した値変換を参考に抽出。TABLES・Settings・TableCacheへの依存を整理し、汎用ストア全体はコピーしない |
-| ロックと書込み保護 | ② [core/lock.js](../../../../gas/ai-english-trainer/src/server/core/lock.js) | withLock_/requireWriteLock_とfinally処理を利用。待機時間を今回の3秒へ変更。Actions専用保存処理とflush責務を一か所で定義する |
-| 正規化とハッシュ | ① [core/request-hash.js](../../../../gas/ai-photo-diary/src/server/core/request-hash.js)、② [core/errors.js](../../../../gas/ai-english-trainer/src/server/core/errors.js) | SHA-256計算とstableJson_を利用。対象をop・expectedVersion・正規化payloadとし、合成材料の順不同も正規化する |
-| 保留要求と操作抑止 | ② [client/app.html](../../../../gas/ai-english-trainer/src/client/app.html) | sessionStorage保存・busy制御を抽出。教材のattempt/session/turn情報は除き、今回の要求全体を送信前に保存する |
-| Gemini通信の下地 | ① [draft/gemini-client.js](../../../../gas/ai-photo-diary/src/server/services/draft/gemini-client.js) | キーのヘッダー設定、通信エラー処理などを参考にする。文章抽出部分は画像生成に使えないため置換 |
-| ローカル試験基盤 | ① [gas-mock.mjs](../../../../gas/ai-photo-diary/src/tests/gas-mock.mjs)、[drive-mock.mjs](../../../../gas/ai-photo-diary/src/tests/drive-mock.mjs)、② [lock-safety.test.mjs](../../../../gas/ai-english-trainer/src/tests/lock-safety.test.mjs) | Sheets・Properties・Lock・Driveのモックとロック異常系の試験を流用。対象テーブル・ファイル読込・関数名を変更する |
+| HTML Serviceの入口 | ② [controllers/web.js](../../../../ai-english-trainer/src/server/controllers/web.js) | 小さなdoGet/include_を土台にする。教材用メニュー・初期化は除く。HTMLパスを移植先に合わせる |
+| 初期JSON埋込み | ① [controllers/web.js](../../../../ai-photo-diary/src/server/controllers/web.js) | serializeForScript_のエスケープ処理を利用。日記設定、初回アクセス時のSeeder呼出し、sheetUrlのブラウザ配信は持ち込まない |
+| クライアント通信 | ① [core/api.html](../../../../ai-photo-diary/src/client/core/api.html) | Promise化・成功失敗ハンドラを利用。呼出し先をapi(request)に限定し、version/replayed等を捨てない構造へ変更 |
+| DOM・画面切替 | ① [core/dom.html](../../../../ai-photo-diary/src/client/core/dom.html)、[core/router.html](../../../../ai-photo-diary/src/client/core/router.html) | DOM操作と画面切替の部品を利用。App名前空間や参照を調整し、日記の画面を今回の5画面へ置換 |
+| 非公開Drive取得 | ① [photo/drive-store.js](../../../../ai-photo-diary/src/server/services/photo/drive-store.js) | 所有者・非公開・共有相手・親フォルダー・ゴミ箱判定を利用。IntegrationSettings等を移植先設定へ接続。AssetsのREADY行から内部fileIdを解決する |
+| 画像表示 | ① [core/photo-view.html](../../../../ai-photo-diary/src/client/core/photo-view.html) | base64表示、取得中・失敗・再試行、キャッシュを利用。getAssetとWebPに対応させ、assetIdとversionによる識別、名前付き代替表示を実装 |
+| Sheetsアクセス | ① [db/sheet-store.js](../../../../ai-photo-diary/src/server/db/sheet-store.js) | Spreadsheet取得、ヘッダー確認、型を考慮した値変換を参考に抽出。TABLES・Settings・TableCacheへの依存を整理し、汎用ストア全体はコピーしない |
+| ロックと書込み保護 | ② [core/lock.js](../../../../ai-english-trainer/src/server/core/lock.js) | withLock_/requireWriteLock_とfinally処理を利用。待機時間を今回の3秒へ変更。Actions専用保存処理とflush責務を一か所で定義する |
+| 正規化とハッシュ | ① [core/request-hash.js](../../../../ai-photo-diary/src/server/core/request-hash.js)、② [core/errors.js](../../../../ai-english-trainer/src/server/core/errors.js) | SHA-256計算とstableJson_を利用。対象をop・expectedVersion・正規化payloadとし、合成材料の順不同も正規化する |
+| 保留要求と操作抑止 | ② [client/app.html](../../../../ai-english-trainer/src/client/app.html) | sessionStorage保存・busy制御を抽出。教材のattempt/session/turn情報は除き、今回の要求全体を送信前に保存する |
+| Gemini通信の下地 | ① [draft/gemini-client.js](../../../../ai-photo-diary/src/server/services/draft/gemini-client.js) | キーのヘッダー設定、通信エラー処理などを参考にする。文章抽出部分は画像生成に使えないため置換 |
+| ローカル試験基盤 | ① [gas-mock.mjs](../../../../ai-photo-diary/src/tests/gas-mock.mjs)、[drive-mock.mjs](../../../../ai-photo-diary/src/tests/drive-mock.mjs)、② [lock-safety.test.mjs](../../../../ai-english-trainer/src/tests/lock-safety.test.mjs) | Sheets・Properties・Lock・Driveのモックとロック異常系の試験を流用。対象テーブル・ファイル読込・関数名を変更する |
 
-①のGASモックは `.clasp.json` の `filePushOrder` を読むため、モックをコピーしただけでは独立しない。②の[モック](../../../../gas/ai-english-trainer/src/tests/gas-mock.mjs)のserverファイル列挙を参考に、テスト用ローダーを移植先で完結させる。テストを動かす目的で元の `.clasp.json` を持ち込まない。
+①のGASモックは `.clasp.json` の `filePushOrder` を読むため、モックをコピーしただけでは独立しない。②の[モック](../../../../ai-english-trainer/src/tests/gas-mock.mjs)のserverファイル列挙を参考に、テスト用ローダーを移植先で完結させる。テストを動かす目的で元の `.clasp.json` を持ち込まない。
 
 ## 無修正コピーで仕様を壊す箇所
 
@@ -68,7 +68,7 @@
 
 - ①のsheet-store.js L59は主キーが空の行を除外する。不完全なActions行を見落とすため、全空行と不完全行を区別し、後者はDATA_INTEGRITY_ERRORにする。
 - ①のwriteValues_は値によってsetValues後にRichTextの追加書込みを行う。汎用関数をそのまま「1行1回の保存」と見なさず、Actions専用の追記処理を作る。
-- ②の[sheet-store.js](../../../../gas/ai-english-trainer/src/server/db/sheet-store.js) L218以降は全値を文字列化してRichText保存する。今回必要な数値・真偽値のセル型を保てないため、ストア全体のコピーは不適切。
+- ②の[sheet-store.js](../../../../ai-english-trainer/src/server/db/sheet-store.js) L218以降は全値を文字列化してRichText保存する。今回必要な数値・真偽値のセル型を保てないため、ストア全体のコピーは不適切。
 - ②のappendOnly・ロック必須検証は参考になるが、最新状態の検証、重複判定、200件上限、書込み後の確認まで代替するものではない。
 
 新規テーブルはPlayers / Characters / Skills / CharacterSkills / Recipes / Assets / Actions / Settingsの8表。既存のv2_ / et_接頭辞や移行履歴を引き継がず、初期化は提供者が明示的に実行する。①の日時規約も引き継がず、今回のUTC ISO保存・東京表示に合わせる。
@@ -85,7 +85,7 @@
 
 ### 画像は①でもWebP対応が必要
 
-①の[image-validator.js](../../../../gas/ai-photo-diary/src/server/services/photo/image-validator.js) L5はJPEG/PNGだけを許可し、[photo-upload.html](../../../../gas/ai-photo-diary/src/client/core/photo-upload.html) L29はcanvasからJPEGを出力する。現行上限も今回の100KiBとは異なる。MIME文字列だけWebPに変更しても、ファイル内容・寸法の検証は対応しない。
+①の[image-validator.js](../../../../ai-photo-diary/src/server/services/photo/image-validator.js) L5はJPEG/PNGだけを許可し、[photo-upload.html](../../../../ai-photo-diary/src/client/core/photo-upload.html) L29はcanvasからJPEGを出力する。現行上限も今回の100KiBとは異なる。MIME文字列だけWebPに変更しても、ファイル内容・寸法の検証は対応しない。
 
 今回必要なのはWebP7枚、各512×512以下・100KiB以下、合計700KiB以下。提供者用の変換・内容確認・登録手順とWebP検証を追加する。日記の写真選択画面、一般アップロード、孤立画像の削除操作を子どもの画面に持ち込む必要はない。
 
@@ -110,7 +110,7 @@
 | package.jsonのpush/deploy/buildスクリプト | 必要分だけ再構成する。①のdeployには元アプリのDeployment IDが固定されている |
 | vendor・CSS | 使用する場合のみ採用し、含まれるライセンス表記を維持する。子ども向けUIの寸法・操作性は別に確認する |
 
-両方のmanifestはV8・Asia/Tokyo・本人実行／本人限定の設定で今回と方向が合うため、[①のmanifest](../../../../gas/ai-photo-diary/src/appsscript.json)をひな形にできる。ただしmanifestが一致していても、実際のデプロイ設定やDrive共有の確認は別途必要。
+両方のmanifestはV8・Asia/Tokyo・本人実行／本人限定の設定で今回と方向が合うため、[①のmanifest](../../../../ai-photo-diary/src/appsscript.json)をひな形にできる。ただしmanifestが一致していても、実際のデプロイ設定やDrive共有の確認は別途必要。
 
 開発依存には両方ともclasp・Playwright・jsdom・yamlがあるが、①はCommonJS、②はES modulesでスクリプト構成も異なる。両方のpackage一式を混ぜず、実際に使うコピー対象と試験方法に合わせる。元のMakefileはTODOのひな形なので起動基盤として扱わない。
 

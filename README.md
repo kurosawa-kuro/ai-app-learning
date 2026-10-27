@@ -10,12 +10,12 @@ IT入門者がAIを活用して、ITの基礎、プログラミング、業務�
 
 | 取り組み・誰に | 本人のゴール | スタートの支援 | AIで横展開するもの |
 |---|---|---|---|
-| [GASアプリ教材](src/gas/README.md)：遊び・英語・写真・店舗業務などに関心や課題がある人 | 自分に身近な題材を通じてITを理解し、目的に合う小さな変更ができる。対象者別の違いは次節を参照 | 本人に合う題材を選び、動作確認済みの体験環境、説明、設定・改修の伴走を用意する | 身近な対象をデータとルールで捉える経験を、同じ題材の別の変更へ応用する |
-| [Webアプリを作って使う支援](src/nextjs/GASではなくNextjs-Vercel戦略.md)：自分用・業務用のアプリが欲しい非エンジニア | 自分の用途に合うアプリを使い、必要に応じて改善できる | 要望を小さく整理し、ひな形・環境準備・最初の公開までのつまずきを減らす | 動いたアプリと仕様を土台に、項目・画面・処理を用途に合わせて変え、別の身近な業務にも応用する |
-| [Java・Oracle Bronze × Devin](<src/Java・Oracle Bronze × Devin/Java・Oracle Bronze × Devin 実務直結型学習戦略.md>)：Java・Oracle系の仕事を目指すIT未経験者 | 資格と実習成果で基礎技能を示し、開発・保守の仕事に近づく | 学習範囲を絞り、実行環境、最初のJava課題、SQL実習、成果の残し方を支援する | 学んだ文法・SQL・テストを別の課題へ応用し、一つのアプリをDB連携・Web化・運用へ育てる |
-| [Cursor業務効率化](src/cursor-office-automation-starter/README.md)：Windowsを使う非エンジニア、特にIT人材・SES営業担当者 | 日々の事務処理の手間やミスを減らす | Cursor導入、サンプルデータ、コピーして使えるプロンプトで、最初の1業務を試せるようにする | 成功した依頼の入力・条件・出力を変え、別の集計、資料整理、文面作成などへ応用する |
+| [GASアプリ教材](src/gas-app-learning/README.md)：遊び・英語・写真・店舗業務などに関心や課題がある人 | 自分に身近な題材を通じてITを理解し、目的に合う小さな変更ができる。対象者別の違いは次節を参照 | 本人に合う題材を選び、動作確認済みの体験環境、説明、設定・改修の伴走を用意する | 身近な対象をデータとルールで捉える経験を、同じ題材の別の変更へ応用する |
+| [Webアプリを作って使う支援](src/web-app-starter/GASではなくSpringBoot-render-supabase戦略.md)：自分用・業務用のアプリが欲しい非エンジニア | 自分の用途に合うアプリを使い、必要に応じて改善できる | 要望を小さく整理し、ひな形・環境準備・最初の公開までのつまずきを減らす | 動いたアプリと仕様を土台に、項目・画面・処理を用途に合わせて変え、別の身近な業務にも応用する |
+| [Java・Oracle Bronze × Devin](<src/java-career-learning/Java・Oracle Bronze × Devin 実務直結型学習戦略.md>)：Java・Oracle系の仕事を目指すIT未経験者 | 資格と実習成果で基礎技能を示し、開発・保守の仕事に近づく | 学習範囲を絞り、実行環境、最初のJava課題、SQL実習、成果の残し方を支援する | 学んだ文法・SQL・テストを別の課題へ応用し、一つのアプリをDB連携・Web化・運用へ育てる |
+| [Cursor業務効率化](src/office-automation-starter/README.md)：Windowsを使う非エンジニア、特にIT人材・SES営業担当者 | 日々の事務処理の手間やミスを減らす | Cursor導入、サンプルデータ、コピーして使えるプロンプトで、最初の1業務を試せるようにする | 成功した依頼の入力・条件・出力を変え、別の集計、資料整理、文面作成などへ応用する |
 
-Webアプリの戦略メモには、Next.jsに加えてSpring Boot＋Thymeleafや公開方法の比較があり、技術選定は検討中です。Java・Oracleの資料も学習戦略であり、Java実習環境や完成アプリの提供を示すものではありません。GAS各教材の設計・実装・検証・公開状況は、[GASアプリ集の一覧](src/gas/README.md)と各プロジェクトのREADMEを確認してください。
+Webアプリの採用スタックは、**Spring Boot＋Thymeleaf＋Render＋Supabase**です。2026-10-27にNext.js＋Vercel案を廃止し、統一を決定しました。採用決定と実装・公開の完了は別です。Java・Oracleの資料も学習戦略であり、Java実習環境や完成アプリの提供を示すものではありません。GAS各教材の設計・実装・検証・公開状況は、[GASアプリ集の一覧](src/gas-app-learning/README.md)と各プロジェクトのREADMEを確認してください。
 
 ## GAS：本人に身近な世界から始める
 
@@ -23,11 +23,11 @@ GAS（Google Apps Script）は、Google Sheetsなどと組み合わせて小さ�
 
 | 誰に・教材 | 本人のゴール | スタートの支援 | AIで広げる方向の例 |
 |---|---|---|---|
-| 遊びからプログラミングに関心を持つ子供：[skill-janken](src/gas/skill-janken/README.md) | 自分でルールを変える楽しさを知り、結果の理由を説明できる | 大人が環境とAI操作を支え、遊ぶ・予想する・小さく変える体験を用意する | 本人の「こう遊びたい」を、大人とAIが条件やルールの変更案にする。本人が試して結果を確かめる |
-| 海外で働くことに関心がある英語学習者：[ai-english-trainer](src/gas/ai-english-trainer/README.md) | 英語学習を改善し、ITを使った成果と自分の担当部分を説明できる | クイズや会話を体験し、回答・評価・履歴の読み方と小さな改善を支援する | 別の学習場面に合う改善案や練習課題をAIと考え、自分の学習へ応用する |
-| 写真日記を身近に感じる人（ナイトワークの女性など）：[ai-photo-diary](src/gas/ai-photo-diary/README.md) | 写真・日記・タグの関係を理解し、自分の記録を整理する力をつける | サンプル画像で記録を体験し、日記とタグの関係を言葉や図で整理する | 分類・検索などの改善案をAIへ伝え、身近な情報整理へ考え方を応用する |
-| 複数キャストを雇う予定の独立希望者・店長：[cast-evaluation-system](src/gas/cast-evaluation-system/README.md) | 自分の店の評価業務を運用し、ルール変更の結果を確認できる | 評価業務の必要性を確かめ、検証用MVP、導入案内、店舗設定の伴走を準備する | 店舗固有の要望を仕様にし、設定で足りない改修をAIへ依頼して検証する |
-| 商取引の仕組みを学びたい人：[ec-shop](src/gas/ec-shop/README.md) | 商品・注文・明細の関係と、確定時点の情報を守る理由を理解する | 設計中の注文シナリオを、サンプルデータと期待結果で学べる形にする | 注文・明細の考え方を別の取引課題へ応用する案をAIと検討する。具体的な対象者像は未確定 |
+| 遊びからプログラミングに関心を持つ子供：[skill-janken](src/gas-app-learning/skill-janken/README.md) | 自分でルールを変える楽しさを知り、結果の理由を説明できる | 大人が環境とAI操作を支え、遊ぶ・予想する・小さく変える体験を用意する | 本人の「こう遊びたい」を、大人とAIが条件やルールの変更案にする。本人が試して結果を確かめる |
+| 海外で働くことに関心がある英語学習者：[ai-english-trainer](src/gas-app-learning/ai-english-trainer/README.md) | 英語学習を改善し、ITを使った成果と自分の担当部分を説明できる | クイズや会話を体験し、回答・評価・履歴の読み方と小さな改善を支援する | 別の学習場面に合う改善案や練習課題をAIと考え、自分の学習へ応用する |
+| 写真日記を身近に感じる人（ナイトワークの女性など）：[ai-photo-diary](src/gas-app-learning/ai-photo-diary/README.md) | 写真・日記・タグの関係を理解し、自分の記録を整理する力をつける | サンプル画像で記録を体験し、日記とタグの関係を言葉や図で整理する | 分類・検索などの改善案をAIへ伝え、身近な情報整理へ考え方を応用する |
+| 複数キャストを雇う予定の独立希望者・店長：[cast-evaluation-system](src/gas-app-learning/cast-evaluation-system/README.md) | 自分の店の評価業務を運用し、ルール変更の結果を確認できる | 評価業務の必要性を確かめ、検証用MVP、導入案内、店舗設定の伴走を準備する | 店舗固有の要望を仕様にし、設定で足りない改修をAIへ依頼して検証する |
+| 商取引の仕組みを学びたい人：[ec-shop](src/gas-app-learning/ec-shop/README.md) | 商品・注文・明細の関係と、確定時点の情報を守る理由を理解する | 設計中の注文シナリオを、サンプルデータと期待結果で学べる形にする | 注文・明細の考え方を別の取引課題へ応用する案をAIと検討する。具体的な対象者像は未確定 |
 
 GAS教材では、**体験 → 理解 → 設定 → 改修 → 検証 → 自立**を指導の枠組みとして使います。どこまで進めるか、何をもって成功とするかは対象者ごとに決めます。子供は楽しさと理解、英語学習者は学習への活用、店長は評価業務を運用できることなどで確認します。保護者の希望と子供本人のゴールも分けて扱います。
 
@@ -43,13 +43,13 @@ AIには、本人の業務の説明を仕様や画面・データの案にする
 
 成功は、本人の用途で主要操作が完了すること、変更した結果を確かめられること、問題が起きたときに復旧・相談できることで確認します。
 
-[Next.js系の戦略メモ](src/nextjs/GASではなくNextjs-Vercel戦略.md)と[Spring Boot系の戦略メモ](src/SpringBoot-render-supabase/GASではなくSpringBoot-render-supabase戦略.md)を参照します。Spring Boot＋Thymeleafによる技術の集約や、GitHub・公開作業の負担を減らす案も検討されています。ファイル名だけで技術採用を確定しません。ホスティングの対応状況・料金・具体コマンドは、採用時に公式情報と実環境で確認します。
+[Webアプリ支援戦略](src/web-app-starter/GASではなくSpringBoot-render-supabase戦略.md)に従い、画面・業務処理はSpring Boot＋Thymeleaf、アプリの実行・公開はRender、DBはSupabaseのPostgreSQLに統一します。画像保存などに必要な場合はSupabase Storageを扱います。Java・SQLの知識やひな形を再利用し、導入・AI改修・検証の支援を蓄積します。具体的な環境設定・料金・運用条件は実装時に確認します。
 
-[GAS資料](src/gas/README.md)の「同じ題材のGAS版とNext.js版を比較する構想」は、教材を作る側の選択肢として保持します。利用者全員の進路にはせず、新しい技術案との整合は採用時に整理します。既存5教材の整備は1題材ずつ進め、一括移植や新規教材の量産、事業化は当面の目的にしません。
+[GAS資料](src/gas-app-learning/README.md)の発展版も同じSpring Boot構成に揃えます。GAS版とSpring Boot版を共通の業務要件・受入条件で比較し、既存5教材を1題材ずつ整備します。基盤を揃えても、本人のゴール・スタート支援・AIで横展開する範囲は取り組みごとに分けます。GAS修了やJava資格の取得をWebアプリ利用の条件にはしません。
 
 ## 資格学習を実習につなげる
 
-[Java・Oracle Bronze × Devin 学習戦略](<src/Java・Oracle Bronze × Devin/Java・Oracle Bronze × Devin 実務直結型学習戦略.md>)は、Java・Oracleを扱う業務システム開発・保守の仕事を目指す人に向けた学習案です。
+[Java・Oracle Bronze × Devin 学習戦略](<src/java-career-learning/Java・Oracle Bronze × Devin 実務直結型学習戦略.md>)は、Java・Oracleを扱う業務システム開発・保守の仕事を目指す人に向けた学習案です。
 
 スタートでは、狙う仕事に必要なJava・DBの基礎へ範囲を絞り、環境準備と最初の実行・修正課題を支援します。Devinには例題、解説、エラー再現、レビューを担わせます。本人が学んだことを次の課題でも使えるようにし、応募時に説明できる成果を残します。
 
@@ -63,11 +63,13 @@ AIには、本人の業務の説明を仕様や画面・データの案にする
 
 資格取得・実習成果・就職の成果はそれぞれ確認します。ITパスポートや基本情報技術者試験も含め、目的や応募先に応じて学習を選びます。試験範囲・受験料・AIサービスの利用条件は、利用時点の公式情報を確認してください。
 
+Web教材の実行DBはSupabaseのPostgreSQLとし、Oracle固有の管理・SQL実習は資格学習側で扱います。Spring Boot段階では共通のWeb教材を活用できます。Linux・AWSは志望する仕事に応じた追加学習であり、Web教材の標準公開先はRenderです。
+
 ## 事務処理からAIを使い始める
 
-[Cursor業務効率化スターター](src/cursor-office-automation-starter/README.md)は、Windows 10/11を使う非エンジニア向けの教材です。主な想定読者はIT人材・SES営業担当者で、業務の具体例とコピーして使えるプロンプトを用意しています。
+[Cursor業務効率化スターター](src/office-automation-starter/README.md)は、Windows 10/11を使う非エンジニア向けの教材です。主な想定読者はIT人材・SES営業担当者で、業務の具体例とコピーして使えるプロンプトを用意しています。
 
-最初は[クイックスタート](src/cursor-office-automation-starter/docs/教育資料/01_クイックスタート.md)から、[事務処理タスク集](src/cursor-office-automation-starter/src/office-task/README.md)の小さな課題を一つ試します。このリポジトリを取得済みの場合は、`src/cursor-office-automation-starter/` をCursorで開きます。
+最初は[クイックスタート](src/office-automation-starter/docs/教育資料/01_クイックスタート.md)から、[事務処理タスク集](src/office-automation-starter/src/office-task/README.md)の小さな課題を一つ試します。このリポジトリを取得済みの場合は、`src/office-automation-starter/` をCursorで開きます。
 
 この教材ではPython・Node.jsの追加インストールを前提にせず、Windowsの機能や手元の業務ツールを使います。ファイル操作はコピーに対して行い、元ファイルは変更・移動・削除しません。無料枠での利用を想定した資料ですが、利用可能な機能や制限は開始時に確認してください。
 
@@ -92,14 +94,13 @@ AIには、本人の業務の説明を仕様や画面・データの案にする
 
 ```text
 src/
-├── gas/                                  # 既存5教材と共通の教育方針
-├── nextjs/                               # Webアプリ支援の技術検討資料
-├── SpringBoot-render-supabase/            # 同じ支援目的に対する別の技術案
-├── Java・Oracle Bronze × Devin/           # 資格と実務をつなぐ学習戦略
-└── cursor-office-automation-starter/      # 事務処理の教材・プロンプト・データ
-docs/                                     # 共通の設計・作業・運用文書
-AGENTS.md                                 # AIエージェント共通の作業ガイド
-CLAUDE.md                                 # Claude Code向けの作業ガイド
+├── gas-app-learning/          # 既存5教材と共通の教育方針
+├── web-app-starter/           # 採用済みWebスタックの支援戦略
+├── java-career-learning/      # 資格と実務をつなぐ学習戦略
+└── office-automation-starter/ # 事務処理の教材・プロンプト・データ
+docs/                         # 共通の設計・作業・運用文書
+AGENTS.md                     # AIエージェント共通の作業ガイド
+CLAUDE.md                     # Claude Code向けの作業ガイド
 ```
 
 このリポジトリは複数の教材と戦略資料をまとめたものです。導入・実行・検証は対象教材のREADMEと作業ガイドから確認してください。ルートの`Makefile`は現状テンプレートで、`make setup`・`make dev`・`make test`などの実処理は未設定です。

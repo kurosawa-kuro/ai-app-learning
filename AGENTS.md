@@ -10,16 +10,16 @@ Codex は作業前にこのファイルを読むため、ここには repo 共�
 - 設計の起点: 誰の、どんなゴールに対して、スタートをどう補助し、AIで何を横展開するかを取り組みごとに定義する。技術別の共通カリキュラムへまとめない。
 - 成果: 本人の目的に合わせて測る。興味・理解、アプリの実利用、事務処理の効率化、資格と実務技能を別々に評価する。AIが作れたことと本人の習得を区別する。
 - 構成: GASの5教材、非エンジニアの自分用・業務用Webアプリ支援、Java・Oracleの資格／実務学習戦略、Cursorによる事務処理教材。各取り組みは独立した入口。
-- 技術: 現行教材はGAS・Google Sheets、Windows・Cursor等。Webアプリの技術はNext.js系に加えてSpring Boot＋Thymeleaf等を検討中。ファイル名を採用決定とみなさない。
+- 技術: 現行教材はGAS・Google Sheets、Windows・Cursor等。WebアプリとGAS教材の発展版はSpring Boot＋Thymeleaf＋Render＋Supabaseに統一する。Next.js＋Vercel案は2026-10-27に廃止。採用方針は確定、アプリ実装・検証は別に管理する。
 
 ## 優先して読む4つの取り組みの資料
 
 | 対象 | 参照先 | 作業に反映する方針 |
 |---|---|---|
-| 身近なアプリからのIT入門 | [src/gas/README.md](src/gas/README.md) | 子供、英語学習者、写真日記の利用者、店舗運営者などでゴールと支援を分ける。6工程はGAS教材内の指導枠組み |
-| 非エンジニアのアプリ実利用 | [Next.js系の戦略メモ](src/nextjs/GASではなくNextjs-Vercel戦略.md)・[Spring Boot系の戦略メモ](src/SpringBoot-render-supabase/GASではなくSpringBoot-render-supabase戦略.md) | 自分用・業務用アプリを使いたい人が対象。技術乱立や環境・公開の負担を減らす。技術案や公開方法の比較は検討材料であり、技術採用・サービス対応を確定情報として転記しない |
-| 資格と実務の接続 | [Java・Oracle Bronze × Devin 学習戦略](<src/Java・Oracle Bronze × Devin/Java・Oracle Bronze × Devin 実務直結型学習戦略.md>) | 末尾の追記を含めて読む。Java Bronzeは優先取得、Oracle Bronzeは学習先行・受験保留・必要時取得。SQL実習と本人の自力修正を重視する |
-| 非エンジニアの業務効率化 | [Cursor業務効率化スターター](src/cursor-office-automation-starter/README.md) | Windows、追加ランタイム不要、元ファイルを保全するコピー操作、単独で使えるプロンプトという教材前提を守る |
+| 身近なアプリからのIT入門 | [src/gas-app-learning/README.md](src/gas-app-learning/README.md) | 子供、英語学習者、写真日記の利用者、店舗運営者などでゴールと支援を分ける。6工程はGAS教材内の指導枠組み |
+| 非エンジニアのアプリ実利用 | [Spring Boot・Render・Supabase戦略](src/web-app-starter/GASではなくSpringBoot-render-supabase戦略.md) | 自分用・業務用アプリを使いたい人が対象。採用済みの共通基盤で、ひな形・導入・公開・AI改修を支援する。サービス条件や検証結果は根拠を確認する |
+| 資格と実務の接続 | [Java・Oracle Bronze × Devin 学習戦略](<src/java-career-learning/Java・Oracle Bronze × Devin 実務直結型学習戦略.md>) | 末尾の追記を含めて読む。Java Bronzeは優先取得、Oracle Bronzeは学習先行・受験保留・必要時取得。SQL実習と本人の自力修正を重視する |
+| 非エンジニアの業務効率化 | [Cursor業務効率化スターター](src/office-automation-starter/README.md) | Windows、追加ランタイム不要、元ファイルを保全するコピー操作、単独で使えるプロンプトという教材前提を守る |
 
 ## 誰のゴール・スタート支援・AIによる横展開
 
@@ -39,7 +39,8 @@ Codex は作業前にこのファイルを読むため、ここには repo 共�
 - 日本語で、身近な例から説明する。専門用語には意味を添え、前提・操作・期待結果・確認方法を示す。
 - 学習者の関心と目的に合わせて入口を選べるようにする。GAS→Web→Javaの共通進路を作らない。保護者の希望と子供本人のゴールも区別する。
 - GASアプリ教材は既存5題材を優先し、新規題材や事業化を自動的に追加しない。この5題材の方針を、既存の事務処理・資格学習ルートを廃止する意味に広げない。
-- GAS資料の2基盤比較案と、Web戦略メモのSpring Boot等の案は採用時に整合を確認する。特定基盤への進級を本人のゴールに置き換えず、5教材の一括移植や構成案だけを理由とした移動を行わない。
+- GAS資料の発展版はSpring Boot＋Thymeleaf＋Render＋Supabaseとし、同じ題材の業務要件・受入条件をGAS版と比較する。5教材の一括移植や構成案だけを理由とした移動を行わない。
+- Web基盤の正本は[採用判断](docs/adr/0001-web-app-stack.md)とWeb支援戦略。Next.js・Vercel案を実装候補へ戻さない。DBはSupabaseのPostgreSQL、画像保存は必要時にStorage。Oracleの資格実習は別に保持し、全員の学習順や成功条件を統一しない。
 - 共通化するのは対象者・目的・支援・AIの役割・成果を明記する観点。学習手順、必要な自力作業、成功条件は取り組みごとに決める。GASの6工程・対面90分案を全ルートへ適用しない。
 - Javaの実務学習では自力のコード・SQL修正を確認する。非エンジニアのアプリ利用や事務処理では目的に必要な操作・判断・結果確認を求め、全員にコード記述・GitHub・資格取得を一律に課さない。
 - 設計案、実装済み、ローカル検証済み、公開済み、実環境受入済みを分ける。構想や過去の試験結果を現在の動作保証にしない。
@@ -53,7 +54,7 @@ Codex は作業前にこのファイルを読むため、ここには repo 共�
 
 1. 対象教材の README、適用される nested `AGENTS.md`、そこから参照する正本を読む。
 2. 対象の `Makefile`・マニフェスト・スクリプトで実際のコマンドと作業ディレクトリを確認する。
-3. 変更内容に応じた検証を実行し、実行結果と未確認事項を記録する。Next.jsやJavaの戦略資料に、未作成の実行手順を補わない。
+3. 変更内容に応じた検証を実行し、実行結果と未確認事項を記録する。Spring BootやJavaの戦略資料に、未作成の実行手順を補わない。
 
 文書のみの変更では差分、相対リンク、参照資料との整合性を確認し、`git diff --check` を実行する。ルートの `make test` の終了コードをアプリのテスト合格とみなさない。
 

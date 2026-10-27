@@ -2,6 +2,16 @@
 
 ## 1. 結論
 
+### 2026-10-27：Web教材との接続方針
+
+リポジトリのWebアプリとGAS教材の発展版は、[採用判断](../../docs/adr/0001-web-app-stack.md)により **Spring Boot＋Thymeleaf＋Render＋Supabase** に統一する。Next.js＋Vercel案は廃止した。[Webアプリ支援戦略](../web-app-starter/GASではなくSpringBoot-render-supabase戦略.md)とJava・SQLの知識、実装例、テストを共有できるようにする。
+
+本ルートの目的は引き続きJava・Oracle系の仕事へ近づくこと。Oracle Databaseの管理・固有SQLの実習は維持し、Web教材のSupabase PostgreSQLと区別する。Spring Boot段階では共通Web教材を活用し、Linux・AWSは志望する仕事に応じた発展学習として扱う。Web教材の標準公開先はRenderとする。
+
+非エンジニア向けWeb支援と、本ルートの資格・実務学習では、スタート支援と成果の確認を分ける。本ルートは自力のJava・SQL修正やテストを重視するが、アプリを使いたい人全員に資格取得を課さない。
+
+### 学習戦略の狙い
+
 **IT未経験者は、ITパスポートや基本情報技術者試験から順番に学習するだけでなく、Java Bronze・Oracle Database BronzeをDevin環境で学び、実務に直結する技術を段階的に習得する戦略が有力である。**
 
 目的は資格取得そのものではない。

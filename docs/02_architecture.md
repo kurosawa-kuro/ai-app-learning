@@ -2,6 +2,12 @@
 
 ## 概要
 
+本リポジトリは複数の教材と学習支援を扱う。WebアプリとGAS教材の発展版の採用構成は、[ADR 0001](adr/0001-web-app-stack.md)によりSpring Boot＋Thymeleaf＋Render＋Supabaseとする。Next.js＋Vercel案は廃止した。
+
+採用構成：ブラウザ → Render上のSpring Boot／Thymeleaf → Supabase PostgreSQL。画像・添付は必要時にSupabase Storageを利用する。詳細は[Webアプリ支援戦略](../src/web-app-starter/GASではなくSpringBoot-render-supabase戦略.md)を参照。これは実装・接続・公開済みの構成図ではない。
+
+既存GAS版、Oracle資格実習、Cursor事務処理教材はそれぞれの構成を維持する。以下の汎用図や未記入欄を、採用決定に代わる具体仕様として扱わない。
+
 ```text
 入力
   -> アプリケーション
