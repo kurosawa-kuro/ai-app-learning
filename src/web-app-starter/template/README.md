@@ -127,7 +127,7 @@ PlaywrightがSpring Bootを起動して終了します。通常の開発サー�
 - Playwright：画像ON・OFFで計4ケース成功。認証なしの画面、1対多、再読込、絞込み、実Storageへの保存・画像表示・削除、不正画像拒否、CSRF拒否に加え、Pico資産のローカル読込み・モバイルメニュー・横はみ出しを検証。
 - テスト用バケットが非公開で、テスト終了後のオブジェクト数が0であることを確認。
 
-実Storageの正常系と、模擬したDB・Storage障害のテストは区別しています。`render` プロファイルのJarはローカルで起動・DB接続を確認済みですが、Render上のDockerビルドと動作は未検証です。
+実Storageの正常系と、模擬したDB・Storage障害のテストは区別しています。2026-10-27、Render（free・Singapore・画像OFF）でDockerビルド・起動、投稿者・投稿の追加・表示・削除、CSRFなしPOSTの拒否、HTTPSへのリダイレクトを確認しました。Render上の画像ONは未検証です。
 
 ## 構成
 
