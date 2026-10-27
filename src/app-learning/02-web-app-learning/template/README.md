@@ -177,7 +177,7 @@ RenderがGitから [Dockerfile](Dockerfile) をビルドします。手元のDoc
 
 1. GitHubへpushします。
 2. Render Dashboardで New → Blueprint を選び、リポジトリと Blueprint Path `src/app-learning/02-web-app-learning/template/render.yaml` を指定します。
-3. 作成時に `DB_HOST`・`SPRING_DATASOURCE_USERNAME`・`SPRING_DATASOURCE_PASSWORD`、公開先専用の `APP_DB_SCHEMA`、環境共通の `APP_ACCESS_PASSWORD` を入力します。公開用と開発用のデータを分けてください。画像を使う場合は `SUPABASE_URL`・`SUPABASE_SECRET_KEY` と専用バケットの設定をDashboardへ追加し、管理画面で画像投稿を許可します。
+3. 作成時に `DB_HOST`・`SPRING_DATASOURCE_USERNAME`・`SPRING_DATASOURCE_PASSWORD`、公開先専用の `APP_DB_SCHEMA`、環境共通の `APP_ACCESS_PASSWORD` を入力します。公開用と開発用のデータを分けてください。Geminiを使う場合は `GEMINI_API_KEY` をRenderの環境変数へ登録します（ローカルの `.env` は配布されません）。画像を使う場合は `SUPABASE_URL`・`SUPABASE_SECRET_KEY` と専用バケットの設定をDashboardへ追加し、管理画面で画像投稿を許可します。
 
 [render.yaml](render.yaml) はfreeプラン・Singapore（Supabase Tokyoに最も近いリージョン）です。Dockerビルドではテストを実行しないため、pushの前に `./run-local.sh -Action test` を通します。現行Blueprintでは `APP_DB_SCHEMA` と `APP_ACCESS_PASSWORD` を明示入力し、production・basicモードで起動します。既存サービスの設定が追随済みかは別途確認してください。
 
@@ -191,7 +191,7 @@ RenderがGitから [Dockerfile](Dockerfile) をビルドします。手元のDoc
 ./scripts/render.sh env       # .env のDB接続情報をRenderへ反映。その後 deploy
 ```
 
-公開URLは誰でもアクセスでき、認証なしで全ユーザー・投稿・機能設定・デフォルトユーザーを変更できます。画像投稿を許可するとStorageへのアップロードもできます。DBもDashboardの管理用接続のままです。限定的な検証以外で公開し続ける前に、認証とアプリ専用DBロールを設計します。
+公開先は環境共通のHTTP Basic認証で保護します。ユーザー名は `APP_ACCESS_USER`（既定starter）、パスワードは `.env` の `APP_ACCESS_PASSWORD` とRender環境変数で管理し、Gitには保存しません。アプリ内のユーザー切替は本人認証ではありません。公開用DBスキーマは `app_template_render` とし、ローカルの投稿とは分離します。
 
 ## 画像の扱い
 
@@ -284,7 +284,7 @@ PlaywrightがSpring Bootを起動して終了します。通常の開発サー�
 3. 「Gemini接続確認を開く」（`/admin/ai`）で設定状態とモデルを確認し、「接続を確認」を押す。
 4. 成功・失敗、確認時刻、使用モデル、所要時間、照会IDを確認する。失敗時は表示された案内に従う。
 
-`GEMINI_MODEL` の初期値は `gemini-3.5-flash-lite`、`GEMINI_TIMEOUT` は `20s`（1〜60秒）。モデル名は `.env`／環境変数で変更できる。`GEMINI_API_KEY` を正とし、旧 `AI_GEMINI_API_KEY` はこの機能では使用しない。キー未設定・設定不備でも通常機能は起動する。公開先でも環境変数を設定する。本変更ではRenderの設定変更・デプロイを行わない。
+`GEMINI_MODEL` の初期値は `gemini-3.5-flash-lite`、`GEMINI_TIMEOUT` は `20s`（1〜60秒）。モデル名は `.env`／環境変数で変更できる。`GEMINI_API_KEY` を正とし、旧 `AI_GEMINI_API_KEY` はこの機能では使用しない。キー未設定・設定不備でも通常機能は起動する。公開先でも環境変数を設定する。公開先にもキーの登録が必要です。今回の公開結果は[Render受入記録](docs/render-deployment.md)を参照してください。
 
 送るのは `Reply with only OK. This is a connection test.` という固定短文だけ。投稿・画像・ユーザー情報は送らない。APIの利用枠を消費し、契約によって料金が発生する。利用金額の表示は既存のダミーのまま。生のAI応答・エラー本文・キーを画面や操作記録へ残さない。
 
@@ -313,3 +313,7 @@ V8で `app_settings.allowed_ai_models` を追加する。既存の投稿・ユ�
 ユーザー利用件数・画像列挙・復旧対象を小さなPort／Adapterに分けました。別教材へ置き換える場所は[内部構造](docs/architecture.md)、DBの所有・制約・保持は[DB整理結果](docs/database-code-refactoring-plan.md)に記載しています。V9とバックアップ形式2を使用します。既存バックアップは作成時の対応コード版で復元してください。
 
 最新の試験結果と対象環境は[完了記録](docs/completion-report.md)を参照してください。上記の過去の件数・確認履歴を最新結果と混同しないでください。
+
+## 最新の公開確認
+
+2026-10-27のRender再デプロイとGemini疎通は[Render受入記録](docs/render-deployment.md)を参照してください。過去の「Render未反映」の記録と区別します。PowerShellの `scripts/render.ps1 env` はDB・アクセス認証に加え、設定済みのGemini・Storage環境変数を反映します。
