@@ -1,0 +1,5 @@
+CREATE TABLE janken_lines(user_id uuid NOT NULL REFERENCES app_users(id),character varchar(10) NOT NULL CHECK(character IN ('hinoko','shizuku','konoha')),line varchar(120) NOT NULL CHECK(length(trim(line))>0),PRIMARY KEY(user_id,character));
+CREATE TABLE janken_rounds(id uuid PRIMARY KEY,user_id uuid NOT NULL REFERENCES app_users(id),character varchar(10) NOT NULL,skill varchar(10) NOT NULL CHECK(skill IN ('win','lose','draw')),hand varchar(10) NOT NULL CHECK(hand IN ('rock','scissors','paper')),cpu varchar(10) NOT NULL CHECK(cpu IN ('rock','scissors','paper')),outcome varchar(10) NOT NULL CHECK(outcome IN ('win','lose','draw')),points integer NOT NULL CHECK(points BETWEEN 1 AND 3),line varchar(120) NOT NULL,created_at timestamptz NOT NULL DEFAULT now());
+CREATE INDEX janken_rounds_user_created ON janken_rounds(user_id,created_at DESC,id);
+ALTER TABLE janken_lines ENABLE ROW LEVEL SECURITY;ALTER TABLE janken_rounds ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON janken_lines,janken_rounds FROM anon,authenticated;

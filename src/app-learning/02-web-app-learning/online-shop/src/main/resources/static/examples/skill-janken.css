@@ -1,0 +1,14 @@
+.game-setup { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.game-hands { margin: 0; padding: 0; border: 0; }
+.game-hand-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.game-hands legend { font-weight: 650; margin-bottom: 1rem; }
+.game-hands label { display: grid; width: 100%; justify-items: center; gap: .5rem; padding: 1rem .5rem; border: 1px solid var(--admin-border-strong); border-radius: .75rem; cursor: pointer; margin: 0; }
+.game-hands label:has(:checked) { border-color: var(--admin-accent-strong); background: var(--admin-accent-soft); }
+.game-hands label:has(:focus-visible) { outline: 2px solid var(--admin-accent-strong); outline-offset: 3px; }
+.game-hands input { margin: 0; }
+.game-symbol { font-size: 2.4rem; }
+.game-result { text-align: center; padding: 1.5rem; border: 1px solid var(--admin-accent-strong); border-radius: .75rem; }
+.game-result button { width: auto; }
+.game-score { text-align: center; }
+.game-score .ui-help { display: block; }
+@media (max-width: 768px) { .game-hand-options { gap: .5rem; } .game-setup { grid-template-columns: 1fr; gap: 1rem; } }

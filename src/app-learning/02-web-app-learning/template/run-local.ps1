@@ -1,6 +1,7 @@
 ﻿param(
     [ValidateSet('test', 'run', 'stop', 'package', 'seed-preview', 'seed', 'seed-reset', 'seed-cleanup', 'seed-images')]
     [string]$Action = 'run',
+    [string]$SecretsFile,
     [switch]$Images,
     [ValidateRange(1, 65535)]
     [int]$Port = 8080
@@ -13,10 +14,19 @@ if ($Action -eq 'stop') {
 }
 . (Join-Path $PSScriptRoot 'scripts/Read-DotEnv.ps1')
 $settings = Read-DotEnv -Path (Join-Path $PSScriptRoot '.env')
+# Optional shared credentials are read into this process, never copied to app files.
+if ($SecretsFile) {
+    $shared=Read-DotEnv -Path $SecretsFile
+    foreach($name in @('DB_HOST','DB_PORT','DB_NAME','SPRING_DATASOURCE_USERNAME','SPRING_DATASOURCE_PASSWORD','SUPABASE_URL','SUPABASE_SECRET_KEY','GEMINI_API_KEY')) {
+        if(-not $settings.ContainsKey($name) -and $shared.ContainsKey($name)) { $settings[$name]=$shared[$name] }
+    }
+    $shared.Clear()
+}
+
 $allowed = @('DB_HOST', 'DB_PORT', 'DB_NAME', 'SPRING_DATASOURCE_URL',
     'SPRING_DATASOURCE_USERNAME', 'SPRING_DATASOURCE_PASSWORD', 'SUPABASE_URL',
     'SUPABASE_SECRET_KEY', 'SUPABASE_STORAGE_BUCKET', 'APP_IMAGES_ENABLED',
-    'APP_DB_SCHEMA', 'SERVER_PORT', 'APP_ENVIRONMENT', 'AI_GEMINI_API_KEY', 'GEMINI_API_KEY', 'GEMINI_MODEL', 'GEMINI_TIMEOUT')
+    'APP_DB_SCHEMA', 'SERVER_PORT', 'APP_ENVIRONMENT', 'AI_GEMINI_API_KEY', 'GEMINI_API_KEY', 'GEMINI_MODEL', 'GEMINI_TIMEOUT', 'APP_AI_MODE')
 # Read by scripts/render.ps1 only; never passed to the app.
 $deployOnly = @('RENDER_API_KEY', 'RENDER_DB_SCHEMA')
 foreach ($name in @($settings.Keys)) {

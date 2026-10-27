@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Pico Admin - ニュース</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="../../images/favicons/news.svg">
+  <link rel="stylesheet" href="../../css/pico.css">
+  <link rel="stylesheet" href="../../css/admin-theme.css">
+  <link rel="stylesheet" href="../../css/admin-layout.css">
+  <link rel="stylesheet" href="../../css/admin-components.css">
+</head>
+<body class="admin-body" data-sidebar-open="false">
+  <button class="admin-mobile-toggle secondary" type="button" data-sidebar-toggle>メニュー</button>
+  <div class="admin-sidebar-backdrop" data-sidebar-backdrop></div>
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar__inner">
+        <div class="admin-brand">
+          <div class="admin-brand__mark">P</div>
+          <div>
+            <strong>Pico Admin</strong>
+            <div class="admin-brand__eyebrow">Dark Console</div>
+          </div>
+          <button class="secondary" type="button" data-sidebar-close>閉じる</button>
+        </div>
+        <nav class="admin-nav">
+          <details open>
+            <summary>ダッシュボード</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="../../index.html">概要</a></li>
+              <li><a class="admin-nav-item" href="./analytics.html">分析</a></li>
+            </ul>
+          </details>
+          <details open>
+            <summary>運用</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="./customers.html">顧客</a></li>
+              <li><a class="admin-nav-item" href="./orders.html">受注</a></li>
+              <li><a class="admin-nav-item" aria-current="page" href="./news.html">ニュース</a></li>
+              <li><a class="admin-nav-item" href="./todo.html">Todo</a></li>
+              <li><a class="admin-nav-item" href="./ajax.html">非同期サンプル</a></li>
+            </ul>
+          </details>
+          <details>
+            <summary>システム</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="./settings.html">設定</a></li>
+            </ul>
+          </details>
+        </nav>
+      </div>
+    </aside>
+    <main class="admin-main">
+      <header class="admin-header">
+        <div>
+          <div class="admin-eyebrow">ニュース運用</div>
+          <h1>ニュース</h1>
+          <p>公開状況、配信先、優先度をデスクトップ前提で監視するニュース管理画面です。</p>
+        </div>
+        <div class="admin-header__actions">
+          <div class="admin-search">
+            <input type="search" placeholder="記事ID、見出し、担当者で検索">
+          </div>
+          <button type="button">記事を作成</button>
+          <div class="admin-header-presence" aria-label="ログインユーザー">
+            <button class="secondary admin-icon-button" type="button" aria-label="通知">
+              <span aria-hidden="true">●</span>
+              <span class="admin-icon-button__badge"></span>
+            </button>
+            <button class="secondary admin-user-chip" type="button" aria-label="ユーザーメニュー">
+              <span class="admin-avatar admin-avatar--image" aria-hidden="true">
+                <img src="../../images/admin-user-male-30s.png" alt="">
+              </span>
+              <span class="admin-user__meta">
+                <strong>中村 恒一</strong>
+                <small>管理者 / ログイン中</small>
+              </span>
+              <span class="admin-user-chip__caret" aria-hidden="true">▾</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <section class="admin-content">
+        <div class="admin-grid admin-grid--4">
+          <article class="admin-card admin-card--compact admin-card--dense">
+            <div class="admin-card__body admin-kpi admin-kpi--dense">
+              <span class="admin-eyebrow">公開待ち</span>
+              <strong class="admin-kpi__value">18</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--neutral">本日</span><span>編集中または承認待ち</span></div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact admin-card--dense">
+            <div class="admin-card__body admin-kpi admin-kpi--dense">
+              <span class="admin-eyebrow">公開中</span>
+              <strong class="admin-kpi__value">64</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--lime">順調</span><span>主要面へ正常配信</span></div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact admin-card--dense">
+            <div class="admin-card__body admin-kpi admin-kpi--dense">
+              <span class="admin-eyebrow">要確認</span>
+              <strong class="admin-kpi__value">5</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--pink">確認要</span><span>差し替えまたは事実確認</span></div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact admin-card--dense">
+            <div class="admin-card__body admin-kpi admin-kpi--dense">
+              <span class="admin-eyebrow">平均反映時間</span>
+              <strong class="admin-kpi__value">12 分</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--neutral">安定</span><span>配信基盤 SLA 内</span></div>
+            </div>
+          </article>
+        </div>
+
+        <article class="admin-card">
+          <header class="admin-toolbar">
+            <div class="admin-toolbar__group">
+              <div>
+                <div class="admin-eyebrow">記事一覧</div>
+                <h2>直近の更新</h2>
+              </div>
+              <div class="admin-segmented">
+                <a aria-current="page" href="./news.html">全体</a>
+                <a href="#0">公開中</a>
+                <a href="#0">要確認</a>
+              </div>
+            </div>
+            <div class="admin-toolbar__group">
+              <span class="admin-badge admin-badge--neutral">5 分前更新</span>
+              <button class="secondary" type="button">出力</button>
+            </div>
+          </header>
+          <div class="admin-card__body">
+            <div class="admin-news-feed">
+              <article class="admin-news-card">
+                <div class="admin-news-card__meta">
+                  <div class="admin-news-card__tags">
+                    <span class="admin-badge admin-badge--lime">公開中</span>
+                    <span class="admin-badge admin-badge--neutral">トップ / 経済</span>
+                    <span class="admin-badge admin-badge--neutral">佐藤 彩夏</span>
+                  </div>
+                  <a class="admin-news-card__action" href="#0" aria-label="決算速報を開く">詳細</a>
+                </div>
+                <div class="admin-news-card__thumb admin-news-card__thumb--economy">
+                  <span class="admin-news-card__eyebrow">#NEWS-1084</span>
+                  <strong>決算速報</strong>
+                </div>
+                <div class="admin-news-card__content">
+                  <h3>決算速報: SaaS 市況の見通し</h3>
+                  <p>主要 SaaS 企業の今期着地見込みと、国内 B2B 投資温度感を整理した速報です。</p>
+                  <small>10:24 JST</small>
+                </div>
+              </article>
+
+              <article class="admin-news-card">
+                <div class="admin-news-card__meta">
+                  <div class="admin-news-card__tags">
+                    <span class="admin-badge admin-badge--neutral">承認待ち</span>
+                    <span class="admin-badge admin-badge--neutral">特集 / AI</span>
+                    <span class="admin-badge admin-badge--neutral">田中 恒一</span>
+                  </div>
+                  <a class="admin-news-card__action" href="#0" aria-label="生成AI特集を開く">詳細</a>
+                </div>
+                <div class="admin-news-card__thumb admin-news-card__thumb--ai">
+                  <span class="admin-news-card__eyebrow">#NEWS-1083</span>
+                  <strong>生成AI 特集</strong>
+                </div>
+                <div class="admin-news-card__content">
+                  <h3>生成AI 特集: 国内導入事例を更新</h3>
+                  <p>業務適用が進む 3 業界の事例差分を追記し、図版差し替え待ちの状態です。</p>
+                  <small>10:02 JST</small>
+                </div>
+              </article>
+
+              <article class="admin-news-card">
+                <div class="admin-news-card__meta">
+                  <div class="admin-news-card__tags">
+                    <span class="admin-badge admin-badge--pink">確認要</span>
+                    <span class="admin-badge admin-badge--pink">重要告知</span>
+                    <span class="admin-badge admin-badge--neutral">星野 美奈</span>
+                  </div>
+                  <a class="admin-news-card__action" href="#0" aria-label="障害情報を開く">詳細</a>
+                </div>
+                <div class="admin-news-card__thumb admin-news-card__thumb--alert">
+                  <span class="admin-news-card__eyebrow">#NEWS-1082</span>
+                  <strong>障害情報</strong>
+                </div>
+                <div class="admin-news-card__content">
+                  <h3>障害情報: 一部通知遅延のお知らせ</h3>
+                  <p>通知遅延の事象更新が入り、公開済み本文の再確認と再配信判断が必要です。</p>
+                  <small>09:41 JST</small>
+                </div>
+              </article>
+
+              <article class="admin-news-card">
+                <div class="admin-news-card__meta">
+                  <div class="admin-news-card__tags">
+                    <span class="admin-badge admin-badge--lime">公開中</span>
+                    <span class="admin-badge admin-badge--neutral">プロダクト</span>
+                    <span class="admin-badge admin-badge--neutral">高橋 未来</span>
+                  </div>
+                  <a class="admin-news-card__action" href="#0" aria-label="新機能紹介を開く">詳細</a>
+                </div>
+                <div class="admin-news-card__thumb admin-news-card__thumb--product">
+                  <span class="admin-news-card__eyebrow">#NEWS-1081</span>
+                  <strong>新機能紹介</strong>
+                </div>
+                <div class="admin-news-card__content">
+                  <h3>新機能紹介: ダッシュボード改善まとめ</h3>
+                  <p>今回の UI 更新点を 1 記事へ集約し、利用部門向けに配信している記事です。</p>
+                  <small>09:08 JST</small>
+                </div>
+              </article>
+
+              <article class="admin-news-card">
+                <div class="admin-news-card__meta">
+                  <div class="admin-news-card__tags">
+                    <span class="admin-badge admin-badge--neutral">公開待ち</span>
+                    <span class="admin-badge admin-badge--neutral">市場 / 海外</span>
+                    <span class="admin-badge admin-badge--neutral">森 健介</span>
+                  </div>
+                  <a class="admin-news-card__action" href="#0" aria-label="海外市場記事を開く">詳細</a>
+                </div>
+                <div class="admin-news-card__thumb admin-news-card__thumb--global">
+                  <span class="admin-news-card__eyebrow">#NEWS-1080</span>
+                  <strong>海外市場</strong>
+                </div>
+                <div class="admin-news-card__content">
+                  <h3>海外市場: 米国決算ウィークの焦点整理</h3>
+                  <p>注目 5 社の決算日程と論点を整理した下書きで、見出し最終調整前です。</p>
+                  <small>08:34 JST</small>
+                </div>
+              </article>
+
+              <article class="admin-news-card">
+                <div class="admin-news-card__meta">
+                  <div class="admin-news-card__tags">
+                    <span class="admin-badge admin-badge--lime">公開中</span>
+                    <span class="admin-badge admin-badge--neutral">特集 / 働き方</span>
+                    <span class="admin-badge admin-badge--neutral">中村 玲</span>
+                  </div>
+                  <a class="admin-news-card__action" href="#0" aria-label="働き方特集を開く">詳細</a>
+                </div>
+                <div class="admin-news-card__thumb admin-news-card__thumb--feature">
+                  <span class="admin-news-card__eyebrow">#NEWS-1079</span>
+                  <strong>特集記事</strong>
+                </div>
+                <div class="admin-news-card__content">
+                  <h3>特集: 現場業務で進む自動化の実例集</h3>
+                  <p>国内 4 社の運用改善事例を掲載中で、SNS 再掲用の短縮版も連携済みです。</p>
+                  <small>07:58 JST</small>
+                </div>
+              </article>
+            </div>
+          </div>
+          <footer class="admin-pager">
+            <div class="admin-pager__summary">1 - 6 / 64 件を表示</div>
+            <nav class="admin-pager__nav" aria-label="記事一覧のページ切替">
+              <a class="admin-pager__button" href="#0" aria-label="前のページ">前へ</a>
+              <a class="admin-pager__button" href="#0" aria-current="page">1</a>
+              <a class="admin-pager__button" href="#0">2</a>
+              <a class="admin-pager__button" href="#0">3</a>
+              <span class="admin-pager__ellipsis" aria-hidden="true">...</span>
+              <a class="admin-pager__button" href="#0">11</a>
+              <a class="admin-pager__button" href="#0" aria-label="次のページ">次へ</a>
+            </nav>
+          </footer>
+        </article>
+
+        <div class="admin-grid admin-grid--2">
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <div class="admin-eyebrow">例外対応</div>
+                <h2>対応が必要な記事</h2>
+              </div>
+            </header>
+            <div class="admin-card__body">
+              <ul class="admin-list admin-list--dense">
+                <li>
+                  <div class="admin-metric">
+                    <strong>#NEWS-1082</strong>
+                    <span>障害告知の本文に事象更新が入り、再確認待ちです。</span>
+                  </div>
+                  <span class="admin-badge admin-badge--pink">重要</span>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>#NEWS-1077</strong>
+                    <span>配信先のカテゴリ設定にずれがあり、トップ面への再反映が必要です。</span>
+                  </div>
+                  <span class="admin-badge admin-badge--pink">配信</span>
+                </li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <div class="admin-eyebrow">運用メモ</div>
+                <h2>公開監視の方針</h2>
+              </div>
+            </header>
+            <div class="admin-card__body">
+              <div class="admin-note admin-note--neutral">
+                <strong>ニュース画面は記事、公開状態、優先度を同じテーブルで監視する構成です。</strong>
+                <div>公開判断と差し替え対応を 1 画面に寄せ、デスクトップでの横並び確認を優先しています。</div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="../../js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="layout(kind, heading, actions, content)"
+     class="ui-page" th:classappend="${'ui-page--' + kind}">
+  <header th:replace="~{ui/page :: pageHeader(${heading}, ${actions})}"></header>
+  <section class="admin-content">
+    <div th:replace="~{ui/feedback :: messages}"></div>
+    <div th:replace="${content}"></div>
+  </section>
+</div>
+<header xmlns:th="http://www.thymeleaf.org" th:fragment="pageHeader(heading, actions)" class="ui-page-header">
+  <div th:replace="${heading}"></div><div class="ui-page-actions" th:insert="${actions}"></div>
+</header>

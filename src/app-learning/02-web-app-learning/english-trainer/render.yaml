@@ -1,0 +1,33 @@
+# Render Blueprint. When creating it, set Blueprint Path to src/app-learning/02-web-app-learning/english-trainer/render.yaml.
+# Docker paths are relative to rootDir.
+services:
+  - type: web
+    name: learning-english-trainer
+    runtime: docker
+    plan: free
+    region: singapore
+    rootDir: src/app-learning/02-web-app-learning/english-trainer
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    envVars:
+      - key: APP_ENVIRONMENT
+        value: production
+      - key: APP_DB_SCHEMA
+        sync: false
+      # Entered once in the Dashboard at Blueprint creation; never committed.
+      - key: DB_HOST
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite
+      - key: GEMINI_TIMEOUT
+        value: 20s
+      # To enable images, also add SUPABASE_URL and SUPABASE_SECRET_KEY in the Dashboard.
+      - key: APP_IMAGES_ENABLED
+        value: "false"

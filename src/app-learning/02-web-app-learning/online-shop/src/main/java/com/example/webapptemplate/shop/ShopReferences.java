@@ -1,0 +1,3 @@
+package com.example.webapptemplate.shop;
+import com.example.webapptemplate.platform.UserReferences;import java.util.*;import org.springframework.jdbc.core.simple.JdbcClient;import org.springframework.stereotype.Repository;
+@Repository public class ShopReferences implements UserReferences {private final JdbcClient db;public ShopReferences(JdbcClient db){this.db=db;}public long count(UUID user){return db.sql("select count(*) from shop_orders where user_id=:id").param("id",user).query(Long.class).single();}public Map<UUID,Long> counts(){var result=new HashMap<UUID,Long>();db.sql("select user_id,count(*) from shop_orders group by user_id").query((r,n)->{result.put(r.getObject(1,UUID.class),r.getLong(2));return 1;}).list();return result;}}

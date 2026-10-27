@@ -1,0 +1,12 @@
+<article xmlns:th="http://www.thymeleaf.org" th:fragment="list(toolbar, entries, empty, hasEntries)" class="admin-card ui-list">
+  <header th:insert="${toolbar}"></header>
+  <div class="admin-table-wrap" th:if="${hasEntries}" th:insert="${entries}"></div>
+  <div th:unless="${hasEntries}" th:insert="${empty}"></div>
+</article>
+<article xmlns:th="http://www.thymeleaf.org" th:fragment="detail(body, meta, actions)" class="admin-card ui-detail">
+  <div class="admin-card__body">
+    <div class="ui-detail-meta" th:insert="${meta}"></div>
+    <div class="ui-prose" th:insert="${body}"></div>
+    <footer class="ui-detail-actions" th:insert="${actions}"></footer>
+  </div>
+</article>

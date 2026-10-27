@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Pico Admin - 分析</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="../../images/favicons/admin-dashboard.svg">
+  <link rel="stylesheet" href="../../css/pico.css">
+  <link rel="stylesheet" href="../../css/admin-theme.css">
+  <link rel="stylesheet" href="../../css/admin-layout.css">
+  <link rel="stylesheet" href="../../css/admin-components.css">
+</head>
+<body class="admin-body" data-sidebar-open="false">
+  <button class="admin-mobile-toggle secondary" type="button" data-sidebar-toggle>メニュー</button>
+  <div class="admin-sidebar-backdrop" data-sidebar-backdrop></div>
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar__inner">
+        <div class="admin-brand">
+          <div class="admin-brand__mark">P</div>
+          <div>
+            <strong>Pico Admin</strong>
+            <div class="admin-brand__eyebrow">Dark Console</div>
+          </div>
+          <button class="secondary" type="button" data-sidebar-close>閉じる</button>
+        </div>
+        <nav class="admin-nav">
+          <details open>
+            <summary>ダッシュボード</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="../../index.html">概要</a></li>
+              <li><a class="admin-nav-item" aria-current="page" href="./analytics.html">分析</a></li>
+            </ul>
+          </details>
+          <details open>
+            <summary>運用</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="./customers.html">顧客</a></li>
+              <li><a class="admin-nav-item" href="./orders.html">受注</a></li>
+              <li><a class="admin-nav-item" href="./news.html">ニュース</a></li>
+              <li><a class="admin-nav-item" href="./todo.html">Todo</a></li>
+              <li><a class="admin-nav-item" href="./ajax.html">非同期サンプル</a></li>
+            </ul>
+          </details>
+          <details>
+            <summary>システム</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="./settings.html">設定</a></li>
+            </ul>
+          </details>
+        </nav>
+      </div>
+    </aside>
+    <main class="admin-main">
+      <header class="admin-header">
+        <div>
+          <div class="admin-eyebrow">集客分析</div>
+          <h1>分析</h1>
+          <p>流入構成、CV、チャネル別の温度差をライム主軸で整理した集計面です。</p>
+        </div>
+        <div class="admin-header__actions">
+          <div class="admin-segmented">
+            <a href="../../index.html">24h</a>
+            <a aria-current="page" href="./analytics.html">7d</a>
+            <a href="./customers.html">30d</a>
+          </div>
+          <button type="button">CSV 出力</button>
+          <div class="admin-header-presence" aria-label="ログインユーザー">
+            <button class="secondary admin-icon-button" type="button" aria-label="通知">
+              <span aria-hidden="true">●</span>
+              <span class="admin-icon-button__badge"></span>
+            </button>
+            <button class="secondary admin-user-chip" type="button" aria-label="ユーザーメニュー">
+              <span class="admin-avatar admin-avatar--image" aria-hidden="true">
+                <img src="../../images/admin-user-male-30s.png" alt="">
+              </span>
+              <span class="admin-user__meta">
+                <strong>中村 恒一</strong>
+                <small>管理者 / ログイン中</small>
+              </span>
+              <span class="admin-user-chip__caret" aria-hidden="true">▾</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <section class="admin-content">
+        <div class="admin-grid admin-grid--4">
+          <article class="admin-card admin-card--compact">
+            <div class="admin-card__body admin-kpi">
+              <span class="admin-eyebrow">訪問ユーザー</span>
+              <strong class="admin-kpi__value">182k</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--lime">+11%</span><span>前週比</span></div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact">
+            <div class="admin-card__body admin-kpi">
+              <span class="admin-eyebrow">見込み転換率</span>
+              <strong class="admin-kpi__value">8.4%</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--lime">良好</span><span>広告流入が回復</span></div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact">
+            <div class="admin-card__body admin-kpi">
+              <span class="admin-eyebrow">登録単価</span>
+              <strong class="admin-kpi__value">2,920 円</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--pink">+6%</span><span>クリエイティブ疲労</span></div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact">
+            <div class="admin-card__body admin-kpi">
+              <span class="admin-eyebrow">離脱リスク</span>
+              <strong class="admin-kpi__value">31%</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge">LP 点検</span><span>ファーストビュー B 案</span></div>
+            </div>
+          </article>
+        </div>
+
+        <div class="admin-grid admin-grid--sidebar">
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <h2>流入</h2>
+              </div>
+              <span class="admin-badge admin-badge--neutral">3 分前更新</span>
+            </header>
+            <div class="admin-card__body">
+              <div class="admin-chart admin-chart--compact">
+                <canvas id="analytics-traffic-trend"></canvas>
+              </div>
+            </div>
+          </article>
+
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <h2>チャネル</h2>
+              </div>
+            </header>
+            <div class="admin-card__body">
+              <div class="admin-chart admin-chart--compact admin-chart--short">
+                <canvas id="analytics-channel-share"></canvas>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="admin-grid admin-grid--2">
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <h2>ファネル</h2>
+              </div>
+            </header>
+            <div class="admin-card__body">
+              <div class="admin-chart admin-chart--compact admin-chart--short">
+                <canvas id="analytics-funnel-trend"></canvas>
+              </div>
+            </div>
+          </article>
+
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <h2>CPA / 回収</h2>
+              </div>
+            </header>
+            <div class="admin-card__body">
+              <div class="admin-chart admin-chart--compact admin-chart--short">
+                <canvas id="analytics-cost-efficiency"></canvas>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="admin-grid admin-grid--2">
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <div class="admin-eyebrow">主要チャネル</div>
+                <h2>チャネル診断</h2>
+              </div>
+            </header>
+            <div class="admin-card__body">
+              <ul class="admin-list">
+                <li>
+                  <div class="admin-metric">
+                    <strong>自然検索</strong>
+                    <span>料金比較系の意図クラスターが最も強く伸びています。</span>
+                  </div>
+                  <span class="admin-badge admin-badge--neutral">42%</span>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>SNS 広告</strong>
+                    <span>CTR は安定していますが、モバイルで登録完了率が鈍化しています。</span>
+                  </div>
+                  <span class="admin-badge admin-badge--pink">28%</span>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>提携流入</strong>
+                    <span>流入品質は最良ですが、絶対量はまだ小さい状態です。</span>
+                  </div>
+                  <span class="admin-badge admin-badge--neutral">18%</span>
+                </li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <div class="admin-eyebrow">次アクション</div>
+                <h2>グロース対応待ち</h2>
+              </div>
+            </header>
+            <div class="admin-card__body">
+              <div class="admin-note admin-note--neutral">
+                <strong>広告 LP はコントラスト設計をもう一段締める必要があります。</strong>
+                <div>CTA、入力要約、信頼補強帯を次回配信前にダーク固定トークンへ揃えます。</div>
+              </div>
+              <ul class="admin-list">
+                <li>
+                  <div class="admin-metric">
+                    <strong>訴求見出しの更新</strong>
+                    <span>利点の箇条書きを短い一文訴求へ切り替えます。</span>
+                  </div>
+                  <small>担当: グロース</small>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>流入タグ整理</strong>
+                    <span>週次レポート前に提携 UTM 値を正規化します。</span>
+                  </div>
+                  <small>担当: データ運用</small>
+                </li>
+              </ul>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="../../js/admin.js"></script>
+  <script src="../../js/vendors/chart.js"></script>
+  <script src="../../js/admin-charts.js"></script>
+</body>
+</html>

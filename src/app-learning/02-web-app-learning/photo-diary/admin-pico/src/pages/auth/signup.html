@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Pico Admin - 新規登録</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="../../images/favicons/admin-dashboard.svg">
+  <link rel="stylesheet" href="../../css/pico.css">
+  <link rel="stylesheet" href="../../css/admin-theme.css">
+  <link rel="stylesheet" href="../../css/admin-layout.css">
+  <link rel="stylesheet" href="../../css/admin-components.css">
+</head>
+<body>
+  <main class="admin-auth">
+    <section class="admin-auth__panel">
+      <article class="admin-card admin-auth-card">
+        <header>
+          <div class="admin-eyebrow">ワークスペース参加</div>
+          <h1>アカウント作成</h1>
+          <p>招待制の管理画面を想定した最小構成の登録フォームです。</p>
+        </header>
+        <div class="admin-card__body">
+          <form class="admin-stack">
+            <label>
+              メールアドレス
+              <input type="email" placeholder="name@example.com">
+            </label>
+            <label>
+              氏名
+              <input type="text" placeholder="Ayaka Sato">
+            </label>
+            <label>
+              権限
+              <select>
+                <option>管理者</option>
+                <option>分析担当</option>
+                <option>サポート</option>
+              </select>
+            </label>
+            <label>
+              パスワード
+              <input type="password" placeholder="安全なパスワードを設定">
+            </label>
+            <div class="admin-auth-links">
+              <small>通知は運用に必要な内容だけ配信されます。</small>
+              <button type="button" onclick="location.href='../../index.html'">アカウント作成</button>
+            </div>
+          </form>
+        </div>
+        <footer>
+          <small>すでにアカウントをお持ちの場合は <a href="./signin.html">ログイン</a></small>
+        </footer>
+      </article>
+    </section>
+    <aside class="admin-auth__aside">
+      <div class="admin-stack">
+        <div class="admin-brand">
+          <div class="admin-brand__mark">P</div>
+          <div>
+            <strong>Pico Admin</strong>
+            <div class="admin-brand__eyebrow">Dark Console</div>
+          </div>
+        </div>
+        <h2>配色と密度を、最初から運用向けに。</h2>
+        <p>標準要素を優先しつつ、`admin-*` クラスはカード、レイアウト、状態表示だけに絞っています。</p>
+        <span class="admin-badge">Pico コンポーネント</span>
+      </div>
+    </aside>
+  </main>
+</body>
+</html>

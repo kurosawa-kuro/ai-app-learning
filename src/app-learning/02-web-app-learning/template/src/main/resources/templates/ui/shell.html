@@ -50,6 +50,7 @@
     </div>
   </aside>
   <main class="admin-main" id="main" tabindex="-1">
+    <p th:if="${aiDemo}" class="ui-notice" role="status">デモ：AIは固定応答です。外部AIへ送信しません。</p>
     <div th:replace="~{ui/page :: layout(${kind}, ${heading}, ${actions}, ${content})}"></div>
   </main>
 </div>

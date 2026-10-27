@@ -13,7 +13,12 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @Configuration
 @EnableConfigurationProperties(GeminiProperties.class)
 class AiConfiguration {
-    @Bean GeminiGateway geminiGateway(GeminiProperties config) { return new GeminiHttpGateway(config); }
+    @Bean GeminiGateway geminiGateway(GeminiProperties config,@org.springframework.beans.factory.annotation.Value("${app.ai.mode:live}") String mode) {
+        return switch(mode) {case "live" -> new GeminiHttpGateway(config);case "demo" -> new com.example.webapptemplate.ai.internal.adapter.gemini.DemoGeminiGateway(config.getModel());default -> throw new IllegalArgumentException("APP_AI_MODE must be live or demo");};
+    }
+    @Bean com.example.webapptemplate.ai.AiText aiText(GeminiGateway gateway,FeaturePolicy policy,com.example.webapptemplate.platform.ImageCodec codec) {
+        return new com.example.webapptemplate.ai.internal.application.GenerateText(gateway,policy,codec);
+    }
     @Bean AiConnectivity aiConnectivity(GeminiGateway gateway, FeaturePolicy policy) {
         return new CheckGemini(gateway,policy);
     }

@@ -1,0 +1,19 @@
+{
+  "name": "pico-admin-template",
+  "description": "Admin template built with Pico CSS and a dark-only desktop-first theme",
+  "version": "1.0.0",
+  "homepage": "https://cruip.com",
+  "author": "Pasquale Vitiello",
+  "license": "https://cruip.com/terms/",
+  "scripts": {
+    "build": "echo 'Static Pico pages do not require a CSS build.'",
+    "e2e": "playwright test",
+    "e2e:headed": "playwright test --headed",
+    "e2e:ui": "playwright test --ui",
+    "e2e:codegen": "playwright codegen http://127.0.0.1:4173/index.html"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.2",
+    "chartjs-plugin-gradient": "^0.6.1"
+  }
+}

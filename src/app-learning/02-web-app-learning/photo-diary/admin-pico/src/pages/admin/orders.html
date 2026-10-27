@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Pico Admin - 受注</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="../../images/favicons/admin-dashboard.svg">
+  <link rel="stylesheet" href="../../css/pico.css">
+  <link rel="stylesheet" href="../../css/admin-theme.css">
+  <link rel="stylesheet" href="../../css/admin-layout.css">
+  <link rel="stylesheet" href="../../css/admin-components.css">
+</head>
+<body class="admin-body" data-sidebar-open="false">
+  <button class="admin-mobile-toggle secondary" type="button" data-sidebar-toggle>メニュー</button>
+  <div class="admin-sidebar-backdrop" data-sidebar-backdrop></div>
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar__inner">
+        <div class="admin-brand">
+          <div class="admin-brand__mark">P</div>
+          <div>
+            <strong>Pico Admin</strong>
+            <div class="admin-brand__eyebrow">Dark Console</div>
+          </div>
+          <button class="secondary" type="button" data-sidebar-close>閉じる</button>
+        </div>
+        <nav class="admin-nav">
+          <details open>
+            <summary>ダッシュボード</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="../../index.html">概要</a></li>
+              <li><a class="admin-nav-item" href="./analytics.html">分析</a></li>
+            </ul>
+          </details>
+          <details open>
+            <summary>運用</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="./customers.html">顧客</a></li>
+              <li><a class="admin-nav-item" aria-current="page" href="./orders.html">受注</a></li>
+              <li><a class="admin-nav-item" href="./news.html">ニュース</a></li>
+              <li><a class="admin-nav-item" href="./todo.html">Todo</a></li>
+              <li><a class="admin-nav-item" href="./ajax.html">非同期サンプル</a></li>
+            </ul>
+          </details>
+          <details>
+            <summary>システム</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="./settings.html">設定</a></li>
+            </ul>
+          </details>
+        </nav>
+      </div>
+    </aside>
+    <main class="admin-main">
+      <header class="admin-header">
+        <div>
+          <div class="admin-eyebrow">受注運用</div>
+          <h1>受注</h1>
+          <p>受注処理、支払い状態、出荷優先度をデスクトップ前提で確認する管理画面です。</p>
+        </div>
+        <div class="admin-header__actions">
+          <div class="admin-search">
+            <input type="search" placeholder="受注番号、顧客名、SKU で検索">
+          </div>
+          <button type="button">受注を作成</button>
+          <div class="admin-header-presence" aria-label="ログインユーザー">
+            <button class="secondary admin-icon-button" type="button" aria-label="通知">
+              <span aria-hidden="true">●</span>
+              <span class="admin-icon-button__badge"></span>
+            </button>
+            <button class="secondary admin-user-chip" type="button" aria-label="ユーザーメニュー">
+              <span class="admin-avatar admin-avatar--image" aria-hidden="true">
+                <img src="../../images/admin-user-male-30s.png" alt="">
+              </span>
+              <span class="admin-user__meta">
+                <strong>中村 恒一</strong>
+                <small>管理者 / ログイン中</small>
+              </span>
+              <span class="admin-user-chip__caret" aria-hidden="true">▾</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <section class="admin-content">
+        <div class="admin-grid admin-grid--4">
+          <article class="admin-card admin-card--compact admin-card--dense">
+            <div class="admin-card__body admin-kpi admin-kpi--dense">
+              <span class="admin-eyebrow">未完了受注</span>
+              <strong class="admin-kpi__value">84</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--neutral">本日</span><span>処理待ち</span></div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact admin-card--dense">
+            <div class="admin-card__body admin-kpi admin-kpi--dense">
+              <span class="admin-eyebrow">入金済み</span>
+              <strong class="admin-kpi__value">61</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--lime">順調</span><span>正常に確定</span></div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact admin-card--dense">
+            <div class="admin-card__body admin-kpi admin-kpi--dense">
+              <span class="admin-eyebrow">要対応</span>
+              <strong class="admin-kpi__value">7</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--pink">確認要</span><span>決済または在庫に問題</span></div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact admin-card--dense">
+            <div class="admin-card__body admin-kpi admin-kpi--dense">
+              <span class="admin-eyebrow">平均出荷時間</span>
+              <strong class="admin-kpi__value">18 h</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--neutral">安定</span><span>倉庫 SLA 内</span></div>
+            </div>
+          </article>
+        </div>
+
+        <article class="admin-card">
+          <header class="admin-toolbar">
+            <div class="admin-toolbar__group">
+              <div>
+                <div class="admin-eyebrow">受注一覧</div>
+                <h2>直近の受注</h2>
+              </div>
+              <div class="admin-segmented">
+                <a aria-current="page" href="./orders.html">全体</a>
+                <a href="#0">入金済み</a>
+                <a href="#0">要対応</a>
+              </div>
+            </div>
+            <div class="admin-toolbar__group">
+              <label class="admin-inline-control">
+                <span>並び替え</span>
+                <select data-table-sort="orders-table">
+                  <option value="time-desc" selected>新しい順</option>
+                  <option value="total-desc">金額が高い順</option>
+                  <option value="priority-desc">優先度が高い順</option>
+                  <option value="payment-risk">決済リスク優先</option>
+                </select>
+              </label>
+              <span class="admin-badge admin-badge--neutral">5 分前更新</span>
+              <button class="secondary" type="button">出力</button>
+            </div>
+          </header>
+          <div class="admin-table-wrap">
+            <table id="orders-table" class="admin-table">
+              <thead>
+                <tr data-time-rank="4" data-total="328000" data-priority-rank="1" data-payment-rank="3">
+                  <th>受注</th>
+                  <th>顧客</th>
+                  <th>金額</th>
+                  <th>決済</th>
+                  <th>出荷</th>
+                  <th>優先度</th>
+                  <th class="admin-text-right">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-time-rank="3" data-total="194000" data-priority-rank="1" data-payment-rank="2">
+                  <td><strong>#ORD-2048</strong><br><small>10:24 JST</small></td>
+                  <td>Astra Trade</td>
+                  <td>32.8 万円</td>
+                  <td><span class="admin-badge admin-badge--lime">入金済み</span></td>
+                  <td>ピッキング中</td>
+                  <td><span class="admin-badge admin-badge--neutral">通常</span></td>
+                  <td class="admin-text-right"><a href="#0">詳細</a></td>
+                </tr>
+                <tr data-time-rank="2" data-total="62000" data-priority-rank="4" data-payment-rank="4">
+                  <td><strong>#ORD-2047</strong><br><small>10:02 JST</small></td>
+                  <td>Nova Labs</td>
+                  <td>19.4 万円</td>
+                  <td><span class="admin-badge admin-badge--neutral">与信確保</span></td>
+                  <td>梱包完了</td>
+                  <td><span class="admin-badge admin-badge--neutral">通常</span></td>
+                  <td class="admin-text-right"><a href="#0">詳細</a></td>
+                </tr>
+                <tr data-time-rank="1" data-total="216000" data-priority-rank="1" data-payment-rank="3">
+                  <td><strong>#ORD-2046</strong><br><small>09:41 JST</small></td>
+                  <td>Kite Point</td>
+                  <td>6.2 万円</td>
+                  <td><span class="admin-badge admin-badge--pink">再試行要</span></td>
+                  <td>保留</td>
+                  <td><span class="admin-badge admin-badge--pink">高</span></td>
+                  <td class="admin-text-right"><a href="#0">詳細</a></td>
+                </tr>
+                <tr>
+                  <td><strong>#ORD-2045</strong><br><small>09:08 JST</small></td>
+                  <td>Luma Mobility</td>
+                  <td>21.6 万円</td>
+                  <td><span class="admin-badge admin-badge--lime">入金済み</span></td>
+                  <td>出荷済み</td>
+                  <td><span class="admin-badge admin-badge--neutral">通常</span></td>
+                  <td class="admin-text-right"><a href="#0">詳細</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="admin-pager">
+            <span class="admin-pager__summary">1 - 4 / 84 件を表示</span>
+            <nav class="admin-pager__nav" aria-label="受注一覧のページ切替">
+              <a class="admin-pager__button" href="#0">前へ</a>
+              <a class="admin-pager__button" aria-current="page" href="#0">1</a>
+              <a class="admin-pager__button" href="#0">2</a>
+              <a class="admin-pager__button" href="#0">3</a>
+              <span class="admin-pager__ellipsis">...</span>
+              <a class="admin-pager__button" href="#0">21</a>
+              <a class="admin-pager__button" href="#0">次へ</a>
+            </nav>
+          </div>
+        </article>
+
+        <div class="admin-grid admin-grid--2">
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <div class="admin-eyebrow">明細導線</div>
+                <h2>受注明細プレビュー</h2>
+              </div>
+              <span class="admin-badge admin-badge--pink">#ORD-2046</span>
+            </header>
+            <div class="admin-card__body admin-stack">
+              <div class="admin-detail-grid">
+                <div class="admin-detail-item">
+                  <span>顧客</span>
+                  <strong>Kite Point</strong>
+                </div>
+                <div class="admin-detail-item">
+                  <span>決済状態</span>
+                  <strong>カード再試行待ち</strong>
+                </div>
+                <div class="admin-detail-item">
+                  <span>出荷状態</span>
+                  <strong>保留</strong>
+                </div>
+                <div class="admin-detail-item">
+                  <span>担当</span>
+                  <strong>Ops East</strong>
+                </div>
+              </div>
+              <div class="admin-note">
+                <strong>確認手順をテーブル外へ逃がさず、この画面内で判断できる導線へ変更。</strong>
+                <div>支払い、在庫、配送メモ、顧客要望をプレビューで先に見せ、外部画面遷移は最終手段にします。</div>
+              </div>
+              <ol class="admin-checklist">
+                <li>決済再試行を 10 分後に再投入する</li>
+                <li>顧客へ同日確認の返信テンプレートを送る</li>
+                <li>在庫引当の有無を倉庫チャンネルで確認する</li>
+              </ol>
+              <div class="admin-actions">
+                <button type="button">再試行を予約</button>
+                <button class="secondary" type="button">顧客メモを開く</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <div class="admin-eyebrow">例外対応</div>
+                <h2>対応が必要な受注</h2>
+              </div>
+            </header>
+            <div class="admin-card__body">
+              <ul class="admin-list admin-list--dense">
+                <li>
+                  <div class="admin-metric">
+                    <strong>#ORD-2046</strong>
+                    <span>カード再試行待ち。同日中の確認依頼あり。</span>
+                  </div>
+                  <span class="admin-badge admin-badge--pink">重要</span>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>#ORD-2039</strong>
+                    <span>セット SKU の在庫数に差異があります。</span>
+                  </div>
+                  <span class="admin-badge admin-badge--pink">在庫</span>
+                </li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <div class="admin-eyebrow">運用メモ</div>
+                <h2>出荷監視の方針</h2>
+              </div>
+            </header>
+            <div class="admin-card__body">
+              <div class="admin-note admin-note--neutral">
+                <strong>受注画面は請求書ページを分離せず、支払い状態を同じテーブルで扱う方針に変更。</strong>
+                <div>確認作業を 1 画面に寄せ、デスクトップでの横並び監視を優先しています。</div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="../../js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Pico Admin - 404</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="../../images/favicons/admin-dashboard.svg">
+  <link rel="stylesheet" href="../../css/pico.css">
+  <link rel="stylesheet" href="../../css/admin-theme.css">
+  <link rel="stylesheet" href="../../css/admin-layout.css">
+  <link rel="stylesheet" href="../../css/admin-components.css">
+</head>
+<body>
+  <main class="admin-auth">
+    <section class="admin-auth__panel">
+      <article class="admin-card admin-auth-card">
+        <header>
+          <div class="admin-eyebrow">404</div>
+          <h1>ページが見つかりません</h1>
+          <p>指定したページは移行中か、すでに新しい導線へ整理されています。</p>
+        </header>
+        <div class="admin-card__body admin-stack">
+          <div class="admin-note">
+            <strong>ルーティングより先に画面資産の整理を進めています。</strong>
+            <div>旧ページ名のまま残っているものと、`Pico` 側へ置換済みのものが混在しています。</div>
+          </div>
+          <div class="admin-actions">
+            <button type="button" onclick="location.href='../../index.html'">ダッシュボードへ戻る</button>
+            <a href="../admin/analytics.html">分析画面を開く</a>
+          </div>
+        </div>
+      </article>
+    </section>
+    <aside class="admin-auth__aside">
+      <div class="admin-stack">
+        <span class="admin-badge">移行状態</span>
+        <h2>見つからないページは、優先順位を付けて順に置換中です。</h2>
+        <p>今回の範囲では代表ページと認証導線を `Pico + dark-only` に揃えています。</p>
+      </div>
+    </aside>
+  </main>
+</body>
+</html>

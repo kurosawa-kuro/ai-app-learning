@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Pico Admin - ログイン</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="../../images/favicons/admin-dashboard.svg">
+  <link rel="stylesheet" href="../../css/pico.css">
+  <link rel="stylesheet" href="../../css/admin-theme.css">
+  <link rel="stylesheet" href="../../css/admin-layout.css">
+  <link rel="stylesheet" href="../../css/admin-components.css">
+</head>
+<body>
+  <main class="admin-auth">
+    <section class="admin-auth__panel">
+      <article class="admin-card admin-auth-card">
+        <header>
+          <div class="admin-eyebrow">おかえりなさい</div>
+          <h1>ログイン</h1>
+          <p>ダーク固定の運用画面にアクセスします。</p>
+        </header>
+        <div class="admin-card__body">
+          <form class="admin-stack">
+            <label>
+              メールアドレス
+              <input type="email" placeholder="ops@example.com">
+            </label>
+            <label>
+              パスワード
+              <input type="password" placeholder="••••••••">
+            </label>
+            <div class="admin-auth-links">
+              <a href="./reset-password.html">パスワードを忘れた場合</a>
+              <button type="button" onclick="location.href='../../index.html'">ログイン</button>
+            </div>
+          </form>
+        </div>
+        <footer>
+          <small>アカウントがない場合は <a href="./signup.html">新規登録</a></small>
+        </footer>
+      </article>
+    </section>
+    <aside class="admin-auth__aside">
+      <div class="admin-stack">
+        <div class="admin-brand">
+          <div class="admin-brand__mark">P</div>
+          <div>
+            <strong>Pico Admin</strong>
+            <div class="admin-brand__eyebrow">Dark Console</div>
+          </div>
+        </div>
+        <h2>普段は静かに、異常時だけ光る。</h2>
+        <p>ライムは操作と成功、ピンクは危険と異常。管理画面としての判断速度を優先した配色です。</p>
+        <span class="admin-badge admin-badge--lime">ダーク固定</span>
+      </div>
+    </aside>
+  </main>
+</body>
+</html>

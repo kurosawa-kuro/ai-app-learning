@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Pico Admin - 設定</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="../../images/favicons/admin-dashboard.svg">
+  <link rel="stylesheet" href="../../css/pico.css">
+  <link rel="stylesheet" href="../../css/admin-theme.css">
+  <link rel="stylesheet" href="../../css/admin-layout.css">
+  <link rel="stylesheet" href="../../css/admin-components.css">
+</head>
+<body class="admin-body" data-sidebar-open="false">
+  <button class="admin-mobile-toggle secondary" type="button" data-sidebar-toggle>メニュー</button>
+  <div class="admin-sidebar-backdrop" data-sidebar-backdrop></div>
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar__inner">
+        <div class="admin-brand">
+          <div class="admin-brand__mark">P</div>
+          <div>
+            <strong>Pico Admin</strong>
+            <div class="admin-brand__eyebrow">Dark Console</div>
+          </div>
+          <button class="secondary" type="button" data-sidebar-close>閉じる</button>
+        </div>
+        <nav class="admin-nav">
+          <details open>
+            <summary>ダッシュボード</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="../../index.html">概要</a></li>
+              <li><a class="admin-nav-item" href="./analytics.html">分析</a></li>
+            </ul>
+          </details>
+          <details open>
+            <summary>運用</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="./customers.html">顧客</a></li>
+              <li><a class="admin-nav-item" href="./orders.html">受注</a></li>
+              <li><a class="admin-nav-item" href="./news.html">ニュース</a></li>
+              <li><a class="admin-nav-item" href="./todo.html">Todo</a></li>
+              <li><a class="admin-nav-item" href="./ajax.html">非同期サンプル</a></li>
+            </ul>
+          </details>
+          <details open>
+            <summary>システム</summary>
+            <ul>
+              <li><a class="admin-nav-item" aria-current="page" href="./settings.html">設定</a></li>
+            </ul>
+          </details>
+        </nav>
+      </div>
+    </aside>
+    <main class="admin-main">
+      <header class="admin-header">
+        <div>
+          <div class="admin-eyebrow">ワークスペース設定</div>
+          <h1>設定</h1>
+          <p>テーマ切替は廃止し、通知、権限、配信ポリシーだけを明確に操作できる構成に絞っています。</p>
+        </div>
+        <div class="admin-header__actions">
+          <span class="admin-badge admin-badge--lime">ダーク固定</span>
+          <button type="button">変更を保存</button>
+          <div class="admin-header-presence" aria-label="ログインユーザー">
+            <button class="secondary admin-icon-button" type="button" aria-label="通知">
+              <span aria-hidden="true">●</span>
+              <span class="admin-icon-button__badge"></span>
+            </button>
+            <button class="secondary admin-user-chip" type="button" aria-label="ユーザーメニュー">
+              <span class="admin-avatar admin-avatar--image" aria-hidden="true">
+                <img src="../../images/admin-user-male-30s.png" alt="">
+              </span>
+              <span class="admin-user__meta">
+                <strong>中村 恒一</strong>
+                <small>管理者 / ログイン中</small>
+              </span>
+              <span class="admin-user-chip__caret" aria-hidden="true">▾</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <section class="admin-content">
+        <div class="admin-grid admin-grid--2">
+          <article class="admin-card">
+            <header>
+              <div class="admin-eyebrow">ワークスペース</div>
+              <h2>基本設定</h2>
+            </header>
+            <div class="admin-card__body">
+              <form class="admin-stack">
+                <div class="admin-field-grid">
+                  <label>
+                    ワークスペース名
+                    <input type="text" value="Pico Admin Demo">
+                  </label>
+                  <label>
+                    サポートメール
+                    <input type="email" value="ops@example.com">
+                  </label>
+                </div>
+                <div class="admin-field-grid">
+                  <label>
+                    利用リージョン
+                    <select>
+                      <option selected>東京</option>
+                      <option>シンガポール</option>
+                      <option>フランクフルト</option>
+                    </select>
+                  </label>
+                  <label>
+                    契約プラン
+                    <select>
+                      <option>スターター</option>
+                      <option selected>ビジネス</option>
+                      <option>エンタープライズ</option>
+                    </select>
+                  </label>
+                </div>
+                <label>
+                  運用メモ
+                  <textarea rows="5">ダーク固定の管理画面を適用中です。アクセント色は重要操作と警戒表示に限定します。</textarea>
+                </label>
+                <div class="admin-field-grid">
+                  <label>
+                    問い合わせ一次窓口
+                    <input type="text" value="Support Desk Tokyo">
+                  </label>
+                  <label>
+                    緊急連絡先
+                    <input type="tel" value="+81-3-0000-9000">
+                  </label>
+                </div>
+              </form>
+            </div>
+          </article>
+
+          <article class="admin-card">
+            <header>
+              <div class="admin-eyebrow">運用ポリシー</div>
+              <h2>制御項目</h2>
+            </header>
+            <div class="admin-card__body admin-switch-grid">
+              <div class="admin-switch">
+                <div>
+                  <strong>重大アラートの即時昇格</strong>
+                  <div>Pager 通知を最上段レーンへ即時反映します。</div>
+                </div>
+                <input type="checkbox" checked>
+              </div>
+              <div class="admin-switch">
+                <div>
+                  <strong>週次売上サマリー</strong>
+                  <div>毎週月曜 09:00 JST に責任者へ配信します。</div>
+                </div>
+                <input type="checkbox" checked>
+              </div>
+              <div class="admin-switch">
+                <div>
+                  <strong>検証用 UI フラグ</strong>
+                  <div>次バッチ移行向けのステージング専用部品です。</div>
+                </div>
+                <input type="checkbox">
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="admin-grid admin-grid--2">
+          <article class="admin-card">
+            <header>
+              <div class="admin-eyebrow">通知設定</div>
+              <h2>配信パターン</h2>
+            </header>
+            <div class="admin-card__body admin-stack">
+              <fieldset>
+                <legend>障害通知の優先経路</legend>
+                <label><input type="radio" name="incident-route" checked> Slack を優先する</label>
+                <label><input type="radio" name="incident-route"> メールを優先する</label>
+                <label><input type="radio" name="incident-route"> Pager を優先する</label>
+              </fieldset>
+              <div class="admin-field-grid">
+                <label>
+                  日次サマリー配信時刻
+                  <input type="time" value="09:00">
+                </label>
+                <label>
+                  警戒しきい値
+                  <input type="number" value="75" min="0" max="100">
+                </label>
+              </div>
+              <label>
+                連携先 Webhook
+                <input type="url" value="https://hooks.example.com/ops-alert">
+              </label>
+            </div>
+          </article>
+
+          <article class="admin-card">
+            <header>
+              <div class="admin-eyebrow">アクセス管理</div>
+              <h2>権限一覧</h2>
+            </header>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>ユーザー</th>
+                    <th>権限</th>
+                    <th>最終操作</th>
+                    <th>状態</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Ayaka Sato</td>
+                    <td>管理者</td>
+                    <td>2 分前</td>
+                    <td><span class="admin-badge admin-badge--lime">有効</span></td>
+                  </tr>
+                  <tr>
+                    <td>Koji Tanaka</td>
+                    <td>分析担当</td>
+                    <td>18 分前</td>
+                    <td><span class="admin-badge">有効</span></td>
+                  </tr>
+                  <tr>
+                    <td>Mina Hoshino</td>
+                    <td>サポート責任者</td>
+                    <td>昨日</td>
+                    <td><span class="admin-badge admin-badge--pink">招待待ち</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="admin-card">
+            <header>
+              <div class="admin-eyebrow">設計メモ</div>
+              <h2>現在のデザイン方針</h2>
+            </header>
+            <div class="admin-card__body admin-stack">
+              <div class="admin-note">
+                <strong>ライト / ダーク切替は意図的に廃止しています。</strong>
+                <div>運用画面の視認性とテーマ管理コストを下げるため、ダーク固定に寄せています。</div>
+              </div>
+              <ul class="admin-list">
+                <li>
+                  <div class="admin-metric">
+                    <strong>アクセント色</strong>
+                    <span>ライムは前向きな操作と注視点に限定します。</span>
+                  </div>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>警戒表示</strong>
+                    <span>ピンクは危険操作と異常状態だけに使います。</span>
+                  </div>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>コンポーネント方針</strong>
+                    <span>標準要素優先、足りないところだけ `admin-*` を追加。</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="../../js/admin.js"></script>
+</body>
+</html>

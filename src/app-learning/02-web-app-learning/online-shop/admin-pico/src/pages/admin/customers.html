@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Pico Admin - 顧客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="../../images/favicons/admin-dashboard.svg">
+  <link rel="stylesheet" href="../../css/pico.css">
+  <link rel="stylesheet" href="../../css/admin-theme.css">
+  <link rel="stylesheet" href="../../css/admin-layout.css">
+  <link rel="stylesheet" href="../../css/admin-components.css">
+</head>
+<body class="admin-body" data-sidebar-open="false">
+  <button class="admin-mobile-toggle secondary" type="button" data-sidebar-toggle>メニュー</button>
+  <div class="admin-sidebar-backdrop" data-sidebar-backdrop></div>
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar__inner">
+        <div class="admin-brand">
+          <div class="admin-brand__mark">P</div>
+          <div>
+            <strong>Pico Admin</strong>
+            <div class="admin-brand__eyebrow">Dark Console</div>
+          </div>
+          <button class="secondary" type="button" data-sidebar-close>閉じる</button>
+        </div>
+        <nav class="admin-nav">
+          <details open>
+            <summary>ダッシュボード</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="../../index.html">概要</a></li>
+              <li><a class="admin-nav-item" href="./analytics.html">分析</a></li>
+            </ul>
+          </details>
+          <details open>
+            <summary>運用</summary>
+            <ul>
+              <li><a class="admin-nav-item" aria-current="page" href="./customers.html">顧客</a></li>
+              <li><a class="admin-nav-item" href="./orders.html">受注</a></li>
+              <li><a class="admin-nav-item" href="./news.html">ニュース</a></li>
+              <li><a class="admin-nav-item" href="./todo.html">Todo</a></li>
+              <li><a class="admin-nav-item" href="./ajax.html">非同期サンプル</a></li>
+            </ul>
+          </details>
+          <details>
+            <summary>システム</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="./settings.html">設定</a></li>
+            </ul>
+          </details>
+        </nav>
+      </div>
+    </aside>
+    <main class="admin-main">
+      <header class="admin-header">
+        <div>
+          <div class="admin-eyebrow">売上顧客</div>
+          <h1>顧客</h1>
+          <p>ライムで優良顧客、ピンクで離脱予兆を示す一覧画面です。</p>
+        </div>
+        <div class="admin-header__actions">
+          <div class="admin-search">
+            <input type="search" placeholder="顧客名、会社名、プランで検索">
+          </div>
+          <button type="button">顧客を追加</button>
+          <div class="admin-header-presence" aria-label="ログインユーザー">
+            <button class="secondary admin-icon-button" type="button" aria-label="通知">
+              <span aria-hidden="true">●</span>
+              <span class="admin-icon-button__badge"></span>
+            </button>
+            <button class="secondary admin-user-chip" type="button" aria-label="ユーザーメニュー">
+              <span class="admin-avatar admin-avatar--image" aria-hidden="true">
+                <img src="../../images/admin-user-male-30s.png" alt="">
+              </span>
+              <span class="admin-user__meta">
+                <strong>中村 恒一</strong>
+                <small>管理者 / ログイン中</small>
+              </span>
+              <span class="admin-user-chip__caret" aria-hidden="true">▾</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <section class="admin-content">
+        <div class="admin-grid admin-grid--4">
+          <article class="admin-card admin-card--compact">
+            <div class="admin-card__body admin-kpi">
+              <span class="admin-eyebrow">契約社数</span>
+              <strong class="admin-kpi__value">248</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--lime">+12</span><span>今月増加</span></div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact">
+            <div class="admin-card__body admin-kpi">
+              <span class="admin-eyebrow">アップセル候補</span>
+              <strong class="admin-kpi__value">37</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--lime">15%</span><span>利用量が基準超え</span></div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact">
+            <div class="admin-card__body admin-kpi">
+              <span class="admin-eyebrow">解約警戒</span>
+              <strong class="admin-kpi__value">9</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--pink">重要</span><span>CS フォロー要</span></div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact">
+            <div class="admin-card__body admin-kpi">
+              <span class="admin-eyebrow">ARPA</span>
+              <strong class="admin-kpi__value">19.0 万円</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge">法人中心</span><span>安定推移</span></div>
+            </div>
+          </article>
+        </div>
+
+        <article class="admin-card">
+          <header class="admin-toolbar">
+            <div class="admin-toolbar__group">
+              <div>
+                <div class="admin-eyebrow">顧客一覧</div>
+                <h2>優先顧客</h2>
+              </div>
+              <div class="admin-segmented">
+                <a aria-current="page" href="./customers.html">全体</a>
+                <a href="#0">アップセル</a>
+                <a href="#0">警戒</a>
+              </div>
+            </div>
+            <div class="admin-toolbar__group">
+              <label class="admin-inline-control">
+                <span>並び替え</span>
+                <select data-table-sort="customers-table">
+                  <option value="mrr-desc" selected>MRR 高い順</option>
+                  <option value="mrr-asc">MRR 低い順</option>
+                  <option value="expansion-desc">拡張余地が高い順</option>
+                  <option value="health-risk">警戒を先頭</option>
+                </select>
+              </label>
+              <span class="admin-badge">5 分前同期</span>
+              <button class="secondary" type="button">出力</button>
+            </div>
+          </header>
+          <div class="admin-table-wrap">
+            <table id="customers-table" class="admin-table">
+              <thead>
+                <tr data-mrr="820000" data-expansion="82" data-health-rank="3">
+                  <th>顧客</th>
+                  <th>プラン</th>
+                  <th>MRR</th>
+                  <th>状態</th>
+                  <th>拡張余地</th>
+                  <th class="admin-text-right">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-mrr="340000" data-expansion="61" data-health-rank="2">
+                  <td>
+                    <div class="admin-user">
+                      <span class="admin-avatar">AT</span>
+                      <div class="admin-user__meta">
+                        <strong>Astra Trade</strong>
+                        <small>ops@astratrade.io</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>エンタープライズ</td>
+                  <td>82.0 万円</td>
+                  <td><span class="admin-badge admin-badge--lime">良好</span></td>
+                  <td>
+                    <div class="admin-progress"><span style="width: 82%"></span></div>
+                  </td>
+                  <td class="admin-text-right"><a href="#0">詳細</a></td>
+                </tr>
+                <tr data-mrr="88000" data-expansion="24" data-health-rank="0">
+                  <td>
+                    <div class="admin-user">
+                      <span class="admin-avatar">NV</span>
+                      <div class="admin-user__meta">
+                        <strong>Nova Labs</strong>
+                        <small>finance@novalabs.com</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>グロース</td>
+                  <td>34.0 万円</td>
+                  <td><span class="admin-badge">安定</span></td>
+                  <td>
+                    <div class="admin-progress"><span style="width: 61%"></span></div>
+                  </td>
+                  <td class="admin-text-right"><a href="#0">詳細</a></td>
+                </tr>
+                <tr data-mrr="214000" data-expansion="73" data-health-rank="4">
+                  <td>
+                    <div class="admin-user">
+                      <span class="admin-avatar">KP</span>
+                      <div class="admin-user__meta">
+                        <strong>Kite Point</strong>
+                        <small>owner@kitepoint.co</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>スターター</td>
+                  <td>8.8 万円</td>
+                  <td><span class="admin-badge admin-badge--pink">警戒</span></td>
+                  <td>
+                    <div class="admin-progress"><span style="width: 24%"></span></div>
+                  </td>
+                  <td class="admin-text-right"><a href="#0">詳細</a></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="admin-user">
+                      <span class="admin-avatar">LM</span>
+                      <div class="admin-user__meta">
+                        <strong>Luma Mobility</strong>
+                        <small>team@luma-mobility.jp</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>ビジネス</td>
+                  <td>21.4 万円</td>
+                  <td><span class="admin-badge admin-badge--lime">成長中</span></td>
+                  <td>
+                    <div class="admin-progress"><span style="width: 73%"></span></div>
+                  </td>
+                  <td class="admin-text-right"><a href="#0">詳細</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <footer class="admin-pager">
+            <div class="admin-pager__summary">1 - 4 / 248 件を表示</div>
+            <nav class="admin-pager__nav" aria-label="優先顧客のページ切替">
+              <a class="admin-pager__button" href="#0" aria-label="前のページ">前へ</a>
+              <a class="admin-pager__button" href="#0" aria-current="page">1</a>
+              <a class="admin-pager__button" href="#0">2</a>
+              <a class="admin-pager__button" href="#0">3</a>
+              <span class="admin-pager__ellipsis" aria-hidden="true">...</span>
+              <a class="admin-pager__button" href="#0">62</a>
+              <a class="admin-pager__button" href="#0" aria-label="次のページ">次へ</a>
+            </nav>
+          </footer>
+        </article>
+
+        <div class="admin-grid admin-grid--2">
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <div class="admin-eyebrow">CS 対応</div>
+                <h2>確認が必要な顧客</h2>
+              </div>
+            </header>
+            <div class="admin-card__body">
+              <ul class="admin-list">
+                <li>
+                  <div class="admin-metric">
+                    <strong>Kite Point</strong>
+                    <span>ログイン頻度が 3 週連続で低下。導入支援の再提案が必要。</span>
+                  </div>
+                  <span class="admin-badge admin-badge--pink">高リスク</span>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>North Signal</strong>
+                    <span>請求先変更依頼待ち。決済エラー 1 件。</span>
+                  </div>
+                  <span class="admin-badge">請求対応</span>
+                </li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <div class="admin-eyebrow">拡張提案</div>
+                <h2>アップセル候補</h2>
+              </div>
+            </header>
+            <div class="admin-card__body">
+              <ul class="admin-list">
+                <li>
+                  <div class="admin-metric">
+                    <strong>Astra Trade</strong>
+                    <span>利用上限が高く、SSO 追加で年契約へ引き上げ余地があります。</span>
+                  </div>
+                  <span class="admin-badge admin-badge--lime">92 点</span>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>Luma Mobility</strong>
+                    <span>Seat追加タイミング。次回レビューでアドオン提案。</span>
+                  </div>
+                  <span class="admin-badge admin-badge--lime">81 点</span>
+                </li>
+              </ul>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="../../js/admin.js"></script>
+</body>
+</html>

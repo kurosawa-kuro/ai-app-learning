@@ -1,0 +1,5 @@
+<!doctype html>
+<!-- Shared UI entry point. Application navigation is supplied by UiContext. -->
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+      th:fragment="page(title, kind, heading, actions, content)"
+      th:replace="~{ui/shell :: app(${title}, ${kind}, ${heading}, ${actions}, ${content})}"></html>

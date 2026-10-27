@@ -38,7 +38,8 @@ small, .ui-help, .ui-field-kind { font-size: .875rem; color: var(--ui-text-secon
 .admin-card :last-child { margin-bottom: 0; }
 .admin-content form, .admin-content button, .admin-content [role="button"] { margin-bottom: 0; }
 .admin-content input, .admin-content select, .admin-content textarea { margin-bottom: 0; }
-.ui-stack, .admin-stack { display: grid; gap: 1.5rem; }
+.ui-stack, .admin-stack { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+.ui-stack > *, .admin-stack > * { min-width: 0; }
 .ui-field label { font-weight: 650; margin-bottom: .35rem; }
 .ui-field-kind { margin-left: .5rem; font-weight: 400; }
 .ui-help { margin: 0 0 .5rem; }

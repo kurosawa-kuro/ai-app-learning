@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: page(~{::title}, 'form', ~{::#heading}, ~{::#actions}, ~{::#content})}">
+<head><title>Gemini接続確認 | 投稿ノート</title></head>
+<body>
+<div id="heading"><h1>Gemini接続確認</h1><p>AIを使う前に、接続できるかを確かめます。</p></div>
+<div id="actions"><a th:href="@{/admin/settings}">機能管理へ戻る</a></div>
+<div id="content" class="admin-stack">
+  <article class="admin-card">
+    <header><h2>利用を許可するAIモデル</h2></header>
+    <div class="admin-card__body admin-stack">
+      <p>ここに登録したモデルだけが利用できます。空欄で保存すると、すべてのモデルを禁止します。</p>
+      <form th:action="@{/admin/ai/models}" method="post" data-ui-form class="admin-stack">
+        <label for="allowedModelsInput">許可するモデルID（1行に1つ）</label>
+        <textarea id="allowedModelsInput" name="allowedModelsInput" rows="3" maxlength="2000"
+                  aria-describedby="model-help" th:text="${allowedModelsInput}"></textarea>
+        <p id="model-help" class="ui-muted">最大20件。モデルIDの完全一致で判定します。モデルの追加は接続可否や料金の保証ではありません。提供者が利用条件を確認して指定してください。</p>
+        <button type="submit">許可モデルを保存</button>
+      </form>
+      <p class="ui-muted">保存だけではAIに通信しません。使用モデル自体は提供者の接続設定で指定します。許可から外しても、送信済みの処理は中止されません。</p>
+    </div>
+  </article>
+  <article class="admin-card">
+    <header><h2>接続の準備</h2></header>
+    <div class="admin-card__body admin-stack">
+      <dl>
+        <dt>接続設定</dt><dd th:text="${geminiConfigured ? '設定済み' : '未設定・設定不備'}"></dd>
+        <dt>AI連携</dt><dd th:text="${aiAllowed ? '許可' : '禁止'}"></dd>
+        <dt>使用モデル</dt><dd th:text="${geminiModel}"></dd>
+        <dt>モデル制限</dt><dd th:text="${modelAllowed ? '利用を許可' : '利用を禁止'}"></dd>
+      </dl>
+      <p th:unless="${geminiConfigured}" class="admin-note">提供者がAPIキー・モデルの接続設定を確認し、アプリを再起動してください。</p>
+      <p th:unless="${aiAllowed}" class="admin-note">機能管理で「AI連携を許可する」を選び、設定を保存してください。</p>
+      <p th:unless="${modelAllowed}" class="admin-note">使用モデルが許可リストにありません。必要なモデルだけを上の一覧に登録するか、提供者が使用モデルを変更してください。</p>
+      <p>「接続を確認」を押すと、確認用の短文をGeminiへ1回送ります。投稿・写真・ユーザー情報は送りません。APIの利用枠を消費し、契約によって料金が発生します。</p>
+      <form th:action="@{/admin/ai/check}" method="post" data-ui-form data-busy-text="接続を確認中…">
+        <input type="hidden" name="requestToken" th:value="${requestToken}">
+        <button type="submit" th:disabled="${!geminiConfigured || !aiAllowed || !modelAllowed}">接続を確認</button>
+      </form>
+      <p class="ui-muted">画面を開くだけでは通信しません。結果不明でも自動再送はしません。</p>
+    </div>
+  </article>
+  <article th:if="${checkResult != null}" class="admin-card" aria-live="polite" id="ai-check-result">
+    <header><h2 th:text="${checkResult.success() ? '接続できました' : '接続を確認できませんでした'}"></h2></header>
+    <div class="admin-card__body admin-stack">
+      <p th:text="${checkResult.message()}"></p>
+      <dl>
+        <dt>確認時刻（日本時間）</dt><dd th:text="${#temporals.format(checkResult.checkedAt().atZone(T(java.time.ZoneId).of('Asia/Tokyo')), 'yyyy/MM/dd HH:mm:ss')}"></dd>
+        <dt>使用モデル</dt><dd th:text="${checkResult.model()}"></dd>
+        <dt>所要時間</dt><dd th:text="${checkResult.elapsedMillis() + ' ms'}"></dd>
+        <dt>照会ID</dt><dd th:text="${checkResult.reference()}" style="overflow-wrap:anywhere"></dd>
+      </dl>
+      <p class="ui-muted">再確認は上のボタンで明示的に行ってください。AI利用金額の表示はダミーのままで、今回の料金は集計しません。</p>
+    </div>
+  </article>
+</div>
+</body></html>

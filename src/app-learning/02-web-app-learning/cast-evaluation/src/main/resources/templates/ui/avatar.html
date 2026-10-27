@@ -1,0 +1,4 @@
+<span xmlns:th="http://www.thymeleaf.org" th:fragment="avatar(name, url)" class="ui-avatar" aria-hidden="true">
+  <span th:text="${name.substring(0, name.offsetByCodePoints(0, 1))}"></span>
+  <img th:if="${url != null}" th:src="${url}" alt="" data-avatar-image loading="lazy">
+</span>

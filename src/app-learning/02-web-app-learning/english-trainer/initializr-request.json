@@ -1,0 +1,18 @@
+{
+  "generatedOn": "2026-10-27",
+  "generator": "https://start.spring.io/starter.zip",
+  "metadata": "https://start.spring.io/metadata/client",
+  "parameters": {
+    "type": "maven-project",
+    "language": "java",
+    "bootVersion": "4.1.2",
+    "groupId": "com.example",
+    "artifactId": "web-app-template",
+    "name": "WebAppTemplate",
+    "description": "Spring Boot starter for AI app learning",
+    "packageName": "com.example.webapptemplate",
+    "packaging": "jar",
+    "javaVersion": "17",
+    "dependencies": "web,thymeleaf,jdbc,postgresql,security,oauth2-resource-server,validation"
+  }
+}

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Pico Admin - ダッシュボード</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="./images/favicons/admin-dashboard.svg">
+  <link rel="stylesheet" href="./css/pico.css">
+  <link rel="stylesheet" href="./css/admin-theme.css">
+  <link rel="stylesheet" href="./css/admin-layout.css">
+  <link rel="stylesheet" href="./css/admin-components.css">
+</head>
+<body class="admin-body" data-sidebar-open="false">
+  <button class="admin-mobile-toggle secondary" type="button" data-sidebar-toggle>メニュー</button>
+  <div class="admin-sidebar-backdrop" data-sidebar-backdrop></div>
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar__inner">
+        <div class="admin-brand">
+          <div class="admin-brand__mark">P</div>
+          <div>
+            <strong>Pico Admin</strong>
+            <div class="admin-brand__eyebrow">Dark Console</div>
+          </div>
+          <button class="secondary" type="button" data-sidebar-close>閉じる</button>
+        </div>
+        <nav class="admin-nav">
+          <details open>
+            <summary>ダッシュボード</summary>
+            <ul>
+              <li><a class="admin-nav-item" aria-current="page" href="./index.html">概要</a></li>
+              <li><a class="admin-nav-item" href="./pages/admin/analytics.html">分析</a></li>
+            </ul>
+          </details>
+          <details open>
+            <summary>運用</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="./pages/admin/customers.html">顧客</a></li>
+              <li><a class="admin-nav-item" href="./pages/admin/orders.html">受注</a></li>
+              <li><a class="admin-nav-item" href="./pages/admin/news.html">ニュース</a></li>
+              <li><a class="admin-nav-item" href="./pages/admin/todo.html">Todo</a></li>
+              <li><a class="admin-nav-item" href="./pages/admin/ajax.html">非同期サンプル</a></li>
+            </ul>
+          </details>
+          <details>
+            <summary>システム</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="./pages/admin/settings.html">設定</a></li>
+            </ul>
+          </details>
+        </nav>
+        <article class="admin-card admin-card--compact">
+          <div class="admin-card__body">
+            <div class="admin-eyebrow">運用状態</div>
+            <h3>ダーク固定で運用中</h3>
+            <p>テーマ切替を廃止し、ライム主軸の運用画面に固定しています。</p>
+            <span class="admin-badge admin-badge--lime">Pico 稼働中</span>
+          </div>
+        </article>
+      </div>
+    </aside>
+    <main class="admin-main">
+      <header class="admin-header">
+        <div>
+          <div class="admin-eyebrow">運用統括</div>
+          <h1>運用ダッシュボード</h1>
+          <p>日次の売上、返金、導線改善をひと目で追えるダーク固定の管理画面です。</p>
+        </div>
+        <div class="admin-header__actions">
+          <div class="admin-segmented">
+            <a aria-current="page" href="./index.html">今日</a>
+            <a href="./pages/admin/analytics.html">週次</a>
+            <a href="./pages/admin/customers.html">月次</a>
+          </div>
+          <button type="button">レポート作成</button>
+          <div class="admin-header-presence" aria-label="ログインユーザー">
+            <button class="secondary admin-icon-button" type="button" aria-label="通知">
+              <span aria-hidden="true">●</span>
+              <span class="admin-icon-button__badge"></span>
+            </button>
+            <button class="secondary admin-user-chip" type="button" aria-label="ユーザーメニュー">
+              <span class="admin-avatar admin-avatar--image" aria-hidden="true">
+                <img src="./images/admin-user-male-30s.png" alt="">
+              </span>
+              <span class="admin-user__meta">
+                <strong>中村 恒一</strong>
+                <small>管理者 / ログイン中</small>
+              </span>
+              <span class="admin-user-chip__caret" aria-hidden="true">▾</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <section class="admin-content admin-dashboard">
+        <div class="admin-dashboard__top">
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <div class="admin-eyebrow">運用要約</div>
+                <h2>本日の監視サマリー</h2>
+              </div>
+              <div class="admin-actions">
+                <span class="admin-badge admin-badge--lime">MRR +14.8%</span>
+                <span class="admin-badge admin-badge--pink">返金リスク 2.1%</span>
+              </div>
+            </header>
+            <div class="admin-card__body">
+              <div class="admin-dashboard__summary">
+                <div class="admin-dashboard__summary-copy">
+                  <p>売上は前周期比で伸長。返金率は試用流入で上振れしています。優先度は返金導線の隔離、法人請求の前倒し回収、アップセル候補 3 社のレビューです。</p>
+                </div>
+                <ul class="admin-stat-list">
+                  <li class="admin-stat-row">
+                    <span>配信健全性</span>
+                    <strong>99.98%</strong>
+                  </li>
+                  <li class="admin-stat-row">
+                    <span>応答遅延</span>
+                    <strong>142 ms</strong>
+                  </li>
+                  <li class="admin-stat-row">
+                    <span>サポート負荷</span>
+                    <strong>18 件対応中</strong>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
+          <article class="admin-card admin-card--compact">
+            <header class="admin-section-heading">
+              <div>
+                <div class="admin-eyebrow">監視ステータス</div>
+                <h2>即時確認</h2>
+              </div>
+              <span class="admin-badge admin-badge--lime">安定</span>
+            </header>
+            <div class="admin-card__body">
+              <ul class="admin-list">
+                <li>
+                  <div class="admin-metric">
+                    <strong>決済 API</strong>
+                    <span>再送エラー 0 件。ピーク帯でも遅延は閾値内です。</span>
+                  </div>
+                  <span class="admin-badge admin-badge--lime">正常</span>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>返金監視</strong>
+                    <span>試用導線で微増。広告面の訴求差分を要確認。</span>
+                  </div>
+                  <span class="admin-badge admin-badge--pink">注意</span>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>CS 待ち列</strong>
+                    <span>一次返信 SLA は維持。18 件対応中です。</span>
+                  </div>
+                  <span class="admin-badge">平常</span>
+                </li>
+              </ul>
+            </div>
+          </article>
+
+        </div>
+
+        <div class="admin-grid admin-grid--6 admin-dashboard__kpis">
+          <article class="admin-card admin-card--compact admin-card--dense">
+            <div class="admin-card__body admin-kpi admin-kpi--dense">
+              <span class="admin-eyebrow">総売上</span>
+              <strong class="admin-kpi__value">4.82 億円</strong>
+              <div class="admin-kpi__meta">
+                <span class="admin-badge admin-badge--lime">+18.2%</span>
+                <span>前周期比</span>
+              </div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact admin-card--dense">
+            <div class="admin-card__body admin-kpi admin-kpi--dense">
+              <span class="admin-eyebrow">売上継続率</span>
+              <strong class="admin-kpi__value">117%</strong>
+              <div class="admin-kpi__meta">
+                <span class="admin-badge admin-badge--lime">安定</span>
+                <span>大口顧客帯</span>
+              </div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact admin-card--dense">
+            <div class="admin-card__body admin-kpi admin-kpi--dense">
+              <span class="admin-eyebrow">返金率</span>
+              <strong class="admin-kpi__value">2.1%</strong>
+              <div class="admin-kpi__meta">
+                <span class="admin-badge admin-badge--pink">要警戒</span>
+                <span>トライアル流入に偏り</span>
+              </div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact admin-card--dense">
+            <div class="admin-card__body admin-kpi admin-kpi--dense">
+              <span class="admin-eyebrow">有望案件</span>
+              <strong class="admin-kpi__value">910 万円</strong>
+              <div class="admin-kpi__meta">
+                <span class="admin-badge">32 件</span>
+                <span>14 日以内に着地見込み</span>
+              </div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact admin-card--dense">
+            <div class="admin-card__body admin-kpi admin-kpi--dense">
+              <span class="admin-eyebrow">入金保留</span>
+              <strong class="admin-kpi__value">12 件</strong>
+              <div class="admin-kpi__meta">
+                <span class="admin-badge admin-badge--pink">4 件要確認</span>
+                <span>法人請求の審査待ち</span>
+              </div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact admin-card--dense">
+            <div class="admin-card__body admin-kpi admin-kpi--dense">
+              <span class="admin-eyebrow">新規導線 CV</span>
+              <strong class="admin-kpi__value">6.8%</strong>
+              <div class="admin-kpi__meta">
+                <span class="admin-badge admin-badge--lime">+0.7pt</span>
+                <span>週次で改善</span>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="admin-dashboard__analytics">
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <h2>売上</h2>
+              </div>
+              <span class="admin-badge admin-badge--lime">更新中</span>
+            </header>
+            <div class="admin-card__body">
+              <div class="admin-chart admin-chart--compact">
+                <canvas id="dashboard-revenue-trend"></canvas>
+              </div>
+            </div>
+          </article>
+
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <h2>構成</h2>
+              </div>
+            </header>
+            <div class="admin-card__body">
+              <div class="admin-chart admin-chart--compact admin-chart--short">
+                <canvas id="dashboard-revenue-mix"></canvas>
+              </div>
+              <ul class="admin-stat-list">
+                <li class="admin-stat-row"><span>継続課金</span><strong>54%</strong></li>
+                <li class="admin-stat-row"><span>受託・支援</span><strong>28%</strong></li>
+                <li class="admin-stat-row"><span>アップセル</span><strong>18%</strong></li>
+              </ul>
+            </div>
+          </article>
+
+        </div>
+
+        <div class="admin-dashboard__ops">
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <div class="admin-eyebrow">作業キュー</div>
+                <h2>本日優先</h2>
+              </div>
+            </header>
+            <div class="admin-card__body">
+              <ul class="admin-list admin-list--dense">
+                <li>
+                  <div class="admin-metric">
+                    <strong>上位プラン訴求</strong>
+                    <span>申込導線の訴求文をライム基準へ統一。</span>
+                  </div>
+                  <span class="admin-badge admin-badge--lime">対応中</span>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>返金ポリシー見直し</strong>
+                    <span>高返金 SKU の導線を分離。</span>
+                  </div>
+                  <span class="admin-badge admin-badge--pink">確認待ち</span>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>CRM 連携整理</strong>
+                    <span>夜間バッチの重複イベントを削減。</span>
+                  </div>
+                  <span class="admin-badge">待機中</span>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>請求前倒し回収</strong>
+                    <span>月末集中案件の営業事前確認。</span>
+                  </div>
+                  <span class="admin-badge">依頼済み</span>
+                </li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <div class="admin-eyebrow">リスク列</div>
+                <h2>異常値</h2>
+              </div>
+            </header>
+            <div class="admin-card__body">
+              <ul class="admin-list admin-list--dense">
+                <li>
+                  <div class="admin-metric">
+                    <strong>試用流入の返金率</strong>
+                    <span>過去 7 日で 0.6pt 上振れ。</span>
+                  </div>
+                  <span class="admin-badge admin-badge--pink">高</span>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>法人請求の承認待ち</strong>
+                    <span>月末締め案件が集中。</span>
+                  </div>
+                  <span class="admin-badge">中</span>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>解約予兆アカウント</strong>
+                    <span>North Signal / Kite Point を CS レビュー。</span>
+                  </div>
+                  <span class="admin-badge admin-badge--pink">要確認</span>
+                </li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <div class="admin-eyebrow">更新履歴</div>
+                <h2>直近ログ</h2>
+              </div>
+            </header>
+            <div class="admin-card__body">
+              <ul class="admin-list admin-list--dense">
+                <li>
+                  <div class="admin-metric">
+                    <strong>返金導線の隔離案を共有</strong>
+                    <span>広告チームへ差分仕様を送付。</span>
+                  </div>
+                  <small>8 分前</small>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>法人請求の前倒し回収を依頼</strong>
+                    <span>営業へ月末集中案件の一覧を連携。</span>
+                  </div>
+                  <small>21 分前</small>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>アップセル候補の会議枠を確保</strong>
+                    <span>3 社分を次回レビューへ追加。</span>
+                  </div>
+                  <small>43 分前</small>
+                </li>
+              </ul>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="./js/admin.js"></script>
+  <script src="./js/vendors/chart.js"></script>
+  <script src="./js/admin-charts.js"></script>
+</body>
+</html>

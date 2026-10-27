@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 /** Application navigation lives here, not in the reusable shell. No database dependency. */
 @ControllerAdvice
 public class UiContext {
+    @org.springframework.beans.factory.annotation.Value("${app.ai.mode:live}") private String aiMode;
+    @ModelAttribute("aiDemo") public boolean aiDemo(){return "demo".equals(aiMode);}
+
     public record Link(String label, String url, boolean active) {}
     public record Navigation(String name, String home, boolean sidebar, List<Link> links) {}
     public record SidebarContext(String label, String value, String action, String url, String selectedId, String iconUrl) {}

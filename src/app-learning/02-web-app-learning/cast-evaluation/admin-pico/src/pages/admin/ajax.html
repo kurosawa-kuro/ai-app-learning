@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Pico Admin - 非同期サンプル</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="../../images/favicons/ai-tools.svg">
+  <link rel="stylesheet" href="../../css/pico.css">
+  <link rel="stylesheet" href="../../css/admin-theme.css">
+  <link rel="stylesheet" href="../../css/admin-layout.css">
+  <link rel="stylesheet" href="../../css/admin-components.css">
+</head>
+<body class="admin-body" data-sidebar-open="false">
+  <button class="admin-mobile-toggle secondary" type="button" data-sidebar-toggle>メニュー</button>
+  <div class="admin-sidebar-backdrop" data-sidebar-backdrop></div>
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar__inner">
+        <div class="admin-brand">
+          <div class="admin-brand__mark">P</div>
+          <div>
+            <strong>Pico Admin</strong>
+            <div class="admin-brand__eyebrow">Dark Console</div>
+          </div>
+          <button class="secondary" type="button" data-sidebar-close>閉じる</button>
+        </div>
+        <nav class="admin-nav">
+          <details open>
+            <summary>ダッシュボード</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="../../index.html">概要</a></li>
+              <li><a class="admin-nav-item" href="./analytics.html">分析</a></li>
+            </ul>
+          </details>
+          <details open>
+            <summary>運用</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="./customers.html">顧客</a></li>
+              <li><a class="admin-nav-item" href="./orders.html">受注</a></li>
+              <li><a class="admin-nav-item" href="./news.html">ニュース</a></li>
+              <li><a class="admin-nav-item" href="./todo.html">Todo</a></li>
+              <li><a class="admin-nav-item" aria-current="page" href="./ajax.html">非同期サンプル</a></li>
+            </ul>
+          </details>
+          <details>
+            <summary>システム</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="./settings.html">設定</a></li>
+            </ul>
+          </details>
+        </nav>
+      </div>
+    </aside>
+    <main class="admin-main">
+      <header class="admin-header">
+        <div>
+          <div class="admin-eyebrow">非同期検証</div>
+          <h1>非同期サンプル</h1>
+          <p>`JSONPlaceholder` の `users / posts / todos` を読み込み、`users` への作成だけを検証する Ajax デモ画面です。</p>
+        </div>
+        <div class="admin-header__actions">
+          <div class="admin-search">
+            <input id="ajax-search" type="search" placeholder="名前、件名、メール、本文で検索">
+          </div>
+          <button type="button" data-ajax-focus-form>ユーザー作成</button>
+          <div class="admin-header-presence" aria-label="ログインユーザー">
+            <button class="secondary admin-icon-button" type="button" aria-label="通知">
+              <span aria-hidden="true">●</span>
+              <span class="admin-icon-button__badge"></span>
+            </button>
+            <button class="secondary admin-user-chip" type="button" aria-label="ユーザーメニュー">
+              <span class="admin-avatar admin-avatar--image" aria-hidden="true">
+                <img src="../../images/admin-user-male-30s.png" alt="">
+              </span>
+              <span class="admin-user__meta">
+                <strong>中村 恒一</strong>
+                <small>管理者 / ログイン中</small>
+              </span>
+              <span class="admin-user-chip__caret" aria-hidden="true">▾</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <section class="admin-content">
+        <div class="admin-grid admin-grid--4">
+          <article class="admin-card admin-card--compact">
+            <div class="admin-card__body admin-kpi">
+              <span class="admin-eyebrow">取得ユーザー</span>
+              <strong id="ajax-users-count" class="admin-kpi__value">-</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--neutral">GET /users</span><span>一覧取得</span></div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact">
+            <div class="admin-card__body admin-kpi">
+              <span class="admin-eyebrow">取得投稿</span>
+              <strong id="ajax-posts-count" class="admin-kpi__value">-</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--lime">GET /posts</span><span>本文カード化</span></div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact">
+            <div class="admin-card__body admin-kpi">
+              <span class="admin-eyebrow">未完了 Todo</span>
+              <strong id="ajax-open-todos" class="admin-kpi__value">-</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--pink">GET /todos</span><span>未完了件数</span></div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact">
+            <div class="admin-card__body admin-kpi">
+              <span class="admin-eyebrow">作成送信</span>
+              <strong id="ajax-created-count" class="admin-kpi__value">0</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--neutral">POST /users</span><span>ダミー送信数</span></div>
+            </div>
+          </article>
+        </div>
+
+        <div class="admin-grid admin-grid--2">
+          <article class="admin-card">
+            <header>
+              <div class="admin-eyebrow">Create only</div>
+              <h2>ユーザー作成</h2>
+            </header>
+            <div class="admin-card__body">
+              <form id="ajax-create-form" class="admin-stack">
+                <div class="admin-field-grid">
+                  <label>
+                    氏名
+                    <input id="ajax-create-name" name="name" type="text" placeholder="例: 山田 花子" required>
+                  </label>
+                  <label>
+                    メールアドレス
+                    <input id="ajax-create-email" name="email" type="email" placeholder="hanako@example.com" required>
+                  </label>
+                </div>
+                <label>
+                  補足メモ
+                  <textarea id="ajax-create-note" name="note" rows="4" placeholder="保存はされません。POST 応答確認用のダミー入力です。"></textarea>
+                </label>
+                <div class="admin-actions">
+                  <button type="submit">POST 送信</button>
+                  <span class="admin-badge admin-badge--neutral">Update / Delete は未実装</span>
+                </div>
+                <div id="ajax-create-status" class="admin-note admin-note--neutral">
+                  <strong>未送信</strong>
+                  <div>作成は `JSONPlaceholder` に送りますが、実データとしては永続化されません。</div>
+                </div>
+              </form>
+            </div>
+          </article>
+
+          <article class="admin-card">
+            <header>
+              <div class="admin-eyebrow">API status</div>
+              <h2>接続状況</h2>
+            </header>
+            <div class="admin-card__body">
+              <ul class="admin-list">
+                <li>
+                  <div class="admin-metric">
+                    <strong>users</strong>
+                    <span id="ajax-users-status">待機中</span>
+                  </div>
+                  <span class="admin-badge admin-badge--neutral">GET</span>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>posts</strong>
+                    <span id="ajax-posts-status">待機中</span>
+                  </div>
+                  <span class="admin-badge admin-badge--neutral">GET</span>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>todos</strong>
+                    <span id="ajax-todos-status">待機中</span>
+                  </div>
+                  <span class="admin-badge admin-badge--neutral">GET</span>
+                </li>
+              </ul>
+            </div>
+          </article>
+        </div>
+
+        <article class="admin-card">
+          <header class="admin-toolbar">
+            <div class="admin-toolbar__group">
+              <div>
+                <div class="admin-eyebrow">取得データ</div>
+                <h2>直近の Ajax レコード</h2>
+              </div>
+              <div class="admin-segmented admin-segmented--buttons" role="tablist" aria-label="非同期サンプルの種別フィルタ">
+                <button type="button" data-ajax-filter="all" aria-pressed="true">全体</button>
+                <button type="button" data-ajax-filter="users" aria-pressed="false">Users</button>
+                <button type="button" data-ajax-filter="posts" aria-pressed="false">Posts</button>
+                <button type="button" data-ajax-filter="todos" aria-pressed="false">Todos</button>
+              </div>
+            </div>
+            <div class="admin-toolbar__group">
+              <span id="ajax-last-updated" class="admin-badge admin-badge--neutral">読み込み待ち</span>
+              <button class="secondary" type="button" data-ajax-refresh>再取得</button>
+            </div>
+          </header>
+          <div class="admin-card__body">
+            <div id="ajax-feed" class="admin-news-feed" aria-live="polite"></div>
+          </div>
+          <footer class="admin-pager">
+            <div id="ajax-pager-summary" class="admin-pager__summary">0 件</div>
+            <nav id="ajax-pager" class="admin-pager__nav" aria-label="非同期サンプル一覧のページ切替"></nav>
+          </footer>
+        </article>
+      </section>
+    </main>
+  </div>
+  <script src="../../js/admin.js"></script>
+  <script src="../../js/ajax.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: page(~{::title}, 'play', ~{::#heading}, ~{::#actions}, ~{::#content})}">
+<head><title>スキルじゃんけん</title></head>
+<body>
+<div id="heading"><h1>スキルじゃんけん</h1><p>なかまとスキルを選んで、じゃんけんに挑戦。</p></div>
+<div id="actions"><a th:href="@{/admin/users}">プレイヤーを追加</a></div>
+<div id="content" class="ui-stack" data-janken>
+  <p class="ui-help">なかま・スキル・手を選びます。AIはセリフの事前作成だけに使い、対戦中には呼び出しません。</p>
+  <form th:action="@{/janken}" method="get"><label>プレイヤー<select name="user" id="player"><option th:each="u:${players}" th:value="${u.id}" th:text="${u.name}" th:selected="${u.id==player}"></option></select></label><button>履歴を切り替える</button></form><p id="janken-status" role="status"></p><article class="admin-card"><div class="admin-card__body ui-stack">
+    <div class="game-setup">
+      <div class="ui-field"><label for="character">1. なかま</label><select id="character">
+        <option value="hinoko">ひのこ</option><option value="shizuku">しずく</option><option value="konoha">このは</option>
+      </select></div>
+      <div class="ui-field"><label for="skill">2. スキル</label><select id="skill"></select></div>
+    </div>
+    <p class="ui-notice" id="skill-description"></p>
+    <fieldset class="game-hands"><legend>3. 出す手を選ぶ</legend>
+      <div class="game-hand-options">
+      <label><input type="radio" name="hand" value="rock"><span class="game-symbol" aria-hidden="true">✊</span><strong>グー</strong></label>
+      <label><input type="radio" name="hand" value="scissors"><span class="game-symbol" aria-hidden="true">✌</span><strong>チョキ</strong></label>
+      <label><input type="radio" name="hand" value="paper"><span class="game-symbol" aria-hidden="true">✋</span><strong>パー</strong></label>
+      </div>
+    </fieldset>
+    <p class="ui-help" id="hand-help">手を選んでから、決定ボタンを押します。</p>
+    <button type="button" id="play-round" disabled>この手でじゃんけん！</button>
+    <section class="game-result" id="game-result" tabindex="-1" aria-live="polite" hidden>
+      <h2 id="round-title"></h2><p id="round-detail"></p><p id="round-points"></p><p id="round-line"></p>
+      <button type="button" class="secondary" id="next-round">もう一度あそぶ</button>
+    </section>
+  </div></article>
+  <p class="game-score">これまでの合計：<strong id="total-points" th:text="${total}">0</strong> ポイント <span class="ui-help">保存された対戦の合計です。</span></p>
+  <details><summary>スキルとポイントのしくみ</summary><p>勝つと2点、あいこ・負けは1点。スキルの条件に合うと、さらに1点。スキルは勝敗を変えません。</p></details>
+  <article class="admin-card"><div class="admin-card__body ui-stack"><h2>セリフを事前に作る</h2><p>選択中のなかまのセリフです。AI案を確認し、手直ししてから採用します。手入力でも保存できます。</p><label>どんな応援にする？<input id="line-material" maxlength="300" placeholder="失敗してももう一度挑戦したくなる言葉"></label><button type="button" id="line-generate">AIでセリフ案を作る</button><label>確認・手直しするセリフ<textarea id="line-text" maxlength="120" rows="3"></textarea></label><button type="button" id="line-adopt">このセリフを採用して保存</button><p id="line-status" role="status"></p></div></article>
+  <article class="admin-card"><div class="admin-card__body"><h2>対戦履歴</h2><p>直近20件です。再表示すると今回の対戦も確認できます。</p><a th:href="@{/janken(user=${player})}">履歴を再表示</a><p th:if="${#lists.isEmpty(history)}">まだ対戦していません。</p><ul><li th:each="r:${history}"><span th:text="${#temporals.format(r.createdAt,'MM/dd HH:mm')}"></span> · <span th:text="${r.outcome=='win'?'勝ち':r.outcome=='draw'?'あいこ':'負け'}"></span> · <span th:text="${r.points+'点'}"></span><p th:text="${r.line}"></p></li></ul></div></article>
+  <noscript><p class="ui-notice">じゃんけん体験にはJavaScriptを有効にしてください。</p></noscript>
+</div>
+</body>
+</html>

@@ -37,15 +37,18 @@ public final class GeminiHttpGateway implements GeminiGateway {
         return properties.getModel()!=null && properties.getModel().matches("gemini-[a-z0-9.-]{1,80}")
             ? properties.getModel() : "未設定";
     }
-    public Status probe() { return request(PROMPT,"",null,128).status(); }
+    public Status probe() { return request(PROMPT,"",List.of(),128).status(); }
     public Generated generate(String instruction,String input,com.example.webapptemplate.platform.ImageData image) {
-        return request(instruction,input,image,1024);
+        return generateMany(instruction,input,image==null?List.of():List.of(image));
     }
-    private Generated request(String instruction,String input,com.example.webapptemplate.platform.ImageData image,int limit) {
+    public Generated generateMany(String instruction,String input,List<com.example.webapptemplate.platform.ImageData> images) {
+        return request(instruction,input,images,1024);
+    }
+    private Generated request(String instruction,String input,List<com.example.webapptemplate.platform.ImageData> images,int limit) {
         if(!configured()) return new Generated(Status.UNCONFIGURED,"");
         var parts=new java.util.ArrayList<Map<String,Object>>();
         parts.add(Map.of("text",input.isEmpty()?instruction:instruction+"\n\n利用者の素材：\n"+input));
-        if(image!=null) parts.add(Map.of("inline_data",Map.of("mime_type",image.type(),"data",java.util.Base64.getEncoder().encodeToString(image.bytes()))));
+        for(var image:images) parts.add(Map.of("inline_data",Map.of("mime_type",image.type(),"data",java.util.Base64.getEncoder().encodeToString(image.bytes()))));
         try {
             Map<?,?> response=client.post().uri("/models/{model}:generateContent",model())
                 .header("x-goog-api-key",properties.getApiKey()).contentType(MediaType.APPLICATION_JSON)
