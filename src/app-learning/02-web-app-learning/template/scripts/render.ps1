@@ -9,7 +9,7 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $settings = Read-DotEnv -Path (Join-Path $root '.env')
 # Existing process environment wins over the local file, as in run-local.ps1.
-foreach ($name in @('RENDER_API_KEY', 'DB_HOST', 'SPRING_DATASOURCE_USERNAME', 'SPRING_DATASOURCE_PASSWORD', 'RENDER_DB_SCHEMA', 'APP_ACCESS_PASSWORD', 'APP_ACCESS_USER', 'GEMINI_API_KEY', 'GEMINI_MODEL', 'GEMINI_TIMEOUT', 'SUPABASE_URL', 'SUPABASE_SECRET_KEY', 'SUPABASE_STORAGE_BUCKET')) {
+foreach ($name in @('RENDER_API_KEY', 'DB_HOST', 'SPRING_DATASOURCE_USERNAME', 'SPRING_DATASOURCE_PASSWORD', 'RENDER_DB_SCHEMA', 'GEMINI_API_KEY', 'GEMINI_MODEL', 'GEMINI_TIMEOUT', 'SUPABASE_URL', 'SUPABASE_SECRET_KEY', 'SUPABASE_STORAGE_BUCKET')) {
     $existing = [Environment]::GetEnvironmentVariable($name, 'Process')
     if ($null -ne $existing) { $settings[$name] = $existing }
 }
@@ -91,19 +91,15 @@ switch ($Action) {
     }
     'env' {
         # Validate all inputs before changing any remote environment variable.
-        foreach ($name in @('DB_HOST', 'SPRING_DATASOURCE_USERNAME', 'SPRING_DATASOURCE_PASSWORD', 'APP_ACCESS_PASSWORD', 'RENDER_DB_SCHEMA')) {
+        foreach ($name in @('DB_HOST', 'SPRING_DATASOURCE_USERNAME', 'SPRING_DATASOURCE_PASSWORD', 'RENDER_DB_SCHEMA')) {
             if ([string]::IsNullOrWhiteSpace($settings[$name])) { throw "Set $name in .env or the process environment." }
         }
-        if ($settings['APP_ACCESS_PASSWORD'].Length -lt 20) { throw 'Use an access password of at least 20 characters.' }
         if ($settings['RENDER_DB_SCHEMA'] -notmatch '^app_template_[a-z0-9_]+$' -or $settings['RENDER_DB_SCHEMA'] -match 'test|e2e|restore') { throw 'Choose a dedicated production RENDER_DB_SCHEMA.' }
         $deployment = @{
             DB_HOST = $settings['DB_HOST']
             SPRING_DATASOURCE_USERNAME = $settings['SPRING_DATASOURCE_USERNAME']
             SPRING_DATASOURCE_PASSWORD = $settings['SPRING_DATASOURCE_PASSWORD']
             APP_ENVIRONMENT = 'production'
-            APP_ACCESS_MODE = 'basic'
-            APP_ACCESS_USER = $(if ($settings['APP_ACCESS_USER']) { $settings['APP_ACCESS_USER'] } else { 'starter' })
-            APP_ACCESS_PASSWORD = $settings['APP_ACCESS_PASSWORD']
             APP_DB_SCHEMA = $settings['RENDER_DB_SCHEMA']
         }
         foreach ($name in @('GEMINI_API_KEY','GEMINI_MODEL','GEMINI_TIMEOUT','SUPABASE_URL','SUPABASE_SECRET_KEY','SUPABASE_STORAGE_BUCKET')) {

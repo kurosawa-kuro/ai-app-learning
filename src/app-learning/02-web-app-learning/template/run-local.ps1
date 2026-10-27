@@ -1,9 +1,7 @@
 ﻿param(
-    [ValidateSet('test', 'run', 'stop', 'package', 'seed-preview', 'seed', 'seed-reset', 'seed-cleanup', 'seed-images', 'backup', 'restore')]
+    [ValidateSet('test', 'run', 'stop', 'package', 'seed-preview', 'seed', 'seed-reset', 'seed-cleanup', 'seed-images')]
     [string]$Action = 'run',
     [switch]$Images,
-    [string]$BackupFile,
-    [string]$RestoreSchema,
     [ValidateRange(1, 65535)]
     [int]$Port = 8080
 )
@@ -18,8 +16,7 @@ $settings = Read-DotEnv -Path (Join-Path $PSScriptRoot '.env')
 $allowed = @('DB_HOST', 'DB_PORT', 'DB_NAME', 'SPRING_DATASOURCE_URL',
     'SPRING_DATASOURCE_USERNAME', 'SPRING_DATASOURCE_PASSWORD', 'SUPABASE_URL',
     'SUPABASE_SECRET_KEY', 'SUPABASE_STORAGE_BUCKET', 'APP_IMAGES_ENABLED',
-    'APP_DB_SCHEMA', 'SERVER_PORT', 'APP_ENVIRONMENT', 'APP_CONNECTION_LABEL',
-    'APP_ACCESS_MODE', 'APP_ACCESS_USER', 'APP_ACCESS_PASSWORD', 'AI_GEMINI_API_KEY', 'GEMINI_API_KEY', 'GEMINI_MODEL', 'GEMINI_TIMEOUT')
+    'APP_DB_SCHEMA', 'SERVER_PORT', 'APP_ENVIRONMENT', 'AI_GEMINI_API_KEY', 'GEMINI_API_KEY', 'GEMINI_MODEL', 'GEMINI_TIMEOUT')
 # Read by scripts/render.ps1 only; never passed to the app.
 $deployOnly = @('RENDER_API_KEY', 'RENDER_DB_SCHEMA')
 foreach ($name in @($settings.Keys)) {
@@ -82,15 +79,7 @@ try {
         'package' { 'package' }
         'run' { 'spring-boot:run' }
     }
-    if ($Action -in @('backup','restore')) {
-        $maintenanceArgs = "--maintenance.action=$Action --server.port=0"
-        if ($Action -eq 'restore') {
-            if (-not (Test-Path -LiteralPath $BackupFile -PathType Leaf) -or $RestoreSchema -notmatch '^app_template_restore_[a-z0-9_]{1,30}$') { throw 'Specify an existing BackupFile and a new app_template_restore_* RestoreSchema.' }
-            $resolvedBackup = (Resolve-Path -LiteralPath $BackupFile).Path
-            $maintenanceArgs += " --maintenance.file=`"$resolvedBackup`" --maintenance.schema=$RestoreSchema"
-        }
-        & (Join-Path $PSScriptRoot 'mvnw.cmd') -B spring-boot:run "-Dspring-boot.run.arguments=$maintenanceArgs"
-    } elseif ($Action -like 'seed*') {
+    if ($Action -like 'seed*') {
         $seedAction = switch ($Action) {
             'seed-preview' { 'preview' }
             'seed' { 'add' }

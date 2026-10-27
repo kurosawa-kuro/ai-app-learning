@@ -12,7 +12,7 @@
     <form th:action="@{/posts/{id}/delete(id=${post.id})}" method="post" data-ui-form data-busy-text="削除中…"
           th:attr="data-confirm=${'「' + post.title + '」を削除します。'}">
       <button type="submit" class="ui-danger">投稿を削除</button>
-      <small th:if="${!storageConfigured and post.imageKey != null}">画像の後片付けは保留されます。接続の復旧後、「状態と復旧」で再試行してください。</small>
+      <small th:if="${!storageConfigured and post.imageKey != null}">画像の後片付けは保留されます。接続の復旧後、提供者がseed-cleanupで再試行できます。</small>
     </form>
   </details>
 </div>

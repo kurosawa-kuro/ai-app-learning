@@ -26,9 +26,12 @@ public class UserSelectionController {
     @GetMapping("/admin/current-user")
     public ResponseEntity<Options> options(@CookieValue(name = "currentAuthor", required = false) String id) {
         var selected = repository.selected(id);
+        var iconIds = icons.usersWithIcons();
+        var users = repository.choices().stream().map(a -> new User(a.id(), a.name(),
+            iconIds.contains(a.id()) ? "/admin/users/"+a.id()+"/icon" : null)).toList();
         return ResponseEntity.ok().header("Cache-Control", "no-store").body(new Options(
-            repository.authors().stream().map(a -> new User(a.id(), a.name(), icons.url(a.id()))).toList(),
-            selected == null ? null : new User(selected.id(), selected.name(), icons.url(selected.id()))));
+            users,
+            selected == null ? null : users.stream().filter(user -> user.id().equals(selected.id())).findFirst().orElse(null)));
     }
 
     @PostMapping("/admin/current-user")

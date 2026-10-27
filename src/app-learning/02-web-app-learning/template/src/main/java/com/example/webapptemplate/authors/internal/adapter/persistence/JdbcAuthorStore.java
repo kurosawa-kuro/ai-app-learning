@@ -15,10 +15,16 @@ public class JdbcAuthorStore implements AuthorStore {
     public List<AuthorView> authors() {
         var counts=new HashMap<UUID,Long>();
         references.forEach(source -> source.counts().forEach((id,count) -> counts.merge(id,count,Long::sum)));
-        return db.sql("select id,name,0 as usage_count,created_at from app_users order by created_at,id")
-            .query(AuthorView.class).list().stream().map(user -> new AuthorView(user.id(),user.name(),counts.getOrDefault(user.id(),0L),user.createdAt())).toList();
+        return choices().stream().map(user -> new AuthorView(user.id(),user.name(),counts.getOrDefault(user.id(),0L),user.createdAt())).toList();
     }
-    public Optional<AuthorView> author(UUID id) { return authors().stream().filter(user -> user.id().equals(id)).findFirst(); }
+    public List<AuthorView> choices() {
+        return db.sql("select id,name,0 as usage_count,created_at from app_users order by created_at,id").query(AuthorView.class).list();
+    }
+    public Optional<AuthorView> author(UUID id) {
+        return db.sql("select id,name,0 as usage_count,created_at from app_users where id=:id").param("id",id)
+            .query(AuthorView.class).optional().map(user -> new AuthorView(user.id(),user.name(),
+                references.stream().mapToLong(source -> source.count(id)).sum(),user.createdAt()));
+    }
     public void rename(UUID id,String name) {
         db.sql("update app_users set name=:name where id=:id").param("id",id).param("name",name).update();
     }

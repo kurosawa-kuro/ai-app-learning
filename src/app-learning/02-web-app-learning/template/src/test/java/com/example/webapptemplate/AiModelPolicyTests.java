@@ -2,7 +2,6 @@ package com.example.webapptemplate;
 
 import com.example.webapptemplate.ai.AiCheckResult.Status;
 import com.example.webapptemplate.ai.internal.application.*;
-import com.example.webapptemplate.platform.AuditTrail;
 import com.example.webapptemplate.settings.FeaturePolicy;
 import com.example.webapptemplate.settings.SettingsOperations;
 import com.example.webapptemplate.settings.internal.domain.AllowedAiModels;
@@ -44,10 +43,10 @@ class AiModelPolicyTests {
         var gateway=mock(GeminiGateway.class);
         when(gateway.configured()).thenReturn(true); when(gateway.model()).thenReturn("gemini-test");
         settings.saveFeatures(false,true); settings.saveAllowedAiModels("");
-        assertThat(new CheckGemini(gateway,settings,AuditTrail.NONE).check().status()).isEqualTo(Status.MODEL_DENIED);
+        assertThat(new CheckGemini(gateway,settings).check().status()).isEqualTo(Status.MODEL_DENIED);
         var policy=mock(FeaturePolicy.class); when(policy.aiEnabled()).thenReturn(true);
         when(policy.allowsAiModel("gemini-test")).thenReturn(true,false);
-        assertThat(new CheckGemini(gateway,policy,AuditTrail.NONE).check().status()).isEqualTo(Status.MODEL_DENIED);
+        assertThat(new CheckGemini(gateway,policy).check().status()).isEqualTo(Status.MODEL_DENIED);
         verify(gateway,never()).probe();
     }
 }

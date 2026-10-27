@@ -5,7 +5,6 @@ import com.example.webapptemplate.ai.AiConnectivity;
 import com.example.webapptemplate.ai.internal.adapter.gemini.*;
 import com.example.webapptemplate.ai.internal.adapter.web.AiController;
 import com.example.webapptemplate.ai.internal.application.*;
-import com.example.webapptemplate.platform.AuditTrail;
 import com.example.webapptemplate.settings.FeaturePolicy;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.*;
@@ -76,7 +75,7 @@ class GeminiTests {
     }
     @Test void disabledAndMissingKeyNeverCallTheGateway() {
         var gateway=mock(GeminiGateway.class); var policy=mock(FeaturePolicy.class);
-        var audit=mock(AuditTrail.class); var service=new CheckGemini(gateway,policy,audit);
+        var service=new CheckGemini(gateway,policy);
         assertThat(service.check().status()).isEqualTo(Status.DISABLED);
         when(policy.aiEnabled()).thenReturn(true);
         assertThat(service.check().status()).isEqualTo(Status.UNCONFIGURED);
@@ -92,7 +91,7 @@ class GeminiTests {
         when(gateway.model()).thenReturn("gemini-test"); when(policy.allowsAiModel("gemini-test")).thenReturn(true);
         var entered=new CountDownLatch(1); var release=new CountDownLatch(1);
         when(gateway.probe()).thenAnswer(invocation -> { entered.countDown(); release.await(5,TimeUnit.SECONDS); return Status.SUCCESS; });
-        var service=new CheckGemini(gateway,policy,AuditTrail.NONE);
+        var service=new CheckGemini(gateway,policy);
         var executor=Executors.newSingleThreadExecutor();
         try {
             var first=executor.submit(service::check); assertThat(entered.await(5,TimeUnit.SECONDS)).isTrue();

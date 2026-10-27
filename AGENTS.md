@@ -106,3 +106,7 @@ Codex は作業前にこのファイルを読むため、ここには repo 共�
 GAS / Retoolを使う場合は[プラットフォームの入口](docs/runbooks/platforms.md)と対象ディレクトリのAGENTS.mdを読む。対象kindではgas-workflow / retool-workflowをCodexとClaudeの両方へ配布する。生成・ローカル検査・公開・実機受入を区別する。
 
 小さな修正は`rg`と必要範囲の読取りを使う。RTKが利用可能ならGit status・Cargo test・pytest・ruff checkを明示的に圧縮できる。正確なdiff・全件一覧・診断原文が必要なら通常コマンドを使う。Serenaは既定無効で、参照調査が必要なセッションだけ有効化する。導入・実利用確認・復元・効果測定は[運用手順](docs/runbooks/ai-coding.md)を参照する。
+
+## 教育用Webテンプレートの範囲
+
+`src/app-learning/02-web-app-learning/template` の変更では、同配下の `AGENTS.md` と `docs/educational-baseline.md` を必ず確認する。教育用の横展開を本番運用の全部入りと解釈しない。認証・独自復旧・監査DB・AI永続台帳は廃止済みで、過去の課題表を根拠に再追加しない。

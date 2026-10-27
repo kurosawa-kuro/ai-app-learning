@@ -13,10 +13,6 @@ services:
     envVars:
       - key: APP_ENVIRONMENT
         value: production
-      - key: APP_ACCESS_MODE
-        value: basic
-      - key: APP_ACCESS_PASSWORD
-        sync: false
       - key: APP_DB_SCHEMA
         sync: false
       # Entered once in the Dashboard at Blueprint creation; never committed.

@@ -1,33 +1,29 @@
-# Render公開・Gemini疎通の受入記録
+# Renderへの教材公開
 
-2026-10-27（日本時間）。既存サービスを再開し、現在のWebテンプレートを公開した。
+このテンプレートはログイン・Basic認証なし。ユーザー作成／選択は投稿者データの操作であり、認証機能ではない。
 
-- URL：https://web-app-template-ofb7.onrender.com
-- 実行コミット：`1250a8e`（Gemini基盤・モデル制限・永続要求管理・復旧整理を含む）
-- デプロイID：`dep-dbg97m4s728c73dob8mg`。21:09:33にlive。
-- ビルド先：`src/app-learning/02-web-app-learning/template`。既存のfree・Singaporeサービスを継続。
-- DB：公開専用 `app_template_render`。Flyway V9まで適用。ローカルの投稿はコピーせず、公開先は独立データとして開始。
-- 認証：環境共通のHTTP Basic。ユーザー名は `starter`、パスワードは手元の `.env` の `APP_ACCESS_PASSWORD` に保存。値をGitや本文に記載しない。
-- `GEMINI_API_KEY` はRender環境変数へ登録し、ローカルとの一致を値を出さず確認。DB・Storage設定も反映した。
+## 設定
 
-## 実確認
+RenderのRoot Directoryは `src/app-learning/02-web-app-learning/template`、Dockerfileは `./Dockerfile`。ローカルDockerは不要。DB接続、Storage、必要時のGeminiキーを環境変数へ設定する。秘密値をGitへ置かない。
 
-HTTPS、`/healthz` 200、匿名の投稿・管理・AI画面401、正しい環境認証で画面表示、DB・Storage正常、公開スキーマ表示を確認。CSRFなしの更新は401で拒否（CSRFフィルターがBasic認証処理より前に拒否する経路）。
+`.env` のRENDER_API_KEYを使い、`./scripts/render.sh env` でDB・Storage・Geminiの設定を反映する。APP_ACCESS_USER／APP_ACCESS_PASSWORD／APP_ACCESS_MODEは使わない。既存サービスに残っている場合は削除する。
 
-管理画面からAI許可を一時的にONにし、固定短文の疎通を1回実行した。結果：
+コードをテストしてGitへpushすると、現在のサービスでは自動デプロイされる。手動の状態確認は `./scripts/render.sh status`、明示デプロイは `./scripts/render.sh deploy`。
 
-- 確認時刻：2026/10/27 21:14:04 JST
-- モデル：`gemini-3.5-flash-lite`
-- 成否：SUCCESS（画面に「接続できました」）
-- 所要時間：14326ms
-- 照会ID：`cd7fb131-d3f3-4a80-8616-120831f27491`
+## 公開先の受入
 
-投稿・写真・ユーザー情報は送信していない。試験後、AI許可は元のOFFへ復元した。利用開始時は機能管理でAI連携を許可する。モデル許可は既定の1モデルを維持。実課金集計はダミー表示のまま。
+```powershell
+$env:RENDER_ACCEPTANCE_URL='https://web-app-template-ofb7.onrender.com'
+node tests/render-acceptance.cjs
+node tests/render-visual.cjs
+node tests/render-performance.cjs
+```
 
-## 再確認
+- ログインなしで投稿・管理画面が開けること。
+- 全CSSのHTTP200／text/css、入力部品へのPico適用。
+- 12件以上の架空投稿、縦長・横長・正方形の4画像、2ページ目。
+- PC・スマホの表示、画像デコード、ページャー、ユーザー切替、横はみ出しなし。
+- CSRFなし更新は403。AI実APIは通常検証で呼ばず、明示指定時だけ実行する。
+- 起動直後の遅さを隠さず、稼働後・画像取得・再訪を分けて記録。
 
-`tests/render-acceptance.cjs` を使用。HTTPS URLを `RENDER_ACCEPTANCE_URL`、環境認証を `APP_ACCESS_USER`／`APP_ACCESS_PASSWORD` へ設定して実行する。`RUN_RENDER_GEMINI=true` を明示した場合のみ実AIへ固定短文を送る。通常はアクセス確認だけを行う。
-
-キーやパスワードをコマンドへ直書きせず、`scripts/Read-DotEnv.ps1` から読み込む。ログと画面記録は `.local/render-acceptance-result.log`・`.local/render-acceptance/`（Git対象外）。公開中のサービスは停止せず維持する。
-
-デプロイ中は二重ビルド防止のため自動デプロイをOFFにし、記録のpush後に元のONへ戻す。今回の追加Blueprint宣言と受入スクリプトは稼働アプリのコードを変更しない。
+サービス：web-app-template、URL：https://web-app-template-ofb7.onrender.com 。デプロイごとの完了状況は[最小構成](educational-baseline.md)と[性能記録](performance-validation.md)を参照。

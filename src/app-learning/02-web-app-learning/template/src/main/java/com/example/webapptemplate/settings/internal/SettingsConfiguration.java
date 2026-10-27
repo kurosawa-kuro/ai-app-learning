@@ -7,5 +7,5 @@ import com.example.webapptemplate.settings.internal.application.SettingsStore;
 import org.springframework.context.annotation.*;
 @Configuration
 class SettingsConfiguration {
-    @Bean SettingsOperations settingsOperations(SettingsStore store, ImageStore storage,com.example.webapptemplate.platform.AuditTrail audit) { return new SettingsService(store,storage,audit); }
+    @Bean SettingsOperations settingsOperations(SettingsStore store, ImageStore storage) { return new SettingsService(store,storage); }
 }

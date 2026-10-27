@@ -8,10 +8,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 /** Application navigation lives here, not in the reusable shell. No database dependency. */
 @ControllerAdvice
 public class UiContext {
-    private final com.example.webapptemplate.platform.RuntimeInfo runtime;
-    public UiContext(com.example.webapptemplate.platform.RuntimeInfo runtime) { this.runtime=runtime; }
-    @ModelAttribute("runtimeInfo")
-    public com.example.webapptemplate.platform.RuntimeInfo runtime() { return runtime; }
     public record Link(String label, String url, boolean active) {}
     public record Navigation(String name, String home, boolean sidebar, List<Link> links) {}
     public record SidebarContext(String label, String value, String action, String url, String selectedId, String iconUrl) {}
@@ -20,7 +16,6 @@ public class UiContext {
     public List<Link> managementLinks(HttpServletRequest request) {
         String path = request.getRequestURI();
         return List.of(new Link("ユーザー管理", "/admin/users", path.startsWith("/admin/users")),
-                new Link("状態と復旧", "/admin/operations", path.startsWith("/admin/operations")),
                 new Link("機能管理", "/admin/settings", path.equals("/admin/settings")),
                 new Link("CSVエクスポート", "/admin#csv-export", false),
                 new Link("管理の一覧", "/admin", path.equals("/admin")));
@@ -28,15 +23,20 @@ public class UiContext {
 
     @ModelAttribute("appStyles")
     public List<String> styles(HttpServletRequest request) {
-        return List.of(request.getRequestURI().startsWith("/examples/skill-janken")
-                ? "/examples/skill-janken.css" : "/features/posts/posts.css");
+        String path=request.getRequestURI();
+        if(path.startsWith("/examples/skill-janken")) return List.of("/examples/skill-janken.css");
+        return path.startsWith("/posts") ? List.of("/features/posts/posts.css") : List.of();
     }
 
     @ModelAttribute("appScripts")
     public List<String> scripts(HttpServletRequest request) {
-        return request.getRequestURI().startsWith("/examples/skill-janken")
-                ? List.of("/examples/janken-rules.js", "/examples/skill-janken.js")
-                : List.of("/features/posts/posts.js", "/features/ai/drafts.js");
+        String path=request.getRequestURI();
+        if(path.startsWith("/examples/skill-janken")) return List.of("/examples/janken-rules.js", "/examples/skill-janken.js");
+        if(path.equals("/posts/new") || path.matches("/posts/[0-9a-f-]{36}/edit") || (path.equals("/posts") && request.getMethod().equals("POST")))
+            return List.of("/ui/image-preview.js", "/ui/form-protection.js", "/features/posts/posts.js", "/features/ai/drafts.js");
+        if(path.equals("/posts") || path.matches("/posts/[0-9a-f-]{36}")) return List.of("/features/posts/feed.js");
+        if(path.startsWith("/posts/") || path.matches("/admin/users/[0-9a-f-]{36}/icon(/edit)?")) return List.of("/ui/image-preview.js");
+        return List.of();
     }
 
     @ModelAttribute("navigation")

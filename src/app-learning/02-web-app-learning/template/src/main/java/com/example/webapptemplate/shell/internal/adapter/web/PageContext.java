@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /** Values every page layout needs, the selected author cookie, and redirects for form errors. */
-@ControllerAdvice(basePackages = {"com.example.webapptemplate.posts.internal.adapter.web", "com.example.webapptemplate.authors.internal.adapter.web", "com.example.webapptemplate.settings.internal.adapter.web", "com.example.webapptemplate.operations.internal.adapter.web"})
+@ControllerAdvice(basePackages = {"com.example.webapptemplate.posts.internal.adapter.web", "com.example.webapptemplate.authors.internal.adapter.web", "com.example.webapptemplate.settings.internal.adapter.web"})
 public class PageContext {
     // Remembers which author new posts default to. A convenience, not authentication.
     private static final String AUTHOR_COOKIE = "currentAuthor";
@@ -55,7 +55,7 @@ public class PageContext {
         String path=request.getRequestURI();
         return !("GET".equals(request.getMethod()) && path.matches("/posts/[0-9a-f-]{36}/image|/admin/users/[0-9a-f-]{36}/icon"))
             && !"true".equals(request.getHeader("X-UI-Form"))
-            && !path.startsWith("/api/");
+            && !path.startsWith("/api/") && !path.equals("/admin/current-user");
     }
 
     public AuthorView currentAuthor(String id) { return repository.selected(id); }

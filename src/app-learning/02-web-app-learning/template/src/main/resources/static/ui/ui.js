@@ -1,3 +1,6 @@
+  document.addEventListener('error', event => {
+    if (event.target.matches?.('[data-avatar-image]')) event.target.remove();
+  }, true);
 (() => {
   const sidebar = document.getElementById('sidebar');
   const toggle = document.querySelector('[data-sidebar-toggle]');

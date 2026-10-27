@@ -13,6 +13,6 @@ import com.example.webapptemplate.authors.internal.application.UserIconService;
 import org.springframework.context.annotation.*;
 @Configuration
 class AuthorsConfiguration {
-    @Bean AuthorOperations authorOperations(AuthorStore store, IconStore icons, UnitOfWork tx, ImageCleanup cleanup,com.example.webapptemplate.platform.AuditTrail audit) { return new AuthorService(store,icons,tx,cleanup,audit); }
+    @Bean AuthorOperations authorOperations(AuthorStore store, IconStore icons, UnitOfWork tx, ImageCleanup cleanup) { return new AuthorService(store,icons,tx,cleanup); }
     @Bean UserIcons userIcons(AuthorStore authors, IconStore icons, UnitOfWork tx, ImageStore storage, ImageCodec codec, ImageCleanup cleanup) { return new UserIconService(authors,icons,tx,storage,codec,cleanup); }
 }

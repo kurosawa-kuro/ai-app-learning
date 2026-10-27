@@ -41,7 +41,7 @@ public class PostController {
     public String list(@RequestParam(required = false) UUID userId,
                        @RequestParam(defaultValue = "1") long page, @RequestParam(defaultValue="") String q,
                        @RequestParam(defaultValue="newest") String sort, Model model) {
-        var authors = repository.authors();
+        var authors = repository.choices();
         model.addAttribute("authors", authors);
         model.addAttribute("selectedAuthor", authors.stream().filter(a -> a.id().equals(userId)).findFirst().orElse(null));
         model.addAttribute("filtered", userId != null || !q.isBlank());
@@ -158,7 +158,7 @@ public class PostController {
     }
     private String form(Model model) {
         if(model.getAttribute("requestId")==null) model.addAttribute("requestId",UUID.randomUUID());
-        var authors = repository.authors();
+        var authors = repository.choices();
         var draft = (PostForm) model.getAttribute("form");
         model.addAttribute("authors", authors);
         model.addAttribute("chosenAuthor", authors.stream().filter(a -> a.id().equals(draft.userId())).findFirst().orElse(null));

@@ -6,26 +6,22 @@ import com.example.webapptemplate.authors.internal.domain.AuthorDeletion;
 import com.example.webapptemplate.authors.internal.domain.AuthorName;
 import com.example.webapptemplate.platform.ImageCleanup;
 import com.example.webapptemplate.platform.UnitOfWork;
-import com.example.webapptemplate.platform.AuditTrail;
 import java.util.*;
 public class AuthorService implements AuthorOperations {
     private final AuthorStore store;
     private final IconStore icons;
     private final UnitOfWork transaction;
     private final ImageCleanup cleanup;
-    private final AuditTrail audit;
+
     public AuthorService(AuthorStore store, IconStore icons, UnitOfWork transaction, ImageCleanup cleanup) {
-        this(store,icons,transaction,cleanup,AuditTrail.NONE);
-    }
-    public AuthorService(AuthorStore store, IconStore icons, UnitOfWork transaction, ImageCleanup cleanup,AuditTrail audit) {
         this.store=store; this.icons=icons; this.transaction=transaction; this.cleanup=cleanup;
-        this.audit=audit;
+
     }
+    public List<AuthorView> choices() { return store.choices(); }
     public List<AuthorView> authors() { return store.authors(); }
     public Optional<AuthorView> author(UUID id) { return store.author(id); }
     public void rename(UUID id,String name) {
-        try { requireAuthor(id); store.rename(id,new AuthorName(name).value()); audit.record("user.rename","success",id.toString()); }
-        catch(RuntimeException failure) { audit.record("user.rename","failure",String.valueOf(id)); throw failure; }
+        requireAuthor(id); store.rename(id,new AuthorName(name).value());
     }
     public UUID addAuthor(String name) { return store.addAuthor(new AuthorName(name).value()); }
     public void requireAuthor(UUID id) {

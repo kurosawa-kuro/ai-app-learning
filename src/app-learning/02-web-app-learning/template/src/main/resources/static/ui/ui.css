@@ -177,8 +177,3 @@ body:has(dialog[open]) { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0s !important; } }
 
 .ui-page--feed { max-width: 800px; }
-.ui-environment { padding: .25rem 1rem; font-size: .75rem; color: var(--ui-text-secondary); background: var(--admin-bg-header); overflow-wrap: anywhere; text-align: right; }
-.operations-page, .operations-page > article, .operations-page .admin-card__body { min-width: 0; overflow-wrap: anywhere; }
-.operations-page .admin-table-wrap { max-width: 100%; overflow-x: auto; }
-.operations-page table { width: 100%; table-layout: fixed; }
-.operations-page td { overflow-wrap: anywhere; }

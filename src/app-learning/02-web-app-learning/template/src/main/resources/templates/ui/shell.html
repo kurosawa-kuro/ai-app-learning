@@ -17,7 +17,6 @@
 </head>
 <body class="admin-body" data-sidebar-open="false" th:classappend="${navigation.sidebar ? 'ui-with-sidebar' : 'ui-without-sidebar'}">
 <a class="ui-skip" href="#main">本文へスキップ</a>
-<div class="ui-environment" th:if="${runtimeInfo != null}" th:text="${runtimeInfo.environment + ' / ' + runtimeInfo.connectionLabel + ' / ' + runtimeInfo.schema + ' / 接続ID ' + runtimeInfo.connectionId}"></div>
 <header class="ui-topbar">
   <button th:if="${navigation.sidebar}" type="button" class="secondary" data-sidebar-toggle aria-controls="sidebar" aria-expanded="false">メニュー</button>
   <a class="ui-brand" th:href="${navigation.home}" th:text="${navigation.name}"></a>
@@ -67,10 +66,7 @@
 <script th:src="@{/admin-pico/js/admin.js}"></script>
 <script th:src="@{/ui/ui.js}"></script>
 <dialog id="image-viewer" aria-label="投稿画像の拡大" class="post-image-dialog"><button type="button" data-close-image autofocus>閉じる</button><img alt=""><p role="status"></p></dialog>
-<script th:src="@{/ui/image-preview.js}"></script>
-<script th:src="@{/ui/form-protection.js}"></script>
-<script th:src="@{/features/posts/feed.js}"></script>
-<script th:src="@{/features/authors/user-selection.js}"></script>
+<script th:if="${navigation.sidebar}" th:src="@{/features/authors/user-selection.js}"></script>
 <script th:each="asset : ${appScripts}" th:src="@{${asset}}"></script>
 </body>
 </html>

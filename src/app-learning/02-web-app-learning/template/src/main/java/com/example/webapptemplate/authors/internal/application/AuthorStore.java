@@ -7,6 +7,7 @@ import com.example.webapptemplate.authors.AuthorView;
 
 public interface AuthorStore {
     List<AuthorView> authors();
+    List<AuthorView> choices();
     Optional<AuthorView> author(UUID id);
     void rename(UUID id, String name);
     UUID addAuthor(String name);

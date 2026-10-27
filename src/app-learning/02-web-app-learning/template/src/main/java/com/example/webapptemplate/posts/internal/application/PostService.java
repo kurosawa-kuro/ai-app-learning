@@ -13,20 +13,19 @@ import com.example.webapptemplate.posts.internal.domain.PostContent;
 
 import java.util.UUID;
 import com.example.webapptemplate.platform.ImageCleanup;
-import com.example.webapptemplate.platform.AuditTrail;
 
 public class PostService implements PostOperations {
     private static final int PAGE_SIZE = 10;
     private final ImageCleanup cleanup;
-    private final AuditTrail audit;
+
     private final AuthorOperations authors;
     private final FeaturePolicy policy;
     private final PostStore repository;
     private final ImageStore storage;
     private final ImageCodec validator;
     private final UnitOfWork transactions;
-    public PostService(PostStore repository, ImageStore storage, ImageCodec validator, UnitOfWork transactions, AuthorOperations authors, FeaturePolicy policy, ImageCleanup cleanup, AuditTrail audit) {
-        this.cleanup=cleanup; this.audit=audit;
+    public PostService(PostStore repository, ImageStore storage, ImageCodec validator, UnitOfWork transactions, AuthorOperations authors, FeaturePolicy policy, ImageCleanup cleanup) {
+        this.cleanup=cleanup;
         this.authors=authors; this.policy=policy;
         this.repository = repository; this.storage = storage; this.validator = validator; this.transactions = transactions;
     }
@@ -63,7 +62,6 @@ public class PostService implements PostOperations {
             }
             throw failure;
         }
-        audit.record("post.create","success",id.toString());
         return id;
     }
     private void cleanupAfterFailure(String key, RuntimeException failure) {
@@ -71,7 +69,6 @@ public class PostService implements PostOperations {
         catch (RuntimeException cleanupFailure) {
             try { cleanup.enqueue(storage.bucket(),key); }
             catch (RuntimeException queueFailure) { failure.addSuppressed(queueFailure); }
-            audit.record("post.image-compensation","pending",null);
             failure.addSuppressed(cleanupFailure);
         }
     }
@@ -82,7 +79,6 @@ public class PostService implements PostOperations {
             repository.deletePost(id);
         });
         cleanup.run();
-        audit.record("post.delete","success",id.toString());
     }
     public java.util.List<PostView> posts(UUID userId) { return repository.posts(userId); }
     public PostPage page(UUID userId, long requestedPage) {
@@ -122,8 +118,7 @@ public class PostService implements PostOperations {
             if(staged.get()!=null) {
                 try { cleanup.enqueue(storage.bucket(),staged.get()); cleanup.run(); }
                 catch(RuntimeException retryFailure) { failure.addSuppressed(retryFailure); }
-            }
-            audit.record("post.create","failure",request.toString()); throw failure;
+            } throw failure;
         }
     }
     private static String fingerprint(UUID author,String title,String body,ImageUpload image) {
@@ -155,8 +150,8 @@ public class PostService implements PostOperations {
                 if(!repository.update(changed,version)) throw new IllegalStateException("別の操作で更新されました。再読込みして内容を確認してください。");
                 if((file!=null || removeImage) && original.imageKey()!=null) cleanup.enqueue(original.imageBucket(),original.imageKey());
             });
-        } catch(RuntimeException failure) { if(key!=null) cleanupAfterFailure(key,failure); audit.record("post.update","failure",id.toString()); throw failure; }
-        cleanup.run(); audit.record("post.update","success",id.toString());
+        } catch(RuntimeException failure) { if(key!=null) cleanupAfterFailure(key,failure); throw failure; }
+        cleanup.run();
     }
     public PostView post(UUID id) { return repository.post(id); }
 }

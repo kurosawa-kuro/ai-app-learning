@@ -30,7 +30,7 @@ class PostServiceTests {
         when(validator.read(file)).thenReturn(new ImageData(new byte[]{1}, "image/png", "png"));
         when(storage.bucket()).thenReturn("test-bucket");
         doThrow(new IllegalStateException("database unavailable")).when(tx).run(any());
-        var service = new PostService(repository, storage, validator, tx, mock(AuthorOperations.class), mock(FeaturePolicy.class), mock(com.example.webapptemplate.platform.ImageCleanup.class), com.example.webapptemplate.platform.AuditTrail.NONE);
+        var service = new PostService(repository, storage, validator, tx, mock(AuthorOperations.class), mock(FeaturePolicy.class), mock(com.example.webapptemplate.platform.ImageCleanup.class));
         assertThatThrownBy(() -> service.create(UUID.randomUUID(), "投稿", "", file)).hasMessage("database unavailable");
         var key = org.mockito.ArgumentCaptor.forClass(String.class);
         verify(storage).upload(key.capture(), any());
@@ -46,7 +46,7 @@ class PostServiceTests {
         doAnswer(call -> { ((Runnable)call.getArgument(0)).run(); return null; }).when(tx).run(any());
         var cleanup=mock(com.example.webapptemplate.platform.ImageCleanup.class);
         when(cleanup.run()).thenReturn(1);
-        var service = new PostService(repository, storage, mock(ImageCodec.class), tx, mock(AuthorOperations.class), mock(FeaturePolicy.class), cleanup, com.example.webapptemplate.platform.AuditTrail.NONE);
+        var service = new PostService(repository, storage, mock(ImageCodec.class), tx, mock(AuthorOperations.class), mock(FeaturePolicy.class), cleanup);
         service.delete(id);
         verify(cleanup).enqueue("test","object.png");
         verify(repository).deletePost(id);
@@ -56,7 +56,7 @@ class PostServiceTests {
     @Test
     void rejectsImageWhenOptionIsDisabled() {
         var storage = new SupabaseImageStore("", "", "unused");
-        var service = new PostService(mock(PostStore.class), storage, new ImageIoCodec(), mock(UnitOfWork.class), mock(AuthorOperations.class), mock(FeaturePolicy.class, CALLS_REAL_METHODS), mock(com.example.webapptemplate.platform.ImageCleanup.class), com.example.webapptemplate.platform.AuditTrail.NONE);
+        var service = new PostService(mock(PostStore.class), storage, new ImageIoCodec(), mock(UnitOfWork.class), mock(AuthorOperations.class), mock(FeaturePolicy.class, CALLS_REAL_METHODS), mock(com.example.webapptemplate.platform.ImageCleanup.class));
         assertThatThrownBy(() -> service.create(UUID.randomUUID(), "投稿", "", new ImageUpload(new byte[]{1})))
                 .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("OFF");
     }

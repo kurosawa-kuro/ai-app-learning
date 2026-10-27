@@ -1,7 +1,4 @@
 (() => {
-  document.addEventListener('error', event => {
-    if (event.target.matches?.('[data-avatar-image]')) event.target.remove();
-  }, true);
   document.querySelectorAll('[data-image-picker]').forEach(picker => {
     const input = picker.querySelector('[data-image-input]');
     const preview = picker.querySelector('[data-image-preview]');

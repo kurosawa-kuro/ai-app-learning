@@ -3,15 +3,15 @@ const {chromium,expect,request}=require('@playwright/test');
 const fs=require('node:fs');
 (async()=>{
  const baseURL=process.env.RENDER_ACCEPTANCE_URL;
- if(!baseURL || !baseURL.startsWith('https://') || !process.env.APP_ACCESS_PASSWORD) throw Error('Set HTTPS URL and environment access credentials.');
+ if(!baseURL || !baseURL.startsWith('https://')) throw Error('Set HTTPS URL.');
  const anonymous=await request.newContext({baseURL});
  for(const path of ['/posts','/admin','/admin/ai']) {
-  const response=await anonymous.get(path);if(response.status()!==401)throw Error(`Anonymous ${path}: ${response.status()}`);
+  const response=await anonymous.get(path);if(response.status()!==200)throw Error(`Public ${path}: ${response.status()}`);
  }
  const health=await anonymous.get('/healthz');if(health.status()!==200)throw Error('Health check failed');await anonymous.dispose();
  const browser=await chromium.launch();
  try {
-  const context=await browser.newContext({baseURL,httpCredentials:{username:process.env.APP_ACCESS_USER||'starter',password:process.env.APP_ACCESS_PASSWORD}});
+  const context=await browser.newContext({baseURL});
   const page=await context.newPage();await page.goto('/posts');await expect(page.getByRole('heading',{name:'投稿一覧',exact:true})).toBeVisible();
   // Check every shipped stylesheet, not just headings rendered without CSS.
   for (const href of await page.locator('link[rel=stylesheet]').evaluateAll(links => links.map(link => link.href))) {
@@ -23,13 +23,9 @@ const fs=require('node:fs');
    const style = getComputedStyle(el); return {height:el.getBoundingClientRect().height, boxSizing:style.boxSizing};
   });
   if(inputStyle.height < 40 || inputStyle.boxSizing !== 'border-box') throw Error('Pico form styles are not applied');
-  await page.goto('/admin/operations');const ops=await page.locator('#content').innerText();
-  if(!ops.includes('app_template_render') || ops.includes('接続失敗'))throw Error('Production schema or connection check failed');
-  const auth='Basic '+Buffer.from(`${process.env.APP_ACCESS_USER||'starter'}:${process.env.APP_ACCESS_PASSWORD}`).toString('base64');
-  const csrf=await context.request.post('/admin/ai/models',{headers:{Authorization:auth},form:{allowedModelsInput:''}});
-  if(![401,403].includes(csrf.status()))throw Error(`CSRF protection failed: ${csrf.status()}`);
-  console.log(`POST without CSRF rejected: ${csrf.status()}`);
-  console.log('HTTPS, health, anonymous rejection, authenticated pages, production schema, DB/Storage and CSRF passed.');
+  const csrf=await context.request.post('/admin/ai/models',{form:{allowedModelsInput:''}});
+  if(csrf.status()!==403)throw Error(`CSRF protection failed: ${csrf.status()}`);
+  console.log('Public pages without login, all CSS, Pico form styling and CSRF passed.');
   if(process.env.RUN_RENDER_GEMINI==='true') {
    await page.goto('/admin/settings');const toggle=page.locator('[name="aiIntegration"]');const original=await toggle.isChecked();
    try {

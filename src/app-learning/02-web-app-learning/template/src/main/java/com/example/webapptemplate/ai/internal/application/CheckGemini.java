@@ -4,7 +4,6 @@ import com.example.webapptemplate.ai.AiConnectivity;
 import com.example.webapptemplate.ai.AiCheckResult;
 import com.example.webapptemplate.ai.AiCheckResult.Status;
 import com.example.webapptemplate.settings.FeaturePolicy;
-import com.example.webapptemplate.platform.AuditTrail;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
@@ -12,10 +11,10 @@ import java.util.concurrent.locks.ReentrantLock;
 public final class CheckGemini implements AiConnectivity {
     private final GeminiGateway gateway;
     private final FeaturePolicy policy;
-    private final AuditTrail audit;
+
     private final ReentrantLock running = new ReentrantLock();
-    public CheckGemini(GeminiGateway gateway, FeaturePolicy policy, AuditTrail audit) {
-        this.gateway=gateway; this.policy=policy; this.audit=audit;
+    public CheckGemini(GeminiGateway gateway, FeaturePolicy policy) {
+        this.gateway=gateway; this.policy=policy;
     }
     public boolean configured() { return gateway.configured(); }
     public String model() { return gateway.model(); }
@@ -30,12 +29,10 @@ public final class CheckGemini implements AiConnectivity {
             // Recheck saved policy immediately before making an external request.
             if (!policy.aiEnabled()) return result(id,Status.DISABLED,start);
             if (!policy.allowsAiModel(model())) return result(id,Status.MODEL_DENIED,start);
-            audit.record("ai.check","started",id);
             return result(id,gateway.probe(),start);
         } finally { running.unlock(); }
     }
     private AiCheckResult result(String id, Status status, long start) {
-        audit.record("ai.check",status.name(),id);
         return new AiCheckResult(id,status,model(),Instant.now(),(System.nanoTime()-start)/1_000_000);
     }
 }

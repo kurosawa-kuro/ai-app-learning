@@ -11,5 +11,5 @@ import com.example.webapptemplate.posts.internal.application.PostStore;
 import org.springframework.context.annotation.*;
 @Configuration
 class PostsConfiguration {
-    @Bean PostOperations postOperations(PostStore store, ImageStore storage, ImageCodec codec, UnitOfWork tx, AuthorOperations authors, FeaturePolicy policy, ImageCleanup cleanup, AuditTrail audit) { return new PostService(store,storage,codec,tx,authors,policy,cleanup,audit); }
+    @Bean PostOperations postOperations(PostStore store, ImageStore storage, ImageCodec codec, UnitOfWork tx, AuthorOperations authors, FeaturePolicy policy, ImageCleanup cleanup) { return new PostService(store,storage,codec,tx,authors,policy,cleanup); }
 }

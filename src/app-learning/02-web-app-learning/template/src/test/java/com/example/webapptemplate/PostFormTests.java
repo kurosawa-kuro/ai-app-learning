@@ -20,7 +20,7 @@ class PostFormTests {
     @Test
     void validationPreservesDraftAndIdentifiesEachInvalidField() {
         var repository = mock(AuthorOperations.class);
-        when(repository.authors()).thenReturn(List.of());
+        when(repository.choices()).thenReturn(List.of());
         var service = mock(PostOperations.class);
         var controller = new PostController(repository, service);
         var model = new ExtendedModelMap();
@@ -34,7 +34,7 @@ class PostFormTests {
     @Test
     void databaseFailurePreservesNativeFormAndReturnsRecoverableAsyncError() {
         var repository = mock(AuthorOperations.class);
-        when(repository.authors()).thenReturn(List.of());
+        when(repository.choices()).thenReturn(List.of());
         var service = mock(PostOperations.class);
         var author = UUID.randomUUID();
         when(service.create(author, "下書き", "残す本文", null))

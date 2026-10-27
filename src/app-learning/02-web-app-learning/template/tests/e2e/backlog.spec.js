@@ -108,17 +108,3 @@ test('画像の遅延・失敗・再読込と未保存の離脱確認', async ({
     expect((await page.request.post(`/admin/users/${author.id}/delete`, { headers })).ok()).toBeTruthy();
   }
 });
-
-test('管理画面で状態・再試行・画像照会・バックアップを操作できる', async ({ page }, info) => {
-  test.skip(info.project.name !== 'images-off', '共通の運用機能');
-  await page.goto('/admin'); await page.getByRole('button', { name: '状態と復旧を開く' }).click();
-  await expect(page.getByRole('heading', { name: '状態と復旧', exact: true })).toBeVisible();
-  await expect(page.getByText('データベース：正常', { exact: true })).toBeVisible();
-  await page.getByRole('button', { name: '後片付けを再試行' }).click();
-  await expect(page.getByRole('status')).toContainText('再試行しました');
-  await page.getByRole('button', { name: '保存済み画像を確認' }).click();
-  const downloaded = page.waitForEvent('download'); await page.getByRole('button', { name: 'バックアップを保存' }).click();
-  const download = await downloaded; expect(download.suggestedFilename()).toMatch(/^backup-.*\.zip$/); expect(await download.failure()).toBeNull();
-  await page.setViewportSize({ width: 390, height: 844 });
-  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
-});
