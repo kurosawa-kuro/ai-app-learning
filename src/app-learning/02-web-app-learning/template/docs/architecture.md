@@ -36,4 +36,4 @@ GenerateDraftは許可・モデル・入力を確認してGeminiを一度だけ�
 
 Pico CSS・admin-pico・共通UIを使い、投稿用JSは投稿画面、ゲーム用JSはゲーム画面だけに配信する。アイコン編集にも画像プレビューが必要であることを資産選択テストで確認する。
 
-旧operationsモジュール・監査フィルター・RecoveryDataset・RuntimeInfoは削除した。過去のFlywayで作られた旧台帳は互換性のため残るが、実行時の依存にはしない。
+旧operationsモジュール・監査フィルター・RecoveryDataset・RuntimeInfoは削除した。V10で過去の台帳を稼働スキーマから外し、データがあれば別スキーマへ保全する。[DB設計](database-design.md)に6表の構造と移行条件を定義する。

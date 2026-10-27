@@ -30,39 +30,29 @@ public class PostService implements PostOperations {
         this.repository = repository; this.storage = storage; this.validator = validator; this.transactions = transactions;
     }
     public UUID create(UUID author, String title, String body, ImageUpload file) {
-        return createAt(UUID.randomUUID(),author,title,body,file);
-    }
-    private UUID createAt(UUID id, UUID author, String title, String body, ImageUpload file) {
-        return createAt(id,author,title,body,file,key -> {});
-    }
-    private UUID createAt(UUID id, UUID author, String title, String body, ImageUpload file, java.util.function.Consumer<String> staged) {
-        authors.requireAuthor(author);
-        var content = new PostContent(title, body);
-        title=content.title(); body=content.body();
-        ImageData image = null;
-        String key = null;
-        if (file != null) {
-            policy.requireImagesEnabled();
-            image = validator.read(file);
-            key = id + "." + image.extension();
-            staged.accept(key);
-            try { storage.upload(key, image); }
-            catch (RuntimeException failure) {
-                // A timed-out upload might have completed remotely; remove only this request's key.
-                cleanupAfterFailure(key, failure);
-                throw failure;
-            }
-        }
-        var post = new PostView(id, author, "", title, body,
-                key == null ? null : storage.bucket(), key, image == null ? null : image.type(), null);
+        var post=prepare(UUID.randomUUID(),author,title,body,file);
         try { transactions.run(() -> repository.insert(post)); }
-        catch (RuntimeException failure) {
-            if (key != null) {
-                cleanupAfterFailure(key, failure);
-            }
+        catch(RuntimeException failure) {
+            if(post.imageKey()!=null) cleanupAfterFailure(post.imageKey(),failure);
             throw failure;
         }
-        return id;
+        return post.id();
+    }
+    /** Validate and upload before opening a database transaction. Each attempt owns its object. */
+    private PostView prepare(UUID id,UUID author,String title,String body,ImageUpload file) {
+        var content=new PostContent(title,body);
+        authors.requireAuthor(author);
+        ImageData image=null;
+        String key=null;
+        if(file!=null) {
+            policy.requireImagesEnabled();
+            image=validator.read(file);
+            key=UUID.randomUUID()+"."+image.extension();
+            try { storage.upload(key,image); }
+            catch(RuntimeException failure) { cleanupAfterFailure(key,failure); throw failure; }
+        }
+        return new PostView(id,author,"",content.title(),content.body(),
+            key==null?null:storage.bucket(),key,image==null?null:image.type(),null);
     }
     private void cleanupAfterFailure(String key, RuntimeException failure) {
         try { storage.delete(storage.bucket(), key); }
@@ -99,27 +89,43 @@ public class PostService implements PostOperations {
     }
     public UUID createOnce(UUID request,UUID author,String title,String body,ImageUpload image) {
         if(request==null) return create(author,title,body,image);
+        // Fast retry: no image upload or author-count query for an already saved request.
+        new PostContent(title,body);
         var hash=fingerprint(author,title,body,image);
-        var staged=new java.util.concurrent.atomic.AtomicReference<String>();
-        var id=UUID.randomUUID();
-        try { return transactions.execute(() -> {
-            repository.lockRequest(request);
-            var prior=repository.request(request);
-            if(prior.isPresent()) {
-                if(!prior.get().fingerprint().equals(hash)) throw new IllegalArgumentException("送信内容が変更されました。新しい投稿画面から保存してください。");
-                return prior.get().postId();
+        var existing=repository.request(request);
+        if(existing.isPresent()) return replay(existing.get(),hash);
+        var prepared=prepare(UUID.randomUUID(),author,title,body,image);
+        UUID saved;
+        try {
+            saved=transactions.execute(() -> {
+                // Serialize only the short DB commit, never a Storage network request.
+                repository.lockRequest(request);
+                var prior=repository.request(request);
+                if(prior.isPresent()) return replay(prior.get(),hash);
+                repository.insert(prepared);
+                repository.saveRequest(request,hash,prepared.id());
+                return prepared.id();
+            });
+        } catch(RuntimeException failure) {
+            // A commit acknowledgement can be lost: verify references before deleting anything.
+            if(prepared.imageKey()!=null) {
+                try { cleanup.enqueue(prepared.imageBucket(),prepared.imageKey()); cleanup.run(); }
+                catch(RuntimeException cleanupFailure) { failure.addSuppressed(cleanupFailure); }
             }
-            repository.saveRequest(request,hash,id);
-            createAt(id,author,title,body,image,staged::set);
-            return id;
-        }); } catch(RuntimeException failure) {
-            // The request transaction has rolled back. Persist retry state outside it,
-            // even if both the database write and direct Storage compensation failed.
-            if(staged.get()!=null) {
-                try { cleanup.enqueue(storage.bucket(),staged.get()); cleanup.run(); }
-                catch(RuntimeException retryFailure) { failure.addSuppressed(retryFailure); }
-            } throw failure;
+            throw failure;
         }
+        if(!saved.equals(prepared.id()) && prepared.imageKey()!=null) {
+            // Concurrent retry won. This attempt's distinct upload is not referenced.
+            cleanup.enqueue(prepared.imageBucket(),prepared.imageKey()); cleanup.run();
+        }
+        return saved;
+    }
+    private static UUID replay(PostStore.Receipt receipt,String hash) {
+        if(!receipt.fingerprint().equals(hash))
+            throw new IllegalArgumentException("送信内容が変更されました。新しい投稿画面から保存してください。");
+        if(receipt.postId()==null)
+            throw new IllegalArgumentException("この送信で作成した投稿は削除済みです。新しい投稿画面から作成してください。");
+        return receipt.postId();
     }
     private static String fingerprint(UUID author,String title,String body,ImageUpload image) {
         try {

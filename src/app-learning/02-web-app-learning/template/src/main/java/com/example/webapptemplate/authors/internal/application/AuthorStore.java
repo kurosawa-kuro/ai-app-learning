@@ -9,6 +9,7 @@ public interface AuthorStore {
     List<AuthorView> authors();
     List<AuthorView> choices();
     Optional<AuthorView> author(UUID id);
+    long usageCount(UUID id);
     void rename(UUID id, String name);
     UUID addAuthor(String name);
     void deleteAuthor(UUID id);

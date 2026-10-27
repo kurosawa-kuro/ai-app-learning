@@ -21,18 +21,20 @@ public class JdbcPostStore implements PostStore, ImageReferences {
         db.sql("insert into post_requests(request_id,fingerprint,post_id) values(:id,:hash,:post)")
             .param("id",id).param("hash",fingerprint).param("post",postId).update();
     }
-    private String conditions(UUID userId) {
-        return " where " + (userId == null ? "" : "p.user_id=:userId and ")
-            + "(strpos(lower(p.title),lower(:query)) > 0 or strpos(lower(p.body),lower(:query)) > 0) ";
+    private String conditions(UUID userId,String query) {
+        var filters=new ArrayList<String>();
+        if(userId!=null) filters.add("p.user_id=:userId");
+        if(!query.isEmpty()) filters.add("(strpos(lower(p.title),lower(:query)) > 0 or strpos(lower(p.body),lower(:query)) > 0)");
+        return filters.isEmpty()?" ":" where "+String.join(" and ",filters)+" ";
     }
     public long searchCount(UUID userId,String query) {
-        var sql=db.sql("select count(*) from posts p"+conditions(userId)).param("query",query);
+        var sql=db.sql("select count(*) from posts p"+conditions(userId,query)).param("query",query);
         if(userId!=null) sql.param("userId",userId);
         return sql.query(Long.class).single();
     }
     public List<PostView> search(UUID userId,String query,String sort,int limit,long offset) {
         String order = "oldest".equals(sort) ? "asc" : "desc";
-        var sql=db.sql("select p.*,u.name as user_name from posts p join app_users u on u.id=p.user_id"+conditions(userId)
+        var sql=db.sql("select p.*,u.name as user_name from posts p join app_users u on u.id=p.user_id"+conditions(userId,query)
             +"order by p.created_at "+order+",p.id limit :limit offset :offset")
             .param("query",query).param("limit",limit).param("offset",offset);
         if(userId!=null) sql.param("userId",userId);

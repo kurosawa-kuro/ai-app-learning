@@ -30,7 +30,7 @@ public class AuthorService implements AuthorOperations {
     public int deleteAuthor(UUID id) {
         transaction.run(() -> {
             store.lockUser(id);
-            AuthorDeletion.requireUnused(store.author(id).orElseThrow().usageCount());
+            AuthorDeletion.requireUnused(store.usageCount(id));
             icons.icon(id).ifPresent(old -> cleanup.enqueue(old.bucket(),old.key()));
             store.deleteAuthor(id); // FK remains the final concurrent-write guard.
         });

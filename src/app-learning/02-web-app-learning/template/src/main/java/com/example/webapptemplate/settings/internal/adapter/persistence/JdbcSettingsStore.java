@@ -15,7 +15,7 @@ public class JdbcSettingsStore implements SettingsStore {
     public JdbcSettingsStore(JdbcTemplate jdbc, @Value("${app.images.enabled}") boolean initialImagesEnabled) {
         this.jdbc = jdbc;
         // Environment variables seed new installations; never overwrite a saved preference.
-        jdbc.update("insert into app_settings (id, images_enabled) values (1, ?) on conflict (id) do nothing",
+        jdbc.update("with initial as (insert into app_settings (id, images_enabled) values (1, ?) on conflict (id) do nothing returning id) insert into allowed_ai_models(model_id,position) select 'gemini-3.5-flash-lite',0 from initial",
                 initialImagesEnabled);
     }
 
@@ -32,9 +32,14 @@ public class JdbcSettingsStore implements SettingsStore {
                 imagesEnabled, aiEnabled);
     }
     public String allowedAiModels() {
-        return jdbc.queryForObject("select allowed_ai_models from app_settings where id = 1",String.class);
+        return String.join("\n",jdbc.queryForList("select model_id from allowed_ai_models order by position",String.class));
     }
+    @org.springframework.transaction.annotation.Transactional
     public void saveAllowedAiModels(String models) {
-        jdbc.update("update app_settings set allowed_ai_models = ?, updated_at = now() where id = 1",models);
+        var allowed=com.example.webapptemplate.settings.internal.domain.AllowedAiModels.parse(models).values();
+        jdbc.queryForObject("select id from app_settings where id=1 for update",Integer.class);
+        jdbc.update("delete from allowed_ai_models");
+        for(int i=0;i<allowed.size();i++) jdbc.update("insert into allowed_ai_models(model_id,position) values (?,?)",allowed.get(i),i);
+        jdbc.update("update app_settings set updated_at=now() where id=1");
     }
 }

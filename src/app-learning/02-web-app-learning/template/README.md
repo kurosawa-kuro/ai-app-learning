@@ -44,6 +44,7 @@ npx playwright test
 - [仕様](テンプレート仕様.md)、[コード構成](docs/architecture.md)、[UI](docs/ui-foundation.md)
 - [最小共通機能](docs/shared-foundation-requirements.md)、[現在の対応状況](docs/improvement-backlog.md)
 - [Render公開](docs/render-deployment.md)、[作業用コマンド](docs/operations-runbook.md)
+- [DB設計・移行条件](docs/database-design.md)
 - [性能の測定記録](docs/performance-validation.md)
 
 Pico CSS 2.1.1をMITライセンス付きで同梱します。admin-picoのレイアウト・部品はMavenから取り込みます。公開前に全CSSのHTTP200・text/css・スタイル適用を確認します。

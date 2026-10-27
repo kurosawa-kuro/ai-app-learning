@@ -86,6 +86,20 @@ class BacklogIntegrationTests {
             assertThatThrownBy(()->service.createOnce(key,author,"異なる内容","",null)).hasMessageContaining("変更されました");
         } finally { pool.shutdownNow(); }
     }
+    @Test void uploadDoesNotHoldDatabaseTransactionAndDeletedRequestCannotResurrectPost() {
+        doAnswer(call->{
+            assertThat(org.springframework.transaction.support.TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
+            objects.put(call.getArgument(0),((ImageData)call.getArgument(1)).bytes());
+            return null;
+        }).when(storage).upload(anyString(),any());
+        var request=UUID.randomUUID();
+        var id=service.createOnce(request,author,"短いDB処理","",image());
+        service.delete(id);
+        assertThatThrownBy(()->service.createOnce(request,author,"短いDB処理","",image())).hasMessageContaining("削除済み");
+        assertThat(service.posts(author)).isEmpty();
+        assertThat(objects).isEmpty();
+        verify(storage,times(1)).upload(anyString(),any());
+    }
     @Test void authorRenamePreservesReferencesAndSearchIsLiteralAndSorted() {
         var first=service.create(author,"100%_の記録","検索本文",null);
         var second=service.create(author,"別の記録","検索本文",null);

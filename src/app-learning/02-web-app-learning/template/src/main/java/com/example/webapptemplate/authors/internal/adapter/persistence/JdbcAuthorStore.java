@@ -22,9 +22,9 @@ public class JdbcAuthorStore implements AuthorStore {
     }
     public Optional<AuthorView> author(UUID id) {
         return db.sql("select id,name,0 as usage_count,created_at from app_users where id=:id").param("id",id)
-            .query(AuthorView.class).optional().map(user -> new AuthorView(user.id(),user.name(),
-                references.stream().mapToLong(source -> source.count(id)).sum(),user.createdAt()));
+            .query(AuthorView.class).optional();
     }
+    public long usageCount(UUID id) { return references.stream().mapToLong(source -> source.count(id)).sum(); }
     public void rename(UUID id,String name) {
         db.sql("update app_users set name=:name where id=:id").param("id",id).param("name",name).update();
     }

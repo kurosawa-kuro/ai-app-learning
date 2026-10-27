@@ -11,21 +11,20 @@ public class JdbcIconStore implements IconStore, ImageReferences {
     private final JdbcTemplate jdbc;
     public JdbcIconStore(JdbcTemplate jdbc) { this.jdbc=jdbc; }
     public Optional<Icon> icon(UUID id) {
-        return jdbc.query("select image_bucket,image_key,image_type from user_icons where user_id=?",
+        return jdbc.query("select icon_bucket,icon_key,icon_type from app_users where id=? and icon_key is not null",
             (rs, row) -> new Icon(rs.getString(1), rs.getString(2), rs.getString(3)), id).stream().findFirst();
     }
     public Set<UUID> usersWithIcons() {
-        return new HashSet<>(jdbc.queryForList("select user_id from user_icons", UUID.class));
+        return new HashSet<>(jdbc.queryForList("select id from app_users where icon_key is not null", UUID.class));
     }
 
     public void save(UUID id, Icon icon) {
         jdbc.update("""
-            insert into user_icons values (?,?,?,?) on conflict (user_id) do update
-            set image_bucket=excluded.image_bucket,image_key=excluded.image_key,image_type=excluded.image_type
-            """, id,icon.bucket(),icon.key(),icon.type());
+            update app_users set icon_bucket=?,icon_key=?,icon_type=? where id=?
+            """, icon.bucket(),icon.key(),icon.type(),id);
     }
-    public void delete(UUID id) { jdbc.update("delete from user_icons where user_id=?",id); }
+    public void delete(UUID id) { jdbc.update("update app_users set icon_bucket=null,icon_key=null,icon_type=null where id=?",id); }
     public boolean uses(String bucket,String key) {
-        return Boolean.TRUE.equals(jdbc.queryForObject("select exists(select 1 from user_icons where image_bucket=? and image_key=?)",Boolean.class,bucket,key));
+        return Boolean.TRUE.equals(jdbc.queryForObject("select exists(select 1 from app_users where icon_bucket=? and icon_key=?)",Boolean.class,bucket,key));
     }
 }
