@@ -1,0 +1,7 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="image(id,title,eager)" class="post-media" data-post-media>
+  <button type="button" class="post-image-button post-thumbnail" data-image-enlarge th:attr="aria-label=${title + 'の画像を拡大'}">
+    <img class="post-image" th:src="@{/diary/photos/{id}(id=${id})}" th:alt="${title + 'の添付画像'}" th:loading="${eager ? 'eager' : 'lazy'}">
+  </button>
+  <p class="post-image-status" role="status">画像を読み込み中…</p>
+  <button type="button" class="secondary post-image-retry" data-image-retry hidden>画像を再読み込み</button>
+</div>
