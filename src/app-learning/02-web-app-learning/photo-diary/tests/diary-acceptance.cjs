@@ -15,7 +15,7 @@ const fs=require('node:fs');
  await page.locator('[name=userId]').selectOption(users[0]);await page.locator('[name=title]').fill(title);
  await page.locator('[name=tags]').fill('受入確認,散歩');await page.locator('[name=photos]').setInputFiles(samples);
  await page.locator('#diary-material').fill('公園で春の色を見つけた。');
- await page.getByRole('button',{name:'AIで下書きを作る'}).click();await expect(page.locator('#diary-draft')).toBeVisible();
+ await page.getByRole('button',{name:'AIで下書きを作る'}).click();await expect(page.locator('#diary-generate')).toBeEnabled({timeout:30000});await expect(page.locator('#diary-draft')).toBeVisible();
  await page.getByRole('button',{name:'本文へ反映'}).click();await page.locator('[name=body]').fill('本人が確認して手直しした日記です。\n写真を3枚残しました。');
  if(process.env.DIARY_EXPIRE_SESSION==='1'){
   const originalId=await page.locator('[name=requestId]').inputValue();await page.context().clearCookies();
