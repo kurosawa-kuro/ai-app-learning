@@ -2,9 +2,30 @@
 
 このファイルは Claude Code がこのリポジトリで作業する際の最小ガイド。
 
+## 目的と教育方針
+
+IT入門者がAIを活用して、ITの基礎、プログラミング、業務効率化、資格取得に取り組むためのリポジトリ。**誰の、どんなゴールに、どんなスタート支援を提供し、AIで何を横展開するか**を取り組みごとに設計する。
+
+まず [AGENTS.md](AGENTS.md) の対象者別の方針を読み、対象教材のガイドへ進む。作業のGoal / Doneには、対象者と本人のゴールを反映する。日本語で前提と確認方法を示し、AIの生成結果と本人の習得、構想と実装・検証済みの状態を区別する。
+
+| 対象者・ゴール | 優先資料 | スタート支援とAIによる横展開 |
+|---|---|---|
+| 子供・英語学習者・写真日記の利用者・店長等、それぞれの興味や課題 | [GASアプリ集](src/gas/README.md) | 題材の体験と小さな変更を支援し、AIで次の変更へ応用。子供の楽しさ・理解、学習への活用、店舗業務の運用を別々に評価する |
+| 自分用・業務用のアプリを作って使いたい非エンジニア | [Webアプリ・公開戦略メモ](src/nextjs/GASではなくNextjs-Vercel戦略.md) | 要望整理、ひな形、環境、最初の公開を支援。動いたアプリをAIと用途に合わせて変え、別の身近な業務へ応用。実利用と変更結果の確認を成果にする |
+| Java・Oracle系の仕事を目指すIT未経験者 | [Java・Oracle Bronze × Devin 学習戦略](<src/Java・Oracle Bronze × Devin/Java・Oracle Bronze × Devin 実務直結型学習戦略.md>) | 環境と最初のJava・SQL課題を支援。AIの例題・解説・レビューで別課題に応用し、同じアプリを育てる。自力修正・テスト・資格と実習成果を確認する |
+| 日々の事務処理を減らしたい非エンジニア、特にIT人材・SES営業 | [Cursor業務効率化スターター](src/cursor-office-automation-starter/README.md) | 導入・サンプル・プロンプトで1業務を支援。入力・条件・出力をAIと調整し、別の集計・資料整理等へ応用。正確さ・時間・再現性を確認する |
+
+全ルートを同じ学習段階や成功条件に揃えない。GASの6工程と対面90分案はGAS教材内の枠組みであり、全員の必修ではない。Java学習で求める自力のコード・SQL修正を、業務効率化やアプリ実利用の全員へ課さない。
+
+Web戦略は[Spring Boot系のメモ](src/SpringBoot-render-supabase/GASではなくSpringBoot-render-supabase戦略.md)も読む。技術案と公開方法を比較する検討資料として扱い、ファイル名だけで技術採用を確定せず、GAS資料の2基盤比較案との整合は採用時に判断する。サービス対応・料金・コマンドは未検証の会話メモから確定情報として転記しない。
+
+Java戦略は追記を含め、Java Bronzeは優先取得、Oracle Bronzeは学習先行・必要時受験とする。Cursor教材はWindows・追加ランタイム不要・元ファイル保全・単独で使えるプロンプトを維持する。教材ごとの業務ルール・公開範囲を尊重し、5教材の一括移植や新規教材の量産を暗黙の作業範囲にしない。
+
 ## Source of Truth
 
 - Project overview: `README.md`
+- 取り組み別の支援・作業方針: `AGENTS.md` と上記の参照資料
+- 教材の現行仕様・実行手順: 対象の README / AGENTS.md / CLAUDE.md と、そこから参照する正本・実装・検証記録
 - Documentation index: `docs/00_index.md`
 - Requirements: `docs/01_requirements.md`
 - Architecture: `docs/02_architecture.md`
@@ -18,22 +39,21 @@
 
 **spec の使い分け（混同しない）**: `SPEC.md` = 今から作る 1 機能の使い捨て実装スペック（公式 Explore→Plan→Implement→Commit の入口、新セッションで実行）。`docs/specs/` = 恒久アーキ設計マスター。`docs/tasks/` = タスク台帳。
 
+ルート `docs/` にはテンプレートの未記入項目が残る。未記入を確定要件として補完せず、対象教材の正本と実装を確認する。戦略資料は学習の方向性を示すもので、アプリの完成や公開を証明しない。
+
 ## コマンド
 
-```bash
-make setup    # 初期セットアップ (依存取得 + ビルド)
-make build    # ビルド
-make run      # 実行
-make dev      # 開発サーバー / ホットリロード
-make test     # テスト
-make fmt      # フォーマット
-make lint     # 静的解析
-```
+ルートの `Makefile` は実処理が未設定のテンプレート。`make setup` / `make build` / `make run` / `make dev` / `make test` / `make fmt` / `make lint` を動作済みの共通コマンドとして扱わない。
+
+- 対象教材の README と実際の `Makefile`・マニフェスト・スクリプトから、作業ディレクトリと検証方法を確認する。
+- 文書のみの変更は、参照資料との整合性、相対リンク、差分を確認し、`git diff --check` を実行する。
+- コード変更は対象教材のテスト・整形・静的検査を行う。実環境受入や公開の確認はローカル検証と分けて報告する。
+- 未作成のNext.js・Java実習環境について、起動コマンドやテスト合格を推測で記載しない。
 
 ## アーキテクチャ
 
-- ソースは `src/` 配下に置く。
-- 非機密の設定は `env/config.yaml`、ローカル秘密情報は `env/secret.yaml`、チーム共有・本番クレデンシャルは Doppler (`doppler.yaml`) で管理する。
+- `src/` に複数教材と戦略資料を置く。各教材の構成と導入条件を尊重する。
+- 設定・秘密情報は対象教材の仕組みに従う。ルート共通設定の `env/config.yaml`、ローカル秘密情報の `env/secret.yaml`、Doppler (`doppler.yaml`) を全教材へ一律導入しない。秘密情報をコミットしない。
 - 設計・運用ドキュメントは `docs/` 配下。権威順位と更新規約は `docs/00_index.md` に従う。
 - パス別ルールは `.claude/rules/` 配下に置く。
 - 一回性の作業計画は `docs/tasks/`、繰り返し使う作業手順は `.claude/skills/` に置く。
