@@ -53,7 +53,7 @@ public class PageContext {
 
     private static boolean needsPage(HttpServletRequest request) {
         String path=request.getRequestURI();
-        return !path.matches("/posts/[0-9a-f-]{36}/image|/admin/users/[0-9a-f-]{36}/icon")
+        return !("GET".equals(request.getMethod()) && path.matches("/posts/[0-9a-f-]{36}/image|/admin/users/[0-9a-f-]{36}/icon"))
             && !"true".equals(request.getHeader("X-UI-Form"))
             && !path.startsWith("/api/");
     }

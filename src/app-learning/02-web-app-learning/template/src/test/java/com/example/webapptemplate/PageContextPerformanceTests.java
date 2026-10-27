@@ -21,4 +21,10 @@ class PageContextPerformanceTests {
   context.selectedUser(null,new ExtendedModelMap(),request);context.userIconIds(request);context.imagesEnabled(request);
   verifyNoInteractions(users,images,settings,icons);
  }
+ @Test void normalIconFormFailureStillHasLayoutContext() {
+  var users=mock(AuthorOperations.class);var images=mock(ImageStore.class);var settings=mock(SettingsOperations.class);var icons=mock(UserIcons.class);
+  var context=new PageContext(users,images,settings,icons);
+  var model=new ExtendedModelMap();var request=new MockHttpServletRequest("POST","/admin/users/00000000-0000-0000-0000-000000000000/icon");
+  context.selectedUser(null,model,request);assertThat(model).containsKey("sidebarContext");verify(users).selected(null);
+ }
 }
