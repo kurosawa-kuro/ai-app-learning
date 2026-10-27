@@ -31,12 +31,19 @@ public class PageContext {
     }
 
     @ModelAttribute
-    public void selectedUser(@CookieValue(name = AUTHOR_COOKIE, required = false) String id, Model model, HttpServletRequest request) {
+    public void selectedUser(@CookieValue(name = AUTHOR_COOKIE, required = false) String id, Model model, HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) {
         if (!needsPage(request)) return;
         AuthorView author=null;
         boolean unavailable=false;
         String icon=null;
-        try { author=currentAuthor(id); if(author!=null) icon=icons.url(author.id()); }
+        try {
+            if(request.getMethod().equals("GET") && request.getRequestURI().equals("/learning")) {
+                String requested=request.getParameter("user");
+                author=currentAuthor(requested==null?id:requested);
+                if(author==null){var choices=repository.choices();if(!choices.isEmpty())author=repository.author(choices.get(0).id()).orElse(null);}
+                if(author!=null)com.example.webapptemplate.platform.BrowserSelection.selectAuthor(author.id(),request,response);
+            }else author=currentAuthor(id);
+            if(author!=null) icon=icons.url(author.id()); }
         catch(DataAccessException failure) { unavailable=true; }
         model.addAttribute("currentAuthor", author);
         model.addAttribute("sidebarContext", new UiContext.SidebarContext("選択中のユーザー",

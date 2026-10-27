@@ -17,7 +17,7 @@ const fs=require('node:fs');
   const hex=crypto.createHash('sha256').update('photo-diary-fictional-v1-'+i).digest('hex');
   const id=hex.slice(0,8)+'-'+hex.slice(8,12)+'-'+hex.slice(12,16)+'-'+hex.slice(16,20)+'-'+hex.slice(20,32);
   if((await page.request.get(base+'/diary/'+id)).status()===200)continue;
-  const data={requestId:id,userId:users[0],entryDate:'2026-10-'+String(i+1).padStart(2,'0'),title:['散歩で見つけた色','お気に入りの時間','今日できた小さなこと'][i%3]+' '+(i+1),body:i%4===0?'架空の教材データです。\n身近なできごとを、自分の言葉で残す練習をしました。'.repeat(18):'架空の教材データです。今日は一つ、できることが増えました。',tags:i%2?'学習,発見':'散歩,発見',_csrf:token};
+  const data={requestId:id,userId:users[0],entryDate:'2026-10-'+String(i+1).padStart(2,'0'),title:['散歩で見つけた色','お気に入りの時間','今日できた小さなこと'][i%3]+' '+(i+1),body:i%4===0?'架空の教材データです。\n身近なできごとを、自分の言葉で残す練習をしました。'.repeat(18):'架空の教材データです。今日は一つ、できることが増えました。',tags:i%2?'学び,発見':'散歩,発見',_csrf:token};
   if(i%3===0)data.photos=samples[(i/3)%3];
   const response=await page.request.post(base+'/diary',{multipart:data});
   if(!response.ok())throw Error('seed '+i+' HTTP '+response.status()+' '+await response.text());

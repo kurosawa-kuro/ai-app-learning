@@ -7,7 +7,7 @@
   <h1>管理画面</h1>
   <p>ユーザー・機能の管理と、登録データの書き出しができます。</p>
 </div>
-<div id="actions"></div>
+<div id="actions"><a role="button" class="secondary" th:href="@{/admin/tags}">タグ管理</a></div>
 <div id="content" class="admin-grid admin-grid--2">
   <article class="admin-card">
     <header><h2>ユーザー管理</h2></header>
@@ -30,12 +30,13 @@
   <article class="admin-card">
     <header id="csv-export"><h2>CSVエクスポート</h2></header>
     <div class="admin-card__body admin-stack">
-      <p>登録されているすべてのユーザー・投稿を、CSVファイルで保存します。選択中のユーザーや一覧の絞込みにかかわらず、全件を出力します。</p>
+      <p>共通機能のユーザーと投稿ノートをCSVで保存します。この教材固有の日記・実績・学習履歴・注文・対戦履歴は含みません。</p>
       <a role="button" class="secondary" th:href="@{/admin/exports/users.csv}" download>ユーザーをCSVで保存</a>
       <a role="button" class="secondary" th:href="@{/admin/exports/posts.csv}" download>投稿をCSVで保存</a>
       <p class="ui-muted">Excelで開ける日本語CSVです。投稿には画像の有無を含みます。画像ファイル自体・管理設定は含みません。</p>
     </div>
   </article>
+<article class="admin-card"><header><h2>DB接続確認</h2></header><div class="admin-card__body"><p>ボタンを押したときだけ、アプリからDBへの接続を確認します。</p><button type="button" data-db-check>DB接続を確認</button><p data-db-result role="status" aria-live="polite">未確認</p></div></article>
 </div>
 </body>
 </html>

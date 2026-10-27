@@ -33,6 +33,7 @@ public class UiContext {
 
     @ModelAttribute("appScripts")
     public List<String> scripts(HttpServletRequest request) {
+        if(request.getRequestURI().equals("/admin")) return List.of("/ui/database-check.js");
         String path=request.getRequestURI();
         if(path.startsWith("/shop"))return List.of("/lesson/cart.js");
         if(path.startsWith("/examples/skill-janken")) return List.of("/examples/janken-rules.js", "/examples/skill-janken.js");

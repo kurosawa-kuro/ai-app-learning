@@ -1,0 +1,4 @@
+.tag-options{display:flex;flex-wrap:wrap;gap:.65rem}.tag-option{display:flex;align-items:center;gap:.5rem;padding:.65rem .9rem;border:1px solid var(--pico-muted-border-color);border-radius:1.5rem;cursor:pointer;min-height:44px;margin:0;background:var(--pico-card-background-color);overflow-wrap:anywhere}.tag-option:has(:checked){border-color:var(--pico-primary);background:#ffe6f0}.tag-option input{margin:0;flex-shrink:0}.tag-option:focus-within{outline:2px solid var(--pico-primary);outline-offset:2px}.diary-filter{padding:1.25rem;border-radius:1rem;background:var(--pico-card-background-color)}.tag-editor{display:grid;gap:.75rem}.tag-editor .ui-actions{flex-wrap:wrap}.tag-editor input{min-width:0}.tag-meta{margin:0;color:var(--pico-muted-color)}
+
+.tag-option input[type=checkbox]{appearance:auto;-webkit-appearance:checkbox;accent-color:#c42678;width:1.2rem;height:1.2rem;background-image:none;border-radius:.2rem}
+.tag-option:has(:disabled){opacity:.55}

@@ -11,3 +11,5 @@ for(const field of [document.querySelector('#diary-material'),form.querySelector
 document.querySelector('#diary-apply').onclick=()=>{document.querySelector('#diary-body').value=document.querySelector('#diary-draft-text').value;document.querySelector('#diary-body').dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('#diary-draft').hidden=true;};
 document.querySelector('#diary-discard').onclick=()=>{document.querySelector('#diary-draft').hidden=true;draftId=null;};
 })();
+
+document.addEventListener("app:user-selected",event=>{const field=document.querySelector("select[name=userId]");if(field){field.value=event.detail.id;field.dispatchEvent(new Event("change",{bubbles:true}));}});

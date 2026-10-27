@@ -6,3 +6,5 @@ document.querySelectorAll('[data-learning-form]').forEach(form=>{
  catch(e){status.textContent=e.message;}finally{busy=false;button.disabled=false;}
  });
 });
+
+document.addEventListener("app:user-selected",event=>{location.assign("/learning?user="+encodeURIComponent(event.detail.id));});

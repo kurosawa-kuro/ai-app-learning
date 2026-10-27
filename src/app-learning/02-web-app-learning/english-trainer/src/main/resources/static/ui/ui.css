@@ -178,3 +178,15 @@ body:has(dialog[open]) { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0s !important; } }
 
 .ui-page--feed { max-width: 800px; }
+
+/* Keep the fixed mobile header readable over scrolled content. */
+.ui-topbar { background: #fffafd; }
+
+.ui-section-nav{display:flex;justify-content:flex-start;flex-wrap:wrap;gap:.6rem;margin-bottom:1.25rem}.ui-section-nav a{display:inline-block;padding:.65rem .9rem;border:1px solid var(--admin-border);border-radius:1.5rem;background:var(--admin-surface);text-decoration:none}
+.ui-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.ui-form-grid>*{min-width:0}.ui-form-grid .ui-full-row{grid-column:1/-1}
+[id^="lesson-"]{scroll-margin-top:6rem}
+@media(min-width:800px){.ui-form-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+[data-learning-status]:empty,[data-learning-feedback]:empty {display:none}
+
+input[type=checkbox]:not([role=switch]),input[type=radio]{appearance:auto;accent-color:#c42678;background-image:none}

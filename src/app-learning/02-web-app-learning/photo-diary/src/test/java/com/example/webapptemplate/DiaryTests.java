@@ -33,6 +33,7 @@ class DiaryTests {
     @Test void pagesAndFiltersRemainStableWithThirteenEntries() {
         var user = authors.addAuthor("ページ確認");
         var tag = UUID.randomUUID().toString().substring(0, 20);
+        diary.addTag(tag);
         for (int i = 0; i < 13; i++) diary.save(UUID.randomUUID(), user, LocalDate.of(2026,10,1).plusDays(i), "記録" + i, "本文", tag, List.of());
         var first = diary.page(tag, 1);
         var second = diary.page(tag, 2);
@@ -44,5 +45,18 @@ class DiaryTests {
         assertThat(diary.page("存在しないタグ", 9).page()).isEqualTo(1);
         assertThatThrownBy(() -> diary.save(UUID.randomUUID(), user, LocalDate.now(), " ", "本文", "", List.of())).isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> diary.save(UUID.randomUUID(), user, LocalDate.now(), "題名", "本文", "1,2,3,4,5,6", List.of())).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test void tagRenameKeepsManyToManyLinksAndUsedTagsCannotBeDeleted() {
+        var name="タグ"+UUID.randomUUID().toString().substring(0,8);
+        diary.addTag(name);
+        var tag=diary.tagCatalog().stream().filter(t->t.name().equals(name)).findFirst().orElseThrow();
+        var user=authors.addAuthor("タグ確認");
+        var first=diary.save(UUID.randomUUID(),user,LocalDate.now(),"一つ目","本文",name+",散歩",List.of());
+        var second=diary.save(UUID.randomUUID(),user,LocalDate.now(),"二つ目","本文",name,List.of());
+        diary.renameTag(tag.id(),tag.version(),name+"変更");
+        assertThat(diary.entry(first).tags()).contains(name+"変更","散歩");
+        assertThat(diary.page(name+"変更,散歩",1).entries()).extracting(DiaryService.Entry::id).contains(first,second);
+        assertThatThrownBy(()->diary.renameTag(tag.id(),tag.version(),"競合")).isInstanceOf(IllegalArgumentException.class);
     }
 }

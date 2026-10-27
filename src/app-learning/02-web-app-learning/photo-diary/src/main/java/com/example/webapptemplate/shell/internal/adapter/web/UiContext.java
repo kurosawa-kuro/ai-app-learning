@@ -18,7 +18,7 @@ public class UiContext {
     @ModelAttribute("managementLinks")
     public List<Link> managementLinks(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return List.of(new Link("ユーザー管理", "/admin/users", path.startsWith("/admin/users")),
+        return List.of(new Link("タグ管理", "/admin/tags", path.startsWith("/admin/tags")),new Link("ユーザー管理", "/admin/users", path.startsWith("/admin/users")),
                 new Link("機能管理", "/admin/settings", path.equals("/admin/settings")),
                 new Link("CSVエクスポート", "/admin#csv-export", false),
                 new Link("管理の一覧", "/admin", path.equals("/admin")));
@@ -27,14 +27,17 @@ public class UiContext {
     @ModelAttribute("appStyles")
     public List<String> styles(HttpServletRequest request) {
         String path=request.getRequestURI();
+        if(path.startsWith("/diary") || path.equals("/admin/tags")) return List.of("/features/posts/posts.css", "/lesson/tags.css");
         if(path.startsWith("/examples/skill-janken")) return List.of("/examples/skill-janken.css");
         return (path.startsWith("/posts") || path.startsWith("/diary")) ? List.of("/features/posts/posts.css") : List.of();
     }
 
     @ModelAttribute("appScripts")
     public List<String> scripts(HttpServletRequest request) {
+        if(request.getRequestURI().equals("/admin")) return List.of("/ui/database-check.js");
         String path=request.getRequestURI();
-        if(path.equals("/diary/new")) return List.of("/ui/form-protection.js", "/lesson/diary.js");
+        if(path.equals("/diary/new")) return List.of("/ui/form-protection.js", "/lesson/tags.js", "/lesson/diary.js");
+        if(path.equals("/diary")) return List.of("/lesson/tags.js", "/features/posts/feed.js");
         if(path.startsWith("/diary")) return List.of("/features/posts/feed.js");
 
         if(path.startsWith("/examples/skill-janken")) return List.of("/examples/janken-rules.js", "/examples/skill-janken.js");

@@ -1,5 +1,5 @@
 const {chromium,expect}=require('@playwright/test');
-(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1440,height:1000}});const base='http://localhost:8092';await p.goto(base+'/evaluation?month=2026-10');
+(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1440,height:1000}});const base=process.env.APP_URL||'http://localhost:8092';await p.goto(base+'/evaluation?month=2026-10');
 for(const name of ['教材 あおい','教材 さくら','教材 ひなた']){if(!await p.locator('details summary').filter({hasText:name}).count()){await p.getByLabel('新しいメンバー名').fill(name);await p.getByRole('button',{name:'メンバーを追加',exact:true}).click();}}
 const users=await p.locator('[name=memberId] option').evaluateAll(es=>es.filter(x=>x.textContent.startsWith('教材 ')).map(x=>({id:x.value,name:x.textContent})));
 for(let i=0;i<users.length;i++){

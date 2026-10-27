@@ -14,9 +14,15 @@ import org.springframework.http.*;
 public class DiaryController {
  private final DiaryService service;private final AuthorOperations users;private final ImageStore storage;private final AiText ai;
  public DiaryController(DiaryService service,AuthorOperations users,ImageStore storage,AiText ai){this.service=service;this.users=users;this.storage=storage;this.ai=ai;}
- @GetMapping("/diary") public String list(@RequestParam(defaultValue="")String tag,@RequestParam(defaultValue="1")long page,Model model){model.addAttribute("diaryPage",service.page(tag,page));model.addAttribute("tags",service.tags());model.addAttribute("tag",tag);return "diary/list";}
- @GetMapping("/diary/new") public String form(Model model){model.addAttribute("authors",users.choices());model.addAttribute("today",LocalDate.now());model.addAttribute("requestId",UUID.randomUUID());return "diary/form";}
+ @GetMapping("/diary") public String list(@RequestParam(defaultValue="")String tag,@RequestParam(defaultValue="1")long page,Model model){model.addAttribute("diaryPage",service.page(tag,page));model.addAttribute("tags",service.tags());model.addAttribute("tag",tag);model.addAttribute("selectedTags",Arrays.asList(tag.split(",")));return "diary/list";}
+ @GetMapping("/diary/new") public String form(Model model){model.addAttribute("tags",service.tags());model.addAttribute("authors",users.choices());model.addAttribute("today",LocalDate.now());model.addAttribute("requestId",UUID.randomUUID());return "diary/form";}
  @GetMapping("/diary/{id}") public String detail(@PathVariable UUID id,Model model){model.addAttribute("entry",service.entry(id));model.addAttribute("photos",service.photos(id));return "diary/detail";}
+ @GetMapping("/admin/tags") public String tags(Model model){model.addAttribute("catalog",service.tagCatalog());return "diary/tags";}
+ @PostMapping("/admin/tags") public String manageTag(@RequestParam String action,@RequestParam(required=false) UUID id,@RequestParam(defaultValue="0") long version,@RequestParam(defaultValue="") String name,Model model){
+  try{switch(action){case "add" -> service.addTag(name);case "rename" -> service.renameTag(id,version,name);case "delete" -> service.deleteTag(id,version);default -> throw new IllegalArgumentException("操作を確認してください。");}model.addAttribute("success","タグを更新しました。");}
+  catch(IllegalArgumentException e){model.addAttribute("error",e.getMessage());model.addAttribute("failedId",id);model.addAttribute("inputName",name);model.addAttribute("failedAction",action);}
+  return tags(model);
+ }
  @PostMapping("/diary") @ResponseBody public ResponseEntity<?> save(@RequestParam UUID requestId,@RequestParam UUID userId,@RequestParam LocalDate entryDate,@RequestParam String title,@RequestParam String body,@RequestParam(defaultValue="")String tags,@RequestParam(required=false)List<MultipartFile> photos){
   try {var id=service.save(requestId,userId,entryDate,title,body,tags,uploads(photos));return ResponseEntity.ok(Map.of("redirect","/diary/"+id));}
   catch(IllegalArgumentException|IllegalStateException failure){return ResponseEntity.unprocessableContent().body(Map.of("error",failure.getMessage()));}

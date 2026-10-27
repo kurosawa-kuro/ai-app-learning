@@ -13,7 +13,7 @@ const fs=require('node:fs');
  }
  const title='受入確認 '+Date.now();
  await page.locator('[name=userId]').selectOption(users[0]);await page.locator('[name=title]').fill(title);
- await page.locator('[name=tags]').fill('受入確認,散歩');await page.locator('[name=photos]').setInputFiles(samples);
+ await page.getByRole('checkbox',{name:'発見',exact:true}).check();await page.getByRole('checkbox',{name:'散歩',exact:true}).check();await page.locator('[name=photos]').setInputFiles(samples);
  await page.locator('#diary-material').fill('公園で春の色を見つけた。');
  await page.getByRole('button',{name:'AIで下書きを作る'}).click();await expect(page.locator('#diary-generate')).toBeEnabled({timeout:30000});await expect(page.locator('#diary-draft')).toBeVisible();
  await page.getByRole('button',{name:'本文へ反映'}).click();await page.locator('[name=body]').fill('本人が確認して手直しした日記です。\n写真を3枚残しました。');
@@ -29,7 +29,7 @@ const fs=require('node:fs');
  fs.mkdirSync('test-results',{recursive:true});await page.screenshot({path:'test-results/diary-desktop.png',fullPage:true});
  const detail=page.url();await page.setViewportSize({width:390,height:844});await page.reload();await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await page.screenshot({path:'test-results/diary-mobile.png',fullPage:true});
- await page.goto(base+'/diary?tag='+encodeURIComponent('受入確認'));await expect(page.getByRole('link',{name:title,exact:true})).toBeVisible();
+ await page.goto(base+'/diary?tag='+encodeURIComponent('発見'));await expect(page.getByRole('link',{name:title,exact:true})).toBeVisible();
  if(errors.length)throw Error(errors.join('\n'));
  console.log(JSON.stringify({result:'passed',detail,images:3,viewports:['1440x1000','390x844'],checks:[process.env.DIARY_URL?.includes('8096')?'live AI':'configured AI','manual edit','save','reload','tag filter','image decode','no horizontal overflow']}));await browser.close();
 })().catch(e=>{console.error(e);process.exit(1)});

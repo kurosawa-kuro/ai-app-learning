@@ -16,19 +16,25 @@ public class DiaryService {
  private final JdbcClient db; private final UnitOfWork tx; private final AuthorOperations users;
  private final ImageStore storage;private final ImageCodec codec;private final ImageCleanup cleanup;private final FeaturePolicy policy;
  public DiaryService(JdbcClient db,UnitOfWork tx,AuthorOperations users,ImageStore storage,ImageCodec codec,ImageCleanup cleanup,FeaturePolicy policy){this.db=db;this.tx=tx;this.users=users;this.storage=storage;this.codec=codec;this.cleanup=cleanup;this.policy=policy;}
- private static final String SELECT="select e.id,e.user_id,u.name as user_name,e.entry_date,e.title,e.body,e.created_at,coalesce((select string_agg(t.tag,', ' order by t.tag) from diary_tags t where t.entry_id=e.id),'') as tags,(select p.id from diary_photos p where p.entry_id=e.id order by p.position limit 1) as cover_id from diary_entries e join app_users u on u.id=e.user_id ";
+ private static final String SELECT="select e.id,e.user_id,u.name as user_name,e.entry_date,e.title,e.body,e.created_at,coalesce((select string_agg(c.name,', ' order by c.name) from diary_tags t join diary_tag_catalog c on c.id=t.tag_id where t.entry_id=e.id),'') as tags,(select p.id from diary_photos p where p.entry_id=e.id order by p.position limit 1) as cover_id from diary_entries e join app_users u on u.id=e.user_id ";
  public Page page(String tag,long requested){
-  String filter=tag==null?"":tag.strip();if(filter.length()>30)throw new IllegalArgumentException("タグは30文字以内です。");
-  String where=filter.isEmpty()?"":" where exists(select 1 from diary_tags t where t.entry_id=e.id and t.tag=:tag) ";
-  long total=db.sql("select count(*) from diary_entries e"+where).param("tag",filter).query(Long.class).single();
+  String filter=tag==null?"":tag.strip(); if(filter.length()>1000)throw new IllegalArgumentException("タグの選択を確認してください。"); var filters=Arrays.stream(filter.split(",")).map(String::strip).filter(t->!t.isEmpty()).distinct().toList();
+  String where=filter.isEmpty()?"":" where exists(select 1 from diary_tags t join diary_tag_catalog c on c.id=t.tag_id where t.entry_id=e.id and c.name in (:tag)) ";
+  long total=db.sql("select count(*) from diary_entries e"+where).param("tag",filters.isEmpty()?List.of(""):filters).query(Long.class).single();
   long pages=Math.max(1,(total+9)/10),page=Math.max(1,Math.min(requested,pages));
-  var entries=db.sql(SELECT+where+" order by e.entry_date desc,e.created_at desc,e.id limit 10 offset :offset").param("tag",filter).param("offset",(page-1)*10).query(Entry.class).list();
+  var entries=db.sql(SELECT+where+" order by e.entry_date desc,e.created_at desc,e.id limit 10 offset :offset").param("tag",filters.isEmpty()?List.of(""):filters).param("offset",(page-1)*10).query(Entry.class).list();
   return new Page(entries,page,pages,total);
  }
  public Entry entry(UUID id){return db.sql(SELECT+" where e.id=:id").param("id",id).query(Entry.class).optional().orElseThrow(()->new MissingEntity("日記が見つかりません。"));}
  public List<Photo> photos(UUID id){return db.sql("select id,image_bucket,image_key,image_type from diary_photos where entry_id=:id order by position").param("id",id).query(Photo.class).list();}
  public Photo photo(UUID id){return db.sql("select id,image_bucket,image_key,image_type from diary_photos where id=:id").param("id",id).query(Photo.class).optional().orElseThrow(()->new MissingEntity("写真が見つかりません。"));}
- public List<String> tags(){return db.sql("select distinct tag from diary_tags order by tag").query(String.class).list();}
+ public List<String> tags(){return db.sql("select name from diary_tag_catalog order by name").query(String.class).list();}
+ public record Tag(UUID id,String name,long version,long uses){}
+ public List<Tag> tagCatalog(){return db.sql("select c.id,c.name,c.version,count(t.entry_id) as uses from diary_tag_catalog c left join diary_tags t on t.tag_id=c.id group by c.id order by c.name").query(Tag.class).list();}
+ private String tagName(String name){if(name==null || name.isBlank() || name.strip().length()>30 || name.contains(",") || name.contains("、"))throw new IllegalArgumentException("タグ名は1〜30文字で、カンマを含めず入力してください。");return name.strip();}
+ public void addTag(String name){try{db.sql("insert into diary_tag_catalog(name) values(:name)").param("name",tagName(name)).update();}catch(org.springframework.dao.DuplicateKeyException e){throw new IllegalArgumentException("同じ名前のタグがすでにあります。");}}
+ public void renameTag(UUID id,long version,String name){try{if(db.sql("update diary_tag_catalog set name=:name,version=version+1 where id=:id and version=:version").param("name",tagName(name)).param("id",id).param("version",version).update()!=1)throw new IllegalArgumentException("タグは別の操作で変更されています。再読み込みしてください。");}catch(org.springframework.dao.DuplicateKeyException e){throw new IllegalArgumentException("同じ名前のタグがすでにあります。");}}
+ public void deleteTag(UUID id,long version){try{if(db.sql("delete from diary_tag_catalog where id=:id and version=:version").param("id",id).param("version",version).update()!=1)throw new IllegalArgumentException("タグは別の操作で変更されています。再読み込みしてください。");}catch(org.springframework.dao.DataIntegrityViolationException e){throw new IllegalArgumentException("日記で使用中のタグは削除できません。");}}
  public UUID save(UUID id,UUID user,LocalDate date,String title,String body,String rawTags,List<ImageUpload> uploads){
   if(id==null||user==null||date==null||title==null||title.isBlank()||title.length()>120||body==null||body.isBlank()||body.length()>5000||rawTags==null||rawTags.length()>200||uploads==null||uploads.size()>3)
    throw new IllegalArgumentException("日付・投稿者・タイトル・本文を確認してください。写真は3枚までです。");
@@ -46,7 +52,10 @@ public class DiaryService {
     var existing=db.sql("select fingerprint from diary_entries where id=:id").param("id",id).query(String.class).optional();
     if(existing.isPresent()){if(!existing.get().equals(fingerprint))throw new IllegalArgumentException("同じ要求で異なる内容を保存できません。");return false;}
     db.sql("insert into diary_entries(id,user_id,entry_date,title,body,fingerprint) values(:id,:user,:date,:title,:body,:hash)").param("id",id).param("user",user).param("date",date).param("title",title.strip()).param("body",body.strip()).param("hash",fingerprint).update();
-    for(var tag:tags)db.sql("insert into diary_tags values(:id,:tag)").param("id",id).param("tag",tag).update();
+    for(var tag:tags){
+     var tagId=db.sql("select id from diary_tag_catalog where name=:name for key share").param("name",tag).query(UUID.class).optional().orElseThrow(()->new IllegalArgumentException("タグが変更されました。タグの選択を確認してください。"));
+     db.sql("insert into diary_tags(entry_id,tag_id) values(:id,:tag)").param("id",id).param("tag",tagId).update();
+    }
     for(int i=0;i<staged.size();i++){var p=staged.get(i);db.sql("insert into diary_photos values(:id,:entry,:pos,:bucket,:key,:type)").param("id",p.id()).param("entry",id).param("pos",i).param("bucket",p.imageBucket()).param("key",p.imageKey()).param("type",p.imageType()).update();}
     return true;
    });
