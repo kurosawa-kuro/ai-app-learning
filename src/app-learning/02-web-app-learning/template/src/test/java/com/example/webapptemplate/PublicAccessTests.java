@@ -31,6 +31,12 @@ class PublicAccessTests {
         String root="http://127.0.0.1:"+port;
         String auth="Basic "+Base64.getEncoder().encodeToString("acceptance:only-a-local-test-password-12345".getBytes(java.nio.charset.StandardCharsets.UTF_8));
         assertThat(client.send(HttpRequest.newBuilder(URI.create(root+"/admin")).header("Authorization",auth).GET().build(),HttpResponse.BodyHandlers.discarding()).statusCode()).isEqualTo(200);
+        var html=client.send(HttpRequest.newBuilder(URI.create(root+"/posts")).GET().build(),HttpResponse.BodyHandlers.ofString()).body();
+        var asset=java.util.regex.Pattern.compile("/ui/ui-[a-f0-9]{32}\\.css").matcher(html);
+        assertThat(asset.find()).as("content-versioned stylesheet").isTrue();
+        var cached=client.send(HttpRequest.newBuilder(URI.create(root+asset.group())).GET().build(),HttpResponse.BodyHandlers.discarding());
+        assertThat(cached.statusCode()).isEqualTo(200);
+        assertThat(cached.headers().firstValue("cache-control").orElse("")).contains("max-age=31536000");
         assertThat(cookies.getCookieStore().getCookies()).anyMatch(cookie->cookie.getName().equals("JSESSIONID"));
         assertThat(client.send(HttpRequest.newBuilder(URI.create(root+"/ui/ui.css")).GET().build(),HttpResponse.BodyHandlers.discarding()).statusCode()).isEqualTo(200);
         assertThat(client.send(HttpRequest.newBuilder(URI.create(root+"/admin/ai")).GET().build(),HttpResponse.BodyHandlers.discarding()).statusCode()).isEqualTo(200);

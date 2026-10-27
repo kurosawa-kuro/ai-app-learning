@@ -13,7 +13,7 @@
   <link rel="stylesheet" th:href="@{/admin-pico/css/admin-components.css}">
   <link rel="stylesheet" th:href="@{/ui/ui.css}">
   <link rel="stylesheet" th:href="@{/ui/photo-diary-theme.css}">
-  <link rel="stylesheet" th:each="asset : ${appStyles}" th:href="${asset}">
+  <link rel="stylesheet" th:each="asset : ${appStyles}" th:href="@{${asset}}">
 </head>
 <body class="admin-body" data-sidebar-open="false" th:classappend="${navigation.sidebar ? 'ui-with-sidebar' : 'ui-without-sidebar'}">
 <a class="ui-skip" href="#main">本文へスキップ</a>
@@ -71,6 +71,6 @@
 <script th:src="@{/ui/form-protection.js}"></script>
 <script th:src="@{/features/posts/feed.js}"></script>
 <script th:src="@{/features/authors/user-selection.js}"></script>
-<script th:each="asset : ${appScripts}" th:src="${asset}"></script>
+<script th:each="asset : ${appScripts}" th:src="@{${asset}}"></script>
 </body>
 </html>
