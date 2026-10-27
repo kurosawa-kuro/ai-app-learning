@@ -29,19 +29,45 @@ test('Picoのローカル資産、サイドバー移動、モバイル表示', a
     await expect(page.getByRole('heading', { level: 1, name: title })).toBeVisible();
     await expect(menu.getByRole('link', { name: label, exact: true })).toHaveAttribute('aria-current', 'page');
   }
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.getByRole('button', { name: 'メニュー', exact: true }).click();
-  await expect(page.locator('body')).toHaveAttribute('data-sidebar-open', 'true');
-  await expect(page.locator('.admin-sidebar')).toHaveCSS('transform', 'matrix(1, 0, 0, 1, 0, 0)');
-  await expect(menu.getByRole('link', { name: '投稿者の管理', exact: true })).toBeInViewport();
-  await page.screenshot({ path: testInfo.outputPath('mobile-menu.png'), animations: 'disabled' });
-  await page.keyboard.press('Escape');
-  await expect(page.locator('body')).toHaveAttribute('data-sidebar-open', 'false');
-  for (const url of ['/posts', '/posts/new', '/users']) {
-    await page.goto(url);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth), url).toBeLessThanOrEqual(390);
+  // Laptop width keeps the two-column detail layout that admin-pico would otherwise stack.
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/users');
+  const [table, form] = await page.locator('#content > .admin-card').all();
+  expect((await form.boundingBox()).x).toBeGreaterThan((await table.boundingBox()).x + 100);
+  await expect(page.locator('.notes-topbar')).toBeHidden();
+
+  for (const [width, height, name] of [[390, 844, 'mobile'], [820, 1180, 'tablet']]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('/posts');
+    const toggle = page.getByRole('button', { name: 'メニュー', exact: true });
+    // The closed drawer stays out of the accessibility tree.
+    await expect(menu).toBeHidden();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await toggle.click();
+    await expect(page.locator('body')).toHaveAttribute('data-sidebar-open', 'true');
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator('.admin-sidebar')).toHaveCSS('transform', 'matrix(1, 0, 0, 1, 0, 0)');
+    await expect(menu.getByRole('link', { name: '投稿者の管理', exact: true })).toBeInViewport();
+    await page.screenshot({ path: testInfo.outputPath(`${name}-menu.png`), animations: 'disabled' });
+    await page.keyboard.press('Escape');
+    await expect(page.locator('body')).toHaveAttribute('data-sidebar-open', 'false');
+    await expect(toggle).toBeFocused();
+    for (const url of ['/posts', '/posts/new', '/users']) {
+      await page.goto(url);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth), `${name} ${url}`).toBeLessThanOrEqual(width);
+      await page.screenshot({ path: testInfo.outputPath(`${name}${url.replaceAll('/', '-')}.png`), fullPage: true, animations: 'disabled' });
+    }
   }
-  await page.screenshot({ path: testInfo.outputPath('mobile-users.png'), fullPage: true, animations: 'disabled' });
+  // Phones navigate with the bottom tab bar.
+  await page.setViewportSize({ width: 390, height: 844 });
+  const tabs = page.getByRole('navigation', { name: '画面切り替え' });
+  for (const [label, url] of [['新規投稿', /\/posts\/new$/], ['投稿者', /\/users$/], ['投稿一覧', /\/posts$/]]) {
+    await tabs.getByRole('link', { name: label, exact: true }).click();
+    await expect(page).toHaveURL(url);
+    await expect(tabs.getByRole('link', { name: label, exact: true })).toHaveAttribute('aria-current', 'page');
+  }
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await expect(tabs).toBeHidden();
   await page.goto(`/posts/${randomUUID()}`);
   await expect(page.getByRole('heading', { level: 1, name: 'ページが見つかりません' })).toBeVisible();
   expect(errors).toEqual([]);

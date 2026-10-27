@@ -3,7 +3,8 @@
 <html lang="ja" data-theme="dark" xmlns:th="http://www.thymeleaf.org" th:fragment="page(title, nav, heading, actions, content)">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d0f10">
   <title th:replace="${title}">投稿ノート</title>
   <link rel="icon" type="image/svg+xml" th:href="@{/admin-pico/images/favicons/sample-app.svg}">
   <link rel="stylesheet" th:href="@{/vendor/pico/pico.min.css}">
@@ -13,10 +14,18 @@
   <link rel="stylesheet" th:href="@{/app.css}">
 </head>
 <body class="admin-body" data-sidebar-open="false">
-<button class="admin-mobile-toggle secondary" type="button" data-sidebar-toggle>メニュー</button>
+<a class="notes-skip-link" href="#main">本文へスキップ</a>
+<!--/* Phones and tablets: sticky top bar replaces the floating admin-pico toggle. */-->
+<header class="notes-topbar">
+  <button class="secondary" type="button" data-sidebar-toggle aria-controls="sidebar" aria-expanded="false">メニュー</button>
+  <a class="notes-topbar__brand" th:href="@{/posts}">投稿ノート</a>
+  <a class="notes-topbar__author" th:href="@{/users}" th:attr="aria-label=${'選択中の投稿者: ' + (currentAuthor == null ? '未選択' : currentAuthor.name)}">
+    <span class="admin-avatar" aria-hidden="true" th:text="${currentAuthor == null ? '?' : currentAuthor.initial()}"></span>
+  </a>
+</header>
 <div class="admin-sidebar-backdrop" data-sidebar-backdrop></div>
 <div class="admin-shell">
-  <aside class="admin-sidebar">
+  <aside class="admin-sidebar" id="sidebar">
     <div class="admin-sidebar__inner">
       <div class="admin-brand">
         <div class="admin-brand__mark">N</div>
@@ -44,7 +53,7 @@
       </div>
     </div>
   </aside>
-  <main class="admin-main">
+  <main class="admin-main" id="main" tabindex="-1">
     <header class="admin-header">
       <div th:replace="${heading}"></div>
       <div class="admin-header__actions">
@@ -65,6 +74,13 @@
     </section>
   </main>
 </div>
+<!--/* Phones: app-style tab bar for the main destinations. */-->
+<nav class="notes-tabbar" aria-label="画面切り替え">
+  <a th:href="@{/posts}" th:attr="aria-current=${nav == 'posts' ? 'page' : null}">投稿一覧</a>
+  <a th:href="@{/posts/new}" th:attr="aria-current=${nav == 'new' ? 'page' : null}">新規投稿</a>
+  <a th:href="@{/users}" th:attr="aria-current=${nav == 'users' ? 'page' : null}">投稿者</a>
+</nav>
 <script th:src="@{/admin-pico/js/admin.js}"></script>
+<script th:src="@{/app.js}"></script>
 </body>
 </html>
