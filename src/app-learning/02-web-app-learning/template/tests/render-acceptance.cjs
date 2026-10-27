@@ -13,6 +13,16 @@ const fs=require('node:fs');
  try {
   const context=await browser.newContext({baseURL,httpCredentials:{username:process.env.APP_ACCESS_USER||'starter',password:process.env.APP_ACCESS_PASSWORD}});
   const page=await context.newPage();await page.goto('/posts');await expect(page.getByRole('heading',{name:'投稿一覧',exact:true})).toBeVisible();
+  // Check every shipped stylesheet, not just headings rendered without CSS.
+  for (const href of await page.locator('link[rel=stylesheet]').evaluateAll(links => links.map(link => link.href))) {
+   const css = await context.request.get(href);
+   if(css.status() !== 200 || !(css.headers()['content-type'] || '').startsWith('text/css'))
+    throw Error(`Stylesheet missing or invalid: ${new URL(href).pathname} (${css.status()})`);
+  }
+  const inputStyle = await page.locator('#post-search').evaluate(el => {
+   const style = getComputedStyle(el); return {height:el.getBoundingClientRect().height, boxSizing:style.boxSizing};
+  });
+  if(inputStyle.height < 40 || inputStyle.boxSizing !== 'border-box') throw Error('Pico form styles are not applied');
   await page.goto('/admin/operations');const ops=await page.locator('#content').innerText();
   if(!ops.includes('app_template_render') || ops.includes('接続失敗'))throw Error('Production schema or connection check failed');
   const auth='Basic '+Buffer.from(`${process.env.APP_ACCESS_USER||'starter'}:${process.env.APP_ACCESS_PASSWORD}`).toString('base64');

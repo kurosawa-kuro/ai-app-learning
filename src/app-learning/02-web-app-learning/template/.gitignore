@@ -39,3 +39,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Vendored runtime stylesheet must be included in Git and Render builds.
+!/src/main/resources/static/vendor/
+!/src/main/resources/static/vendor/pico/
+!/src/main/resources/static/vendor/pico/**
