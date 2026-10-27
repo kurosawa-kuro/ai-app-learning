@@ -1,6 +1,6 @@
 # 投稿一覧のページ切替
 
-2026-10-27。対象：`src/web-app-starter/template`。
+2026-10-27。対象：`src/app-learning/02-web-app-learning/template`。
 
 - 1ページ10件、総件数・表示範囲・前後移動を追加。
 - 投稿者条件をページリンクに保持し、絞込み変更時は先頭へ戻す。

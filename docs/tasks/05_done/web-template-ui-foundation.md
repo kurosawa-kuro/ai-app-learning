@@ -1,6 +1,6 @@
 # Webテンプレートの共通UI・操作導線の改修記録
 
-作成・実装日：2026-10-27。ユーザー提供のUI/UX評価に沿って共通UIを改修。管理画面の維持とゲーム画面の別レイアウトを両立させる。以下のContext・Planは着手時の記録であり、現在の仕様は[共通UI設計](../../../src/web-app-starter/template/docs/ui-foundation.md)を参照。
+作成・実装日：2026-10-27。ユーザー提供のUI/UX評価に沿って共通UIを改修。管理画面の維持とゲーム画面の別レイアウトを両立させる。以下のContext・Planは着手時の記録であり、現在の仕様は[共通UI設計](../../../src/app-learning/02-web-app-learning/template/docs/ui-foundation.md)を参照。
 
 ## Goal
 
@@ -10,7 +10,7 @@ admin-picoとPico CSSを活かし、投稿ノートとゲーム型教材の両�
 
 ## Context：着手時のコードとの照合
 
-対象：[template](../../../src/web-app-starter/template/README.md)。現行ファイルを読んで確認した内容であり、以前の一画面版を前提にしない。
+対象：[template](../../../src/app-learning/02-web-app-learning/template/README.md)。現行ファイルを読んで確認した内容であり、以前の一画面版を前提にしない。
 
 | 現行箇所 | 確認した状態 | 改修の焦点 |
 |---|---|---|

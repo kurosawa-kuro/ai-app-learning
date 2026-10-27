@@ -1,0 +1,31 @@
+# Render Blueprint. When creating it, set Blueprint Path to src/app-learning/02-web-app-learning/template/render.yaml.
+# Docker paths are relative to rootDir.
+services:
+  - type: web
+    name: web-app-template
+    runtime: docker
+    plan: free
+    region: singapore
+    rootDir: src/app-learning/02-web-app-learning/template
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    envVars:
+      - key: APP_ENVIRONMENT
+        value: production
+      - key: APP_ACCESS_MODE
+        value: basic
+      - key: APP_ACCESS_PASSWORD
+        sync: false
+      - key: APP_DB_SCHEMA
+        sync: false
+      # Entered once in the Dashboard at Blueprint creation; never committed.
+      - key: DB_HOST
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      # To enable images, also add SUPABASE_URL and SUPABASE_SECRET_KEY in the Dashboard.
+      - key: APP_IMAGES_ENABLED
+        value: "false"

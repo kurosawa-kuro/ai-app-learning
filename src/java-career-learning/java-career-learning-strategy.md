@@ -70,6 +70,11 @@ Oracle 日本
 
 +1
 
+## 2. なぜサンプルアプリはOracleではなくPostgreSQLなのか
+Supabase,Neon等比較的簡単に利用できるCloudDBがPostgresql系が最近多いから
+RenderでOracle使う場合はAWSやOracleのやや大掛かりなCloudインフラ対応が必要なので
+
+なので、DevinでDB学習としてOracleだけでなくPostgresqlも学習できる余地は作る
 
 
 ここで重要なのは、単純にBronzeという名称だから合格しやすい、とは限らないことです。
@@ -184,7 +189,7 @@ JavaとOracleを単体の人気や技術的な優劣で選ぶのではなく、�
 
 ### 2026-10-27：Web教材との接続方針
 
-リポジトリのWebアプリとGAS教材の発展版は、[採用判断](../../docs/adr/0001-web-app-stack.md)により **Spring Boot＋Thymeleaf＋Render＋Supabase** に統一する。Next.js＋Vercel案は廃止した。[Webアプリ支援戦略](../web-app-starter/web-app-support-strategy.md)とJava・SQLの知識、実装例、テストを共有できるようにする。
+リポジトリのWebアプリとGAS教材の発展版は、[採用判断](../../docs/adr/0001-web-app-stack.md)により **Spring Boot＋Thymeleaf＋Render＋Supabase** に統一する。Next.js＋Vercel案は廃止した。[Webアプリ支援戦略](../app-learning/02-web-app-learning/web-app-support-strategy.md)とJava・SQLの知識、実装例、テストを共有できるようにする。
 
 本ルートの目的は引き続きJava・Oracle系の仕事へ近づくこと。Oracle Databaseの管理・固有SQLの実習は維持し、Web教材のSupabase PostgreSQLと区別する。Spring Boot段階では共通Web教材を活用し、Linux・AWSは志望する仕事に応じた発展学習として扱う。Web教材の標準公開先はRenderとする。
 

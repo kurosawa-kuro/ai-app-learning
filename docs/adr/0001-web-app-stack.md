@@ -32,6 +32,6 @@ Java・SQLの知識と実装例を、資格／実務学習とWebアプリ支援�
 
 ## 参照
 
-- [Webアプリ支援戦略](../../src/web-app-starter/web-app-support-strategy.md)：構成、支援方法、横展開、公式資料、検証項目
-- [GASアプリ集](../../src/gas-app-learning/README.md)：5教材の役割分担と段階的な整備
+- [Webアプリ支援戦略](../../src/app-learning/02-web-app-learning/web-app-support-strategy.md)：構成、支援方法、横展開、公式資料、検証項目
+- [GASアプリ集](../../src/app-learning/01-gas-app-learning/README.md)：5教材の役割分担と段階的な整備
 - [Java・Oracle学習戦略](<../../src/java-career-learning/java-career-learning-strategy.md>)：資格と実務の独立した学習入口

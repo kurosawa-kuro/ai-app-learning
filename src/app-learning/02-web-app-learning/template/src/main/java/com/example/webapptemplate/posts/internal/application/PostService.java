@@ -1,0 +1,162 @@
+package com.example.webapptemplate.posts.internal.application;
+import com.example.webapptemplate.platform.ImageCodec;
+import com.example.webapptemplate.platform.ImageData;
+import com.example.webapptemplate.platform.ImageStore;
+import com.example.webapptemplate.platform.ImageUpload;
+import com.example.webapptemplate.platform.UnitOfWork;
+import com.example.webapptemplate.authors.AuthorOperations;
+import com.example.webapptemplate.posts.PostOperations;
+import com.example.webapptemplate.posts.PostPage;
+import com.example.webapptemplate.posts.PostView;
+import com.example.webapptemplate.settings.FeaturePolicy;
+import com.example.webapptemplate.posts.internal.domain.PostContent;
+
+import java.util.UUID;
+import com.example.webapptemplate.platform.ImageCleanup;
+import com.example.webapptemplate.platform.AuditTrail;
+
+public class PostService implements PostOperations {
+    private static final int PAGE_SIZE = 10;
+    private final ImageCleanup cleanup;
+    private final AuditTrail audit;
+    private final AuthorOperations authors;
+    private final FeaturePolicy policy;
+    private final PostStore repository;
+    private final ImageStore storage;
+    private final ImageCodec validator;
+    private final UnitOfWork transactions;
+    public PostService(PostStore repository, ImageStore storage, ImageCodec validator, UnitOfWork transactions, AuthorOperations authors, FeaturePolicy policy, ImageCleanup cleanup, AuditTrail audit) {
+        this.cleanup=cleanup; this.audit=audit;
+        this.authors=authors; this.policy=policy;
+        this.repository = repository; this.storage = storage; this.validator = validator; this.transactions = transactions;
+    }
+    public UUID create(UUID author, String title, String body, ImageUpload file) {
+        return createAt(UUID.randomUUID(),author,title,body,file);
+    }
+    private UUID createAt(UUID id, UUID author, String title, String body, ImageUpload file) {
+        return createAt(id,author,title,body,file,key -> {});
+    }
+    private UUID createAt(UUID id, UUID author, String title, String body, ImageUpload file, java.util.function.Consumer<String> staged) {
+        authors.requireAuthor(author);
+        var content = new PostContent(title, body);
+        title=content.title(); body=content.body();
+        ImageData image = null;
+        String key = null;
+        if (file != null) {
+            policy.requireImagesEnabled();
+            image = validator.read(file);
+            key = id + "." + image.extension();
+            staged.accept(key);
+            try { storage.upload(key, image); }
+            catch (RuntimeException failure) {
+                // A timed-out upload might have completed remotely; remove only this request's key.
+                cleanupAfterFailure(key, failure);
+                throw failure;
+            }
+        }
+        var post = new PostView(id, author, "", title, body,
+                key == null ? null : storage.bucket(), key, image == null ? null : image.type(), null);
+        try { transactions.run(() -> repository.insert(post)); }
+        catch (RuntimeException failure) {
+            if (key != null) {
+                cleanupAfterFailure(key, failure);
+            }
+            throw failure;
+        }
+        audit.record("post.create","success",id.toString());
+        return id;
+    }
+    private void cleanupAfterFailure(String key, RuntimeException failure) {
+        try { storage.delete(storage.bucket(), key); }
+        catch (RuntimeException cleanupFailure) {
+            try { cleanup.enqueue(storage.bucket(),key); }
+            catch (RuntimeException queueFailure) { failure.addSuppressed(queueFailure); }
+            audit.record("post.image-compensation","pending",null);
+            failure.addSuppressed(cleanupFailure);
+        }
+    }
+    public void delete(UUID id) {
+        var post = repository.post(id);
+        transactions.run(() -> {
+            if (post.imageKey()!=null) cleanup.enqueue(post.imageBucket(),post.imageKey());
+            repository.deletePost(id);
+        });
+        cleanup.run();
+        audit.record("post.delete","success",id.toString());
+    }
+    public java.util.List<PostView> posts(UUID userId) { return repository.posts(userId); }
+    public PostPage page(UUID userId, long requestedPage) {
+        long total = repository.count(userId);
+        long last = Math.max(1, total / PAGE_SIZE + (total % PAGE_SIZE == 0 ? 0 : 1));
+        long number = Math.max(1, Math.min(requestedPage, last));
+        var items = repository.page(userId, PAGE_SIZE, (number - 1) * PAGE_SIZE);
+        return new PostPage(items, number, PAGE_SIZE, total);
+    }
+    public PostPage search(UUID userId,String query,String sort,long requestedPage) {
+        query=query==null ? "" : query.strip();
+        if(query.length()>200) throw new IllegalArgumentException("検索語は200文字以内にしてください。");
+        if(!"newest".equals(sort) && !"oldest".equals(sort)) throw new IllegalArgumentException("並び順を選択してください。");
+        long total=repository.searchCount(userId,query);
+        long last=Math.max(1,total/PAGE_SIZE+(total%PAGE_SIZE==0?0:1));
+        long number=Math.max(1,Math.min(requestedPage,last));
+        return new PostPage(repository.search(userId,query,sort,PAGE_SIZE,(number-1)*PAGE_SIZE),number,PAGE_SIZE,total);
+    }
+    public UUID createOnce(UUID request,UUID author,String title,String body,ImageUpload image) {
+        if(request==null) return create(author,title,body,image);
+        var hash=fingerprint(author,title,body,image);
+        var staged=new java.util.concurrent.atomic.AtomicReference<String>();
+        var id=UUID.randomUUID();
+        try { return transactions.execute(() -> {
+            repository.lockRequest(request);
+            var prior=repository.request(request);
+            if(prior.isPresent()) {
+                if(!prior.get().fingerprint().equals(hash)) throw new IllegalArgumentException("送信内容が変更されました。新しい投稿画面から保存してください。");
+                return prior.get().postId();
+            }
+            repository.saveRequest(request,hash,id);
+            createAt(id,author,title,body,image,staged::set);
+            return id;
+        }); } catch(RuntimeException failure) {
+            // The request transaction has rolled back. Persist retry state outside it,
+            // even if both the database write and direct Storage compensation failed.
+            if(staged.get()!=null) {
+                try { cleanup.enqueue(storage.bucket(),staged.get()); cleanup.run(); }
+                catch(RuntimeException retryFailure) { failure.addSuppressed(retryFailure); }
+            }
+            audit.record("post.create","failure",request.toString()); throw failure;
+        }
+    }
+    private static String fingerprint(UUID author,String title,String body,ImageUpload image) {
+        try {
+            var hash=java.security.MessageDigest.getInstance("SHA-256");
+            for(var value:new String[]{String.valueOf(author),title,body}) {
+                var bytes=value.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                hash.update(java.nio.ByteBuffer.allocate(4).putInt(bytes.length).array()); hash.update(bytes);
+            }
+            if(image!=null) hash.update(image.bytes());
+            return java.util.HexFormat.of().formatHex(hash.digest());
+        } catch(java.security.NoSuchAlgorithmException impossible) { throw new IllegalStateException(impossible); }
+    }
+    public void update(UUID id,long version,String title,String body,ImageUpload file,boolean removeImage) {
+        var original=repository.post(id);
+        var content=new PostContent(title,body);
+        if(removeImage && file!=null) throw new IllegalArgumentException("画像の差し替えと削除は同時に選べません。");
+        String key=null; ImageData image=null;
+        if(file!=null) {
+            policy.requireImagesEnabled(); image=validator.read(file); key=UUID.randomUUID()+"."+image.extension();
+            try { storage.upload(key,image); } catch(RuntimeException failure) { cleanupAfterFailure(key,failure); throw failure; }
+        }
+        var changed=new PostView(id,original.userId(),original.userName(),content.title(),content.body(),
+            key!=null?storage.bucket():removeImage?null:original.imageBucket(),
+            key!=null?key:removeImage?null:original.imageKey(),
+            image!=null?image.type():removeImage?null:original.imageType(),original.createdAt(),version);
+        try {
+            transactions.run(() -> {
+                if(!repository.update(changed,version)) throw new IllegalStateException("別の操作で更新されました。再読込みして内容を確認してください。");
+                if((file!=null || removeImage) && original.imageKey()!=null) cleanup.enqueue(original.imageBucket(),original.imageKey());
+            });
+        } catch(RuntimeException failure) { if(key!=null) cleanupAfterFailure(key,failure); audit.record("post.update","failure",id.toString()); throw failure; }
+        cleanup.run(); audit.record("post.update","success",id.toString());
+    }
+    public PostView post(UUID id) { return repository.post(id); }
+}

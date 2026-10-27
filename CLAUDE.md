@@ -2,7 +2,11 @@
 
 このファイルは Claude Code がこのリポジトリで作業する際の最小ガイド。
 
+アプリ学習の**受講順は01 GAS → 02 Web、提供者のコード・解説の制作順は02 Web → 01 GAS**。Web側でローカルの動作確認・DB確認・自動テストを先に整え、GASの教材へ展開する。番号を制作の順番に読み替えず、01の完成を02への着手条件にしない。[横断設計の正本](src/app-learning/docs/README.md)を参照する。
+
 ## 目的と教育方針
+
+両基盤の完成版を配布するのは、**photo-diary・cast-evaluation・english-trainerの3教材だけ**。3教材は同じ基本機能で完成とする。じゃんけんはGASの通常対戦からWebのスキル・AIセリフ事前作成へ、ショップはGASの直接注文からWebのカート経由注文へ広げる。じゃんけん・ショップに両版の完成品を揃える要件は課さない。[配布・AIの対応表](src/app-learning/README.md)と[機能分担](src/app-learning/docs/feature-allocation.md)に従う。横展開は目標・参考プロンプト・確認例の提供を基本とし、応用先の完成品や音声・決済・在庫・POS等の追加制作を前提にしない。Web英語の問題管理画面は任意の応用候補。
 
 IT入門者がAIを活用して、ITの基礎、プログラミング、業務効率化、資格取得に取り組むためのリポジトリ。**誰の、どんなゴールに、どんなスタート支援を提供し、AIで何を横展開するか**を取り組みごとに設計する。
 
@@ -14,14 +18,14 @@ IT入門者がAIを活用して、ITの基礎、プログラミング、業務�
 
 | 対象者・ゴール | 優先資料 | スタート支援とAIによる横展開 |
 |---|---|---|
-| 子供・英語学習者・写真日記の利用者・店長等、それぞれの興味や課題 | [GASアプリ集](src/gas-app-learning/README.md) | 題材の体験と小さな変更を支援し、AIで次の変更へ応用。子供の楽しさ・理解、学習への活用、店舗業務の運用を別々に評価する |
-| 自分用・業務用のアプリを作って使いたい非エンジニア | [Webアプリ・公開戦略メモ](src/web-app-starter/web-app-support-strategy.md) | 要望整理、ひな形、環境、最初の公開を支援。動いたアプリをAIと用途に合わせて変え、別の身近な業務へ応用。実利用と変更結果の確認を成果にする |
+| 子供・英語学習者・写真日記の利用者・店長等、それぞれの興味や課題 | [GASアプリ集](src/app-learning/01-gas-app-learning/README.md) | 題材の体験と小さな変更を支援し、AIで次の変更へ応用。子供の楽しさ・理解、学習への活用、店舗業務の運用を別々に評価する |
+| 自分用・業務用のアプリを作って使いたい非エンジニア | [Webアプリ・公開戦略メモ](src/app-learning/02-web-app-learning/web-app-support-strategy.md) | 要望整理、ひな形、環境、最初の公開を支援。動いたアプリをAIと用途に合わせて変え、別の身近な業務へ応用。実利用と変更結果の確認を成果にする |
 | Java・Oracle系の仕事を目指すIT未経験者 | [Java・Oracle Bronze × Devin 学習戦略](<src/java-career-learning/java-career-learning-strategy.md>) | 環境と最初のJava・SQL課題を支援。AIの例題・解説・レビューで別課題に応用し、同じアプリを育てる。自力修正・テスト・資格と実習成果を確認する |
 | 日々の事務処理を減らしたい非エンジニア、特にIT人材・SES営業 | [Cursor業務効率化スターター](src/office-automation-starter/README.md) | 導入・サンプル・プロンプトで1業務を支援。入力・条件・出力をAIと調整し、別の集計・資料整理等へ応用。正確さ・時間・再現性を確認する |
 
 全ルートを同じ学習段階や成功条件に揃えない。GASの6工程と対面90分案はGAS教材内の枠組みであり、全員の必修ではない。Java学習で求める自力のコード・SQL修正を、業務効率化やアプリ実利用の全員へ課さない。
 
-WebアプリとGAS教材の発展版は、**Spring Boot＋Thymeleaf＋Render＋Supabase**に統一する。Next.js＋Vercel案は2026-10-27に廃止。[採用判断](docs/adr/0001-web-app-stack.md)と[Web支援戦略](src/web-app-starter/web-app-support-strategy.md)を参照する。採用決定を実装・公開・受入済みと混同しない。サービス対応・料金・コマンドは未検証の会話メモから転記しない。
+WebアプリとGAS教材の発展版は、**Spring Boot＋Thymeleaf＋Render＋Supabase**に統一する。Next.js＋Vercel案は2026-10-27に廃止。[採用判断](docs/adr/0001-web-app-stack.md)と[Web支援戦略](src/app-learning/02-web-app-learning/web-app-support-strategy.md)を参照する。採用決定を実装・公開・受入済みと混同しない。サービス対応・料金・コマンドは未検証の会話メモから転記しない。
 
 Web教材のDBはSupabaseのPostgreSQL、画像保存は必要時にStorageを使う。Oracle資格の固有実習と、志望する仕事に応じたLinux・AWS学習は独立して扱う。スタックの統一を、利用者の目的・学習順・成功条件の統一へ広げない。
 

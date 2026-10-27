@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: page(~{::title}, 'standard', ~{::#heading}, ~{::#actions}, ~{::#content})}">
+<head><title>管理画面 | 投稿ノート</title></head>
+<body>
+<div id="heading">
+  <h1>管理画面</h1>
+  <p>ユーザー・機能の管理と、登録データの書き出しができます。</p>
+</div>
+<div id="actions"></div>
+<div id="content" class="admin-grid admin-grid--2">
+  <article class="admin-card"><header><h2>状態と復旧</h2></header><div class="admin-card__body"><p>接続状態、画像の後片付け、バックアップ、操作結果を確認します。</p><a role="button" class="secondary" href="/admin/operations">状態と復旧を開く</a></div></article>
+  <article class="admin-card">
+    <header><h2>ユーザー管理</h2></header>
+    <div class="admin-card__body admin-stack">
+      <p>ユーザーの作成・選択と、初めて使うときのデフォルトユーザーを指定します。</p>
+      <p class="ui-muted">ログイン用アカウントではありません。投稿の持ち主を選ぶためのデータです。</p>
+      <a role="button" class="secondary" th:href="@{/admin/users}">ユーザー管理を開く</a>
+    </div>
+  </article>
+  <article class="admin-card">
+    <header><h2>機能管理</h2></header>
+    <div class="admin-card__body admin-stack">
+      <p>画像投稿やAI連携を許可するか設定します。</p>
+      <p><span class="admin-badge" th:text="${imagesEnabled ? '画像投稿：許可' : '画像投稿：禁止'}"></span>
+        <span class="admin-badge" th:text="${aiEnabled ? 'AI連携：許可' : 'AI連携：禁止'}"></span></p>
+      <p class="ui-muted">AIの処理自体は未実装です。</p>
+      <a role="button" class="secondary" th:href="@{/admin/settings}">機能管理を開く</a>
+    </div>
+  </article>
+  <article class="admin-card">
+    <header id="csv-export"><h2>CSVエクスポート</h2></header>
+    <div class="admin-card__body admin-stack">
+      <p>登録されているすべてのユーザー・投稿を、CSVファイルで保存します。選択中のユーザーや一覧の絞込みにかかわらず、全件を出力します。</p>
+      <a role="button" class="secondary" th:href="@{/admin/exports/users.csv}" download>ユーザーをCSVで保存</a>
+      <a role="button" class="secondary" th:href="@{/admin/exports/posts.csv}" download>投稿をCSVで保存</a>
+      <p class="ui-muted">Excelで開ける日本語CSVです。投稿には画像の有無を含みます。画像ファイル自体・管理設定は含みません。</p>
+    </div>
+  </article>
+</div>
+</body>
+</html>

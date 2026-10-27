@@ -2,6 +2,8 @@
 
 このディレクトリは、[README.md](../README.md)・[AGENTS.md](../AGENTS.md)・[CLAUDE.md](../CLAUDE.md)を正として、複数の教材・学習支援に共通する要件、設計、作業、検証、運用を具体化する。単一の完成アプリの仕様書ではない。
 
+アプリ学習に関する横断設計は、昇格した[src/app-learning/docs](../src/app-learning/docs/README.md)を正本とする。受講順は01 GAS → 02 Web、提供者のコード・解説の制作順は02 Web → 01 GAS。Webで動作確認を先に行いやすいことを理由とし、受講者の順番とは分けて管理する。
+
 ## 権威順位
 
 | 判断する内容 | 基準にする資料 |
@@ -11,6 +13,7 @@
 | Claude Code固有の作業案内 | ルートの[CLAUDE.md](../CLAUDE.md) |
 | 全体方針の具体化・採用理由・共通運用 | 本ディレクトリの01〜08、ADR、runbook。上記3文書に整合させる |
 | 個別教材の業務ルール・導入・検証方法 | 対象教材のREADME・AGENTS.mdと、そこから指定された正本 |
+| アプリ学習01・02の横断設計、受講順と制作順 | [src/app-learning/docs](../src/app-learning/docs/README.md) |
 | 現在動くこと・公開状況の事実 | 対象のコード・設定・実行結果・日付と版を伴う検証記録 |
 | 作業途中の案・経緯 | `docs/tasks/`・archive。確定方針や現在の検証結果の代わりにしない |
 
@@ -22,8 +25,8 @@
 
 | 入口 | 優先して読む資料 |
 |---|---|
-| 身近な題材でITに触れる | [GASアプリ集](../src/gas-app-learning/README.md) |
-| 自分用・業務用アプリを作って使う | [Webアプリ支援戦略](../src/web-app-starter/web-app-support-strategy.md) |
+| 身近な題材でITに触れる | [GASアプリ集](../src/app-learning/01-gas-app-learning/README.md) |
+| 自分用・業務用アプリを作って使う | [Webアプリ支援戦略](../src/app-learning/02-web-app-learning/web-app-support-strategy.md) |
 | Java・Oracleの資格と実習を仕事につなげる | [Javaキャリア学習戦略](../src/java-career-learning/java-career-learning-strategy.md) |
 | 日々の事務処理の手間を減らす | [業務効率化スターター](../src/office-automation-starter/README.md) |
 
@@ -51,18 +54,18 @@
 
 ## 毎日使う入口
 
-教育支援の最初の実証は[初回支援シート](templates/ai-pairing-session.md)と[1人・1課題の検証案](../src/gas-app-learning/docs/06_first-pairing-pilot.md)を使う。本人の初回成功と、提供者が合意した範囲で支援を終了できたことを分けて記録する。
+教育支援の最初の実証は[初回支援シート](templates/ai-pairing-session.md)と[1人・1課題の検証案](../src/app-learning/docs/06_first-pairing-pilot.md)を使う。本人の初回成功と、提供者が合意した範囲で支援を終了できたことを分けて記録する。
 
 | 入口 | 用途 |
 |---|---|
-| [tasks/README.md](./tasks/README.md) | 今日やること、次にやること、完了したことを管理する |
-| [tasks/03_active/refactoring-candidates.md](./tasks/03_active/refactoring-candidates.md) | 常時見る cleanup / refactoring 候補 |
-| [04_workflows.md](./04_workflows.md) | 作業開始、検証、リリース前確認のコマンド |
-| [07_test_strategy.md](./07_test_strategy.md) | タスク完了前に通す品質ゲート |
-| [runbooks/ai-coding.md](./runbooks/ai-coding.md) | Codex探索Skill、RTKの明示利用、必要時のSerenaと効果測定 |
-| [runbooks/platforms.md](./runbooks/platforms.md) | GAS・Retoolの選択と併用の境界 |
-| [templates/platform-acceptance.md](./templates/platform-acceptance.md) | 公開と実機受入の証跡 |
-| [templates/ai-coding-measurement.md](./templates/ai-coding-measurement.md) | 実作業比較をtaskへ記録する書式 |
+| [tasks/README.md](tasks/README.md) | 今日やること、次にやること、完了したことを管理する |
+| [tasks/03_active/refactoring-candidates.md](tasks/03_active/refactoring-candidates.md) | 常時見る cleanup / refactoring 候補 |
+| [04_workflows.md](04_workflows.md) | 作業開始、検証、リリース前確認のコマンド |
+| [07_test_strategy.md](07_test_strategy.md) | タスク完了前に通す品質ゲート |
+| [runbooks/ai-coding.md](runbooks/ai-coding.md) | Codex探索Skill、RTKの明示利用、必要時のSerenaと効果測定 |
+| [runbooks/platforms.md](runbooks/platforms.md) | GAS・Retoolの選択と併用の境界 |
+| [templates/platform-acceptance.md](templates/platform-acceptance.md) | 公開と実機受入の証跡 |
+| [templates/ai-coding-measurement.md](templates/ai-coding-measurement.md) | 実作業比較をtaskへ記録する書式 |
 
 `docs/tasks/` は仕様の正本ではないが、日々の実行順・証跡・未決事項の正本として扱う。確定した仕様は `docs/specs/` や 01〜08 文書へ、判断理由は `docs/adr/` へ昇格する。
 
@@ -70,19 +73,19 @@
 
 Webアプリの採用基盤は[ADR 0001](adr/0001-web-app-stack.md)を参照する。Spring Boot＋Thymeleaf＋Render＋Supabaseへの統一は決定済みで、実装・公開・受入状況とは分けて管理する。
 
-Webテンプレートの機能境界と依存方向は[ADR 0002](adr/0002-web-template-modules.md)と[構造・改修例](../src/web-app-starter/template/docs/architecture.md)を参照する。対象はWebテンプレートであり、全教材への一律適用や学習者の必修条件にはしない。
+Webテンプレートの機能境界と依存方向は[ADR 0002](adr/0002-web-template-modules.md)と[構造・改修例](../src/app-learning/02-web-app-learning/template/docs/architecture.md)を参照する。対象はWebテンプレートであり、全教材への一律適用や学習者の必修条件にはしない。
 
 | ドキュメント | 役割 |
 |---|---|
-| [01_requirements.md](./01_requirements.md) | 対象者・目的・初回成功・支援範囲 |
-| [02_architecture.md](./02_architecture.md) | 独立した教材構成・Web採用基盤・責務の境界 |
-| [03_domain_model.md](./03_domain_model.md) | 支援・成果・横展開の用語と状態 |
-| [04_workflows.md](./04_workflows.md) | 教材整備と初回支援の進め方 |
-| [05_data_model.md](./05_data_model.md) | 支援記録・教材別の保存先・設定の扱い |
-| [06_error_policy.md](./06_error_policy.md) | 学習上のつまずき・提供物の不具合・技術障害の切り分け |
-| [07_test_strategy.md](./07_test_strategy.md) | 教材品質・学習成果・支援終了の別々の確認 |
-| [08_release_runbook.md](./08_release_runbook.md) | 教材提供・個別アプリ公開・引き渡しと支援終了 |
-| [tasks/README.md](./tasks/README.md) | 日次運用の実行ハブ、作業計画、実装タスク |
+| [01_requirements.md](01_requirements.md) | 対象者・目的・初回成功・支援範囲 |
+| [02_architecture.md](02_architecture.md) | 独立した教材構成・Web採用基盤・責務の境界 |
+| [03_domain_model.md](03_domain_model.md) | 支援・成果・横展開の用語と状態 |
+| [04_workflows.md](04_workflows.md) | 教材整備と初回支援の進め方 |
+| [05_data_model.md](05_data_model.md) | 支援記録・教材別の保存先・設定の扱い |
+| [06_error_policy.md](06_error_policy.md) | 学習上のつまずき・提供物の不具合・技術障害の切り分け |
+| [07_test_strategy.md](07_test_strategy.md) | 教材品質・学習成果・支援終了の別々の確認 |
+| [08_release_runbook.md](08_release_runbook.md) | 教材提供・個別アプリ公開・引き渡しと支援終了 |
+| [tasks/README.md](tasks/README.md) | 日次運用の実行ハブ、作業計画、実装タスク |
 
 ## ハーネス（AI 制御）
 
@@ -90,12 +93,12 @@ AI エージェント制御の全体像は[.claude/README.md](../.claude/README.
 
 | ドキュメント | 役割 |
 |---|---|
-| [specs/kurosawa-thin-harness-architecture.md](./specs/kurosawa-thin-harness-architecture.md) | Thin Harness アーキ本体（tool-agnostic マスター） |
-| [specs/runtime-protocol.md](./specs/runtime-protocol.md) | 実行手順と停止条件（repo 固有） |
-| [specs/capability-boundary.md](./specs/capability-boundary.md) | 保護 capability と permissions 写像（脅威モデル） |
-| [specs/change-boundary.md](./specs/change-boundary.md) | 保護パスと変更境界 |
-| [specs/evidence-policy.md](./specs/evidence-policy.md) | Evidence Level と done の下限 |
-| [specs/judgment-memory.md](./specs/judgment-memory.md) | 判断記憶のパイプライン |
-| [templates/](./templates/) | 各 Layer のテンプレ（contract / weight-class / reality-check 等） |
-| [decisions/decision-log.md](./decisions/decision-log.md) | 判断日誌（trade journal、append-only） |
-| [memory/](./memory/) | 蒸留済み判断記憶 |
+| [specs/kurosawa-thin-harness-architecture.md](specs/kurosawa-thin-harness-architecture.md) | Thin Harness アーキ本体（tool-agnostic マスター） |
+| [specs/runtime-protocol.md](specs/runtime-protocol.md) | 実行手順と停止条件（repo 固有） |
+| [specs/capability-boundary.md](specs/capability-boundary.md) | 保護 capability と permissions 写像（脅威モデル） |
+| [specs/change-boundary.md](specs/change-boundary.md) | 保護パスと変更境界 |
+| [specs/evidence-policy.md](specs/evidence-policy.md) | Evidence Level と done の下限 |
+| [specs/judgment-memory.md](specs/judgment-memory.md) | 判断記憶のパイプライン |
+| [templates/](templates) | 各 Layer のテンプレ（contract / weight-class / reality-check 等） |
+| [decisions/decision-log.md](decisions/decision-log.md) | 判断日誌（trade journal、append-only） |
+| [memory/](memory) | 蒸留済み判断記憶 |

@@ -19,8 +19,8 @@
 
 | 対象 | 方針と仕様の所在 |
 |---|---|
-| [GASの5教材](../src/gas-app-learning/README.md) | Sheets等の表・関連・保存ルールは個別仕様。アプリ間の共通スキーマを新設しない |
-| [Webアプリ](../src/web-app-starter/web-app-support-strategy.md) | Supabase PostgreSQL、必要時にStorage。具体的なスキーマ・移行は実装時に確定 |
+| [GASの5教材](../src/app-learning/01-gas-app-learning/README.md) | Sheets等の表・関連・保存ルールは個別仕様。アプリ間の共通スキーマを新設しない |
+| [Webアプリ](../src/app-learning/02-web-app-learning/web-app-support-strategy.md) | Supabase PostgreSQL、必要時にStorage。具体的なスキーマ・移行は実装時に確定 |
 | [Java・Oracle実習](../src/java-career-learning/java-career-learning-strategy.md) | Oracle固有のSQL・管理実習はOracle環境。Web側と同一DBとみなさない |
 | [業務効率化](../src/office-automation-starter/README.md) | 元ファイルを保全し、コピーと出力で処理する |
 

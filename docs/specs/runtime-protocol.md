@@ -1,6 +1,6 @@
 # Runtime Protocol（このプロジェクトの instantiation）
 
-**§18 AI Runtime Protocol** と **§11.4 AI-facing Stop Rules** の repo 固有 instantiation。マスター文書 [`kurosawa-thin-harness-architecture.md`](./kurosawa-thin-harness-architecture.md) が tool-agnostic に定義し、このファイルが stop rules を*このリポジトリ*の境界へ固定する。薄い常時版は `CLAUDE.md`、これはより詳しい参照。
+**§18 AI Runtime Protocol** と **§11.4 AI-facing Stop Rules** の repo 固有 instantiation。マスター文書 [`kurosawa-thin-harness-architecture.md`](kurosawa-thin-harness-architecture.md) が tool-agnostic に定義し、このファイルが stop rules を*このリポジトリ*の境界へ固定する。薄い常時版は `CLAUDE.md`、これはより詳しい参照。
 
 ## 最小ループ（毎タスク）
 

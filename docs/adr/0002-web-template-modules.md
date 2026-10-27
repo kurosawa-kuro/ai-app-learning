@@ -2,8 +2,8 @@
 
 - 日付：2026-10-27
 - 状態：採用
-- 対象：`src/web-app-starter/template`
-- 関連：[技術スタック](0001-web-app-stack.md)、[実装構造](../../src/web-app-starter/template/docs/architecture.md)
+- 対象：`src/app-learning/02-web-app-learning/template`
+- 関連：[技術スタック](0001-web-app-stack.md)、[実装構造](../../src/app-learning/02-web-app-learning/template/docs/architecture.md)
 
 ## 背景
 

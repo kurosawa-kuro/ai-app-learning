@@ -1,6 +1,6 @@
 # Capability Boundary（このプロジェクトの instantiation）
 
-**Layer 4: Capability Boundary**（§12）の repo 固有 instantiation。マスター文書 [`kurosawa-thin-harness-architecture.md`](./kurosawa-thin-harness-architecture.md) は保護対象を一般的に列挙する。このファイルは*このリポジトリ*のツールと `.claude/settings.json` の強制層へ写像する。Skill: `assess-risk`。
+**Layer 4: Capability Boundary**（§12）の repo 固有 instantiation。マスター文書 [`kurosawa-thin-harness-architecture.md`](kurosawa-thin-harness-architecture.md) は保護対象を一般的に列挙する。このファイルは*このリポジトリ*のツールと `.claude/settings.json` の強制層へ写像する。Skill: `assess-risk`。
 
 > **使い方（厚いメニュー → 削る）**: 下表は「個人プロジェクトでよく出る保護対象」を**安全既定で厚く列挙**したもの。**このプロジェクトに該当しない行は削る**。薄い TODO から足すのでなく、厚い既定から削る運用にする（テンプレ＝最厚、コピー先で削る）。
 
