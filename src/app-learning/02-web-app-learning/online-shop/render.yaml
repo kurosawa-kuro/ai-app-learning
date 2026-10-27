@@ -13,6 +13,10 @@ services:
     envVars:
       - key: APP_ENVIRONMENT
         value: production
+      - key: APP_AI_MODE
+        value: demo
+      - key: SUPABASE_STORAGE_BUCKET
+        value: online-shop-images-render
       - key: APP_DB_SCHEMA
         sync: false
       # Entered once in the Dashboard at Blueprint creation; never committed.

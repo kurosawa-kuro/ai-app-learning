@@ -17,6 +17,11 @@ const fs=require('node:fs');
  await page.locator('#diary-material').fill('公園で春の色を見つけた。');
  await page.getByRole('button',{name:'AIで下書きを作る'}).click();await expect(page.locator('#diary-draft')).toBeVisible();
  await page.getByRole('button',{name:'本文へ反映'}).click();await page.locator('[name=body]').fill('本人が確認して手直しした日記です。\n写真を3枚残しました。');
+ if(process.env.DIARY_EXPIRE_SESSION==='1'){
+  const originalId=await page.locator('[name=requestId]').inputValue();await page.context().clearCookies();
+  await page.getByRole('button',{name:'日記を保存',exact:true}).click();await expect(page.locator('[data-diary-error]')).toContainText('送信の準備を更新');
+  expect(await page.locator('[name=photos]').evaluate(e=>e.files.length)).toBe(3);expect(await page.locator('[name=requestId]').inputValue()).toBe(originalId);
+ }
  await page.getByRole('button',{name:'日記を保存',exact:true}).click();await page.waitForURL(/\/diary\/[0-9a-f-]{36}$/);
  await page.reload();await expect(page.locator('h1')).toHaveText(title);await expect(page.locator('.post-body')).toContainText('本人が確認');
  await expect(page.locator('img.post-image')).toHaveCount(3);

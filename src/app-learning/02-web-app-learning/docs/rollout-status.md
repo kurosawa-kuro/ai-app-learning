@@ -8,11 +8,11 @@
 
 | 教材 | 起動ポート | 開発スキーマ | 固有機能のブラウザー確認 | 実AI | Render公開 |
 |---|---|---|---|---|---|
-| [写真日記](../photo-diary/docs/lesson-implementation.md) | 8091 | photo_diary | 確認済み（3画像・手直し・保存・再読込・2ページ） | 3画像で確認済み | 準備中 |
+| [写真日記](../photo-diary/docs/lesson-implementation.md) | 8091 | photo_diary | 確認済み（3画像・手直し・保存・再読込・2ページ） | 3画像で確認済み | [公開受入済み](https://learning-photo-diary.onrender.com/diary) |
 | [キャスト評価](../cast-evaluation/docs/lesson-implementation.md) | 8092 | cast_evaluation | 確認済み（実績・同点順位・編集・再集計） | 不要 | 今回は公開しない |
-| [英語](../english-trainer/docs/lesson-implementation.md) | 8093 | english_trainer | 固定応答で確認済み（クイズ・会話・振り返り・履歴） | 確認中 | 今回は公開しない |
+| [英語](../english-trainer/docs/lesson-implementation.md) | 8093 | english_trainer | 固定応答で確認済み（クイズ・会話・振り返り・履歴） | 実Geminiで確認済み | 今回は公開しない |
 | [ショップ](../online-shop/docs/lesson-implementation.md) | 8094 | online_shop | 確認済み（1800円の注文・再送・取消） | 不要 | 今回は公開しない |
-| [じゃんけん](../skill-janken-game/docs/lesson-implementation.md) | 8095 | skill_janken_game | 固定応答で確認済み（採用・対戦・履歴） | 確認中 | 今回は公開しない |
+| [じゃんけん](../skill-janken-game/docs/lesson-implementation.md) | 8095 | skill_janken_game | 固定応答で確認済み（採用・対戦・履歴） | 実Geminiで確認済み | 今回は公開しない |
 
 最初の公開対象は写真日記のみ。他の4教材まで公開済みとは扱わない。
 
@@ -30,3 +30,29 @@
 同時起動とテストでSupabase Session poolerの接続枠15件に達した。確認済みアプリを停止し、1アプリずつ検証する。接続失敗をアプリの動作成功に数えない。
 
 ローカルの確認、実Gemini確認、Render公開受入は分けて記録する。初回起動遅延は通常操作とは別に測る。
+
+## 最終確認結果（2026-10-27）
+
+| 教材 | Javaテスト実行数 | 失敗 | 明示的な実AIテストのスキップ |
+|---|---:|---:|---:|
+| 写真日記 | 76 | 0 | 1 |
+| キャスト評価 | 76 | 0 | 1 |
+| 英語 | 75 | 0 | 1 |
+| ショップ | 75 | 0 | 1 |
+| じゃんけん | 76 | 0 | 1 |
+
+合計378件、373件成功・5件スキップ。実AIは別途ブラウザーから写真日記・英語・じゃんけんで実行し、保存・再読込まで確認した。templateと5アプリのJavaScript単体テストも成功。
+
+写真日記の公開サービス：`learning-photo-diary`（`srv-dbgbffon74is73cgcmpg`）。DBは `photo_diary_render`、Storageは `photo-diary-images-render`。既存のtemplate公開サービスとは分離。無料プラン、手動デプロイで運用する。
+公開先は **固定AI応答のデモモード**。画面に明示し、利用者の操作で実AIへ課金通信しない。実AI接続自体はローカルで確認済み。実接続へ切り替える際はRenderの `APP_AI_MODE=live` を設定してデプロイする。GeminiキーはRenderへ設定済みだが、リポジトリには含めない。
+
+公開受入で確認：
+
+- 13件・5画像の架空シードを投入。その後、写真3枚の受入日記を追加し、計14件・8画像。
+- 固定下書き→本人の手直し→3画像付き保存→再読込→画像デコード。
+- 保存直前にブラウザーのセッションCookieを消し、403後の準備回復で本文・画像3枚・要求IDが残り、再送で保存できる。
+- 1ページ目10件・2ページ目4件、タグ絞り込み、PC／スマホ、CSSのHTTP成功と `text/css`、ブラウザー実行エラーなし。
+- データ投入後の一覧ロードは **1.903秒、1.195秒、1.093秒**。TTFBは1.078秒、1.172秒、1.070秒。確認時の画像デコード待ちは別計測で約1.047秒。
+- デプロイ後に初めて開いた空の一覧は2.394秒。空の画面の値をデータ入りの性能として扱わない。長時間休止後のコールドスタートを速くしたという主張ではない。
+
+確認用のログ・スクリーンショットは各アプリの `test-results` とtemplateの `.local` に保存する。生成物・秘密値はコミットしない。
