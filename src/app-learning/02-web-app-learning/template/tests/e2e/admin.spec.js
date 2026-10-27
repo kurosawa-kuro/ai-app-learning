@@ -44,7 +44,7 @@ test('管理画面・機能設定の共有・デフォルトユーザー・選�
     await saveFeatures(page, images, true);
     await visitor.goto('/admin/settings');
     await expect(visitor.getByRole('switch', { name: 'AI連携を許可する' })).toBeChecked();
-    await expect(visitor.getByText('このテンプレートにはAI処理・接続先はまだありません。', { exact: false })).toBeVisible();
+    await expect(visitor.getByText('設定を保存するだけではAIへ通信しません。', { exact: false })).toBeVisible();
     await page.reload();
     await expect(page.getByRole('switch', { name: 'AI連携を許可する' })).toBeChecked();
     await page.getByRole('switch', { name: 'AI連携を許可する' }).uncheck();

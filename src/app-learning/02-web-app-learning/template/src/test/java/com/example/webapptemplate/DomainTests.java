@@ -18,7 +18,7 @@ class DomainTests {
         assertThat(new AuthorName(" 葵 ").value()).isEqualTo("葵");
         assertThatThrownBy(() -> new AuthorName(" ")).isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> new AuthorName("あ".repeat(81))).isInstanceOf(IllegalArgumentException.class);
-        assertThatCode(() -> AuthorDeletion.requireNoPosts(0)).doesNotThrowAnyException();
-        assertThatThrownBy(() -> AuthorDeletion.requireNoPosts(1)).hasMessageContaining("投稿がある");
+        assertThatCode(() -> AuthorDeletion.requireUnused(0)).doesNotThrowAnyException();
+        assertThatThrownBy(() -> AuthorDeletion.requireUnused(1)).hasMessageContaining("利用中");
     }
 }

@@ -68,7 +68,7 @@ test('投稿者の一か所での変更・入力保持・1対多・詳細・絞�
   try {
     await page.goto('/posts/new');
     await page.getByLabel('タイトル', { exact: false }).fill(titles[0]);
-    await page.getByLabel('本文', { exact: false }).fill('入力中も投稿者を変更できます。');
+    await page.getByRole('textbox', { name: '本文 任意', exact: true }).fill('入力中も投稿者を変更できます。');
     // Inline creation never navigates away from the draft.
     const picker = page.locator('#author-picker');
     if (!await picker.getAttribute('open')) await picker.locator('summary').click();
@@ -79,7 +79,7 @@ test('投稿者の一か所での変更・入力保持・1対多・詳細・絞�
       await expect(page.locator('[data-author-name]')).toHaveText(name);
     }
     await expect(page.getByLabel('タイトル', { exact: false })).toHaveValue(titles[0]);
-    await expect(page.getByLabel('本文', { exact: false })).toHaveValue('入力中も投稿者を変更できます。');
+    await expect(page.getByRole('textbox', { name: '本文 任意', exact: true })).toHaveValue('入力中も投稿者を変更できます。');
     await picker.locator('summary').click();
     await page.locator('#userId').selectOption({ label: author });
     await expect(page.locator('[data-author-name]')).toHaveText(author);

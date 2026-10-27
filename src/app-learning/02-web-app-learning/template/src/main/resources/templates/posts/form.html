@@ -48,6 +48,19 @@
         <small th:if="${error}">画面が再表示された場合、画像はもう一度選択してください。</small>
       </div>
       <p class="ui-help" th:unless="${imagesEnabled}">画像投稿は現在OFFです。タイトルと本文を投稿できます。</p>
+      <section class="ui-stack" data-ai-draft aria-labelledby="ai-draft-heading">
+        <h2 id="ai-draft-heading">AIで本文の下書きを作る</h2>
+        <p class="ui-help">本文と、今回選択した画像をGeminiへ送ります。保存済みの画像は送りません。生成だけでは投稿を保存しません。</p>
+        <button type="button" class="secondary" data-ai-generate>AIで下書きを作る</button>
+        <button type="button" class="secondary" data-ai-check hidden>同じ要求の結果を確認</button>
+        <p role="status" aria-live="polite" data-ai-status></p>
+        <div data-ai-result hidden>
+          <label for="ai-draft-text">生成された下書き</label>
+          <textarea id="ai-draft-text" readonly rows="6" data-ai-text></textarea>
+          <button type="button" data-ai-apply>本文へ反映</button>
+          <button type="button" class="secondary" data-ai-discard>破棄</button>
+        </div>
+      </section>
       <div th:replace="~{ui/form :: actions('/posts', 'キャンセル', '投稿を保存')}"></div>
     </form>
   </div></article>

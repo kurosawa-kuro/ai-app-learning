@@ -31,4 +31,10 @@ public class JdbcSettingsStore implements SettingsStore {
         jdbc.update("update app_settings set images_enabled = ?, ai_enabled = ?, updated_at = now() where id = 1",
                 imagesEnabled, aiEnabled);
     }
+    public String allowedAiModels() {
+        return jdbc.queryForObject("select allowed_ai_models from app_settings where id = 1",String.class);
+    }
+    public void saveAllowedAiModels(String models) {
+        jdbc.update("update app_settings set allowed_ai_models = ?, updated_at = now() where id = 1",models);
+    }
 }

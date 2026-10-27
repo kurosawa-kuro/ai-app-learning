@@ -38,7 +38,8 @@
             <div><dt>今まで使ったAI金額</dt><dd>12,640<span>円</span></dd></div>
           </dl>
         </section>
-        <p id="ai-status" class="admin-note admin-note--neutral">このテンプレートにはAI処理・接続先はまだありません。許可しても外部への通信や料金は発生しません。</p>
+        <p id="ai-status" class="admin-note admin-note--neutral">設定を保存するだけではAIへ通信しません。接続確認画面で明示的に実行すると、Geminiへ確認用の短文を送ります。</p>
+        <a th:href="@{/admin/ai}">Gemini接続確認を開く</a>
       </div>
     </article>
     <div th:replace="~{ui/form :: actions('/admin/settings', '変更を取り消す', '設定を保存')}"></div>

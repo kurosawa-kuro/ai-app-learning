@@ -36,7 +36,7 @@ public class UiContext {
     public List<String> scripts(HttpServletRequest request) {
         return request.getRequestURI().startsWith("/examples/skill-janken")
                 ? List.of("/examples/janken-rules.js", "/examples/skill-janken.js")
-                : List.of("/features/posts/posts.js");
+                : List.of("/features/posts/posts.js", "/features/ai/drafts.js");
     }
 
     @ModelAttribute("navigation")

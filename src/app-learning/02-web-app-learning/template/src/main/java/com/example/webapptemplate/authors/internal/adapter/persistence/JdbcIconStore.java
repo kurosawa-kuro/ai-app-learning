@@ -28,4 +28,7 @@ public class JdbcIconStore implements IconStore, ImageReferences {
     public boolean uses(String bucket,String key) {
         return Boolean.TRUE.equals(jdbc.queryForObject("select exists(select 1 from user_icons where image_bucket=? and image_key=?)",Boolean.class,bucket,key));
     }
+    public java.util.List<com.example.webapptemplate.platform.StoredImage> images() {
+        return jdbc.query("select user_id::text,image_bucket,image_key from user_icons", (rs,row) -> new com.example.webapptemplate.platform.StoredImage(rs.getString(1),rs.getString(2),rs.getString(3)));
+    }
 }

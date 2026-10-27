@@ -17,7 +17,7 @@ class PublicAccessTests {
     @LocalServerPort int port;
     @Test void publicProfileRejectsAnonymousAndWrongCredentialsAndKeepsCsrf() throws Exception {
         var client=HttpClient.newHttpClient(); String root="http://127.0.0.1:"+port;
-        for(var path:new String[]{"/posts","/admin","/admin/operations","/admin/exports/posts.csv"}) {
+        for(var path:new String[]{"/posts","/admin","/admin/operations","/admin/exports/posts.csv","/admin/ai","/ai/drafts/00000000-0000-0000-0000-000000000000"}) {
             assertThat(client.send(HttpRequest.newBuilder(URI.create(root+path)).GET().build(),HttpResponse.BodyHandlers.discarding()).statusCode()).isEqualTo(401);
         }
         String correct="Basic "+Base64.getEncoder().encodeToString("acceptance:only-a-local-test-password-12345".getBytes(java.nio.charset.StandardCharsets.UTF_8));

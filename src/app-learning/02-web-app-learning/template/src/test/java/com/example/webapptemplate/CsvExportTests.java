@@ -55,7 +55,7 @@ class CsvExportTests {
         when(authors.authors()).thenReturn(List.of());
         var mvc = MockMvcBuilders.standaloneSetup(new CsvExportController(repository, authors)).build();
         var empty = mvc.perform(get("/admin/exports/users.csv")).andExpect(status().isOk()).andReturn().getResponse();
-        assertThat(empty.getContentAsString(StandardCharsets.UTF_8)).isEqualTo("\uFEFF\"ユーザーID\",\"ユーザー名\",\"投稿数\",\"作成日時（日本時間）\"\r\n");
+        assertThat(empty.getContentAsString(StandardCharsets.UTF_8)).isEqualTo("\uFEFF\"ユーザーID\",\"ユーザー名\",\"利用件数\",\"作成日時（日本時間）\"\r\n");
         when(repository.posts(null)).thenThrow(new DataAccessResourceFailureException("private connection details"));
         mvc.perform(get("/admin/exports/posts.csv")).andExpect(status().isServiceUnavailable())
             .andExpect(header().doesNotExist("Content-Disposition"))

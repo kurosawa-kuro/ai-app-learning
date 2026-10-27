@@ -31,9 +31,8 @@ public class PostController {
     public record PostForm(UUID userId, String title, String body) {}
     private final AuthorOperations repository;
     private final PostOperations service;
-    private final ImageStore storage;
-    public PostController(AuthorOperations repository, PostOperations service, ImageStore storage) {
-        this.repository = repository; this.service = service; this.storage = storage;
+    public PostController(AuthorOperations repository, PostOperations service) {
+        this.repository = repository; this.service = service;
     }
     @GetMapping("/")
     public String home() { return "redirect:/posts"; }
@@ -104,15 +103,7 @@ public class PostController {
         var flash = new RedirectAttributesModelMap();
         try {
             String target = create(userId, title, body, image, model, request, response, flash);
-            if (target.startsWith("redirect:")) {
-                String url = target.substring("redirect:".length());
-                var map = new FlashMap();
-                map.putAll(flash.getFlashAttributes()); map.setTargetRequestPath(url);
-                RequestContextUtils.getFlashMapManager(request).saveOutputFlashMap(map, request, response);
-                return ResponseEntity.ok(Map.of("redirect", url));
-            }
-            return ResponseEntity.unprocessableEntity().body(Map.of("error", model.getAttribute("error"),
-                    "fields", model.containsAttribute("fieldErrors") ? model.getAttribute("fieldErrors") : Map.of()));
+            return PostFormResponse.from(target,model,flash,request,response);
         } catch (DataAccessException unavailable) {
             return ResponseEntity.status(503).body(Map.of("error", "接続できませんでした。入力内容を残したまま再試行できます。", "fields", Map.of()));
         }
@@ -149,15 +140,7 @@ public class PostController {
         var flash = new RedirectAttributesModelMap();
         try {
             String target = update(id,version,title,body,image,removeImage,model,flash);
-            if (target.startsWith("redirect:")) {
-                String url = target.substring("redirect:".length());
-                var map = new FlashMap();
-                map.putAll(flash.getFlashAttributes()); map.setTargetRequestPath(url);
-                RequestContextUtils.getFlashMapManager(request).saveOutputFlashMap(map, request, response);
-                return ResponseEntity.ok(Map.of("redirect", url));
-            }
-            return ResponseEntity.unprocessableEntity().body(Map.of("error", model.getAttribute("error"),
-                    "fields", model.containsAttribute("fieldErrors") ? model.getAttribute("fieldErrors") : Map.of()));
+            return PostFormResponse.from(target,model,flash,request,response);
         } catch (DataAccessException unavailable) {
             return ResponseEntity.status(503).body(Map.of("error", "接続できませんでした。入力内容を残したまま再試行できます。", "fields", Map.of()));
         }
@@ -192,15 +175,5 @@ public class PostController {
         service.delete(id);
         flash.addFlashAttribute("message", "投稿を削除しました。");
         return "redirect:/posts";
-    }
-    @GetMapping("/posts/{id}/image")
-    public ResponseEntity<byte[]> image(@PathVariable UUID id) {
-        var post = service.post(id);
-        if (!storage.configured() || post.imageKey() == null) return ResponseEntity.notFound().build();
-        try {
-            return ResponseEntity.ok().cacheControl(CacheControl.noStore()).contentType(MediaType.parseMediaType(post.imageType()))
-                .body(storage.download(post.imageBucket(), post.imageKey()));
-        } catch(com.example.webapptemplate.platform.MissingImage missing) { return ResponseEntity.notFound().build(); }
-        catch(IllegalStateException unavailable) { return ResponseEntity.status(503).build(); }
     }
 }

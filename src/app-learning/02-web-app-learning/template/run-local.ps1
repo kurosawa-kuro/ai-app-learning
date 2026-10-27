@@ -1,4 +1,4 @@
-param(
+﻿param(
     [ValidateSet('test', 'run', 'stop', 'package', 'seed-preview', 'seed', 'seed-reset', 'seed-cleanup', 'seed-images', 'backup', 'restore')]
     [string]$Action = 'run',
     [switch]$Images,
@@ -19,7 +19,7 @@ $allowed = @('DB_HOST', 'DB_PORT', 'DB_NAME', 'SPRING_DATASOURCE_URL',
     'SPRING_DATASOURCE_USERNAME', 'SPRING_DATASOURCE_PASSWORD', 'SUPABASE_URL',
     'SUPABASE_SECRET_KEY', 'SUPABASE_STORAGE_BUCKET', 'APP_IMAGES_ENABLED',
     'APP_DB_SCHEMA', 'SERVER_PORT', 'APP_ENVIRONMENT', 'APP_CONNECTION_LABEL',
-    'APP_ACCESS_MODE', 'APP_ACCESS_USER', 'APP_ACCESS_PASSWORD', 'AI_GEMINI_API_KEY', 'GEMINI_API_KEY')
+    'APP_ACCESS_MODE', 'APP_ACCESS_USER', 'APP_ACCESS_PASSWORD', 'AI_GEMINI_API_KEY', 'GEMINI_API_KEY', 'GEMINI_MODEL', 'GEMINI_TIMEOUT')
 # Read by scripts/render.ps1 only; never passed to the app.
 $deployOnly = @('RENDER_API_KEY', 'RENDER_DB_SCHEMA')
 foreach ($name in @($settings.Keys)) {

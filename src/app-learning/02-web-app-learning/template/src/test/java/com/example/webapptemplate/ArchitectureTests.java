@@ -13,7 +13,7 @@ class ArchitectureTests {
     @Test void featureModulesHaveNoCyclesOrInternalAccess() {
         var modules = ApplicationModules.of(WebAppTemplateApplication.class);
         assertThat(modules.stream().map(module -> module.getIdentifier().toString()))
-            .containsExactlyInAnyOrder("authors", "posts", "settings", "platform", "shell", "games", "exports", "bootstrap", "operations");
+            .containsExactlyInAnyOrder("authors", "posts", "settings", "platform", "shell", "games", "exports", "bootstrap", "operations", "ai");
         modules.verify();
     }
 
@@ -48,7 +48,8 @@ class ArchitectureTests {
             "games", Set.<String>of(),
             "shell", Set.of("authors", "settings", "platform"),
             "bootstrap", Set.of("settings", "platform"),
-            "operations", Set.of("platform", "settings"));
+            "operations", Set.of("platform", "settings"),
+            "ai", Set.of("platform", "settings"));
         allowed.forEach((module, dependencies) -> {
             for (var other : allowed.keySet()) {
                 if (other.equals(module) || dependencies.contains(other)) continue;

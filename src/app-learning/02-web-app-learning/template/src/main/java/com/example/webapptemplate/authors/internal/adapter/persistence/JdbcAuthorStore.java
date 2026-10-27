@@ -10,15 +10,15 @@ import org.springframework.stereotype.Repository;
 public class JdbcAuthorStore implements AuthorStore {
     private final JdbcClient db;
     private final JdbcTemplate jdbc;
-    public JdbcAuthorStore(JdbcClient db, JdbcTemplate jdbc) { this.db=db; this.jdbc=jdbc; }
+    private final List<com.example.webapptemplate.platform.UserReferences> references;
+    public JdbcAuthorStore(JdbcClient db, JdbcTemplate jdbc, List<com.example.webapptemplate.platform.UserReferences> references) { this.db=db; this.jdbc=jdbc; this.references=references; }
     public List<AuthorView> authors() {
-        return db.sql("select u.id, u.name, count(p.id) as post_count, u.created_at from app_users u left join posts p on p.user_id=u.id group by u.id order by u.created_at, u.id")
-                .query(AuthorView.class).list();
+        var counts=new HashMap<UUID,Long>();
+        references.forEach(source -> source.counts().forEach((id,count) -> counts.merge(id,count,Long::sum)));
+        return db.sql("select id,name,0 as usage_count,created_at from app_users order by created_at,id")
+            .query(AuthorView.class).list().stream().map(user -> new AuthorView(user.id(),user.name(),counts.getOrDefault(user.id(),0L),user.createdAt())).toList();
     }
-    public Optional<AuthorView> author(UUID id) {
-        return db.sql("select u.id, u.name, count(p.id) as post_count, u.created_at from app_users u left join posts p on p.user_id=u.id where u.id=:id group by u.id")
-                .param("id", id).query(AuthorView.class).optional();
-    }
+    public Optional<AuthorView> author(UUID id) { return authors().stream().filter(user -> user.id().equals(id)).findFirst(); }
     public void rename(UUID id,String name) {
         db.sql("update app_users set name=:name where id=:id").param("id",id).param("name",name).update();
     }

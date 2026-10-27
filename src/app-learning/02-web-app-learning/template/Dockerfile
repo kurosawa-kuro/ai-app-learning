@@ -13,6 +13,7 @@ WORKDIR /app
 RUN useradd --system --no-create-home app
 COPY certs/prod-ca-2021.crt certs/
 COPY --from=build /src/target/web-app-template-0.0.1-SNAPSHOT.jar app.jar
+RUN mkdir -p /app/.local/backups && chown -R app:app /app/.local
 USER app
 ENV SPRING_PROFILES_ACTIVE=render \
     JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75"

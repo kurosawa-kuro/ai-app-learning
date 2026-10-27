@@ -81,7 +81,7 @@ class UserIconTests {
     @Test void usersWithPostsCannotBeDeletedAndReferencedIconsAreNeverCleaned() {
         service.save(user, file); var icon = service.icon(user).orElseThrow();
         jdbc.update("insert into posts(id,user_id,title) values (?,?, '残す投稿')", UUID.randomUUID(), user);
-        assertThatThrownBy(() -> repository.deleteAuthor(user)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("投稿がある");
+        assertThatThrownBy(() -> repository.deleteAuthor(user)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("利用中");
         assertThat(repository.author(user)).isPresent(); assertThat(service.icon(user)).contains(icon);
         var cleanup = TestInfrastructure.cleanup(jdbc, storage); cleanup.enqueue(icon.bucket(), icon.key());
         assertThat(cleanup.run()).isEqualTo(1);

@@ -22,7 +22,9 @@ public class OperationsController {
     private final FeaturePolicy policy;
     private final AuditTrail audit;
     private final RecoveryService recovery;
-    public OperationsController(JdbcTemplate jdbc,ImageStore storage,ImageCleanup cleanup,RuntimeInfo runtime,FeaturePolicy policy,AuditTrail audit,RecoveryService recovery) {
+    private final List<ImageReferences> references;
+    public OperationsController(JdbcTemplate jdbc,ImageStore storage,ImageCleanup cleanup,RuntimeInfo runtime,FeaturePolicy policy,AuditTrail audit,RecoveryService recovery,List<ImageReferences> references) {
+        this.references=references;
         this.jdbc=jdbc; this.storage=storage; this.cleanup=cleanup; this.runtime=runtime; this.policy=policy; this.audit=audit; this.recovery=recovery;
     }
     public record Check(String label,String state,String next) {}
@@ -57,12 +59,12 @@ public class OperationsController {
     public String images(Model model) {
         var results=new ArrayList<Check>();
         try {
-            for(var row:jdbc.queryForList("select id::text as id,image_bucket,image_key from posts where image_key is not null union all select user_id::text,image_bucket,image_key from user_icons")) {
+            for(var row:references.stream().flatMap(source -> source.images().stream()).toList()) {
                 String state="正常";
-                try { storage.download(row.get("image_bucket").toString(),row.get("image_key").toString()); }
+                try { storage.download(row.bucket(),row.key()); }
                 catch(MissingImage missing) { state="元画像なし"; }
                 catch(RuntimeException failure) { state="取得失敗"; }
-                results.add(new Check(row.get("id").toString(),state,state.equals("元画像なし")?"元ファイルを再アップロードしてください。":"接続失敗時はストレージの状態を確認してください。"));
+                results.add(new Check(row.label(),state,state.equals("元画像なし")?"元ファイルを再アップロードしてください。":"接続失敗時はストレージの状態を確認してください。"));
             }
         } catch(RuntimeException failure) { results.add(new Check("画像情報","照会失敗","DB接続を確認してください。")); }
         model.addAttribute("imageChecks",results); audit.record("images.verify","checked",null); return show(model);

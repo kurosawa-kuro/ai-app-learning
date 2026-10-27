@@ -24,7 +24,7 @@
     <div class="admin-table-wrap" th:unless="${#lists.isEmpty(authors)}">
       <table class="admin-table ui-table">
         <thead>
-          <tr><th>名前</th><th>投稿数</th><th>登録日</th><th class="admin-text-right">操作</th></tr>
+          <tr><th>名前</th><th>利用件数</th><th>登録日</th><th class="admin-text-right">操作</th></tr>
         </thead>
         <tbody>
           <tr th:each="author : ${authors}" th:attr="data-author=${author.name}">
@@ -38,7 +38,7 @@
                 </div>
               </div>
             </td>
-            <td data-label="投稿数"><a th:href="@{/posts(userId=${author.id})}" th:text="${author.postCount + ' 件'}"></a></td>
+            <td data-label="利用件数"><span th:text="${author.usageCount + ' 件'}"></span></td>
             <td data-label="登録日" th:text="${author.createdLabel()}"></td>
             <td>
               <div class="ui-row-actions"><a th:href="@{/admin/users/{id}/edit(id=${author.id})}" th:attr="aria-label=${author.name + 'の名前を変更'}">名前を変更</a>
@@ -46,7 +46,7 @@
                 <form th:action="@{/admin/users/{id}/select(id=${author.id})}" method="post" data-ui-form>
                   <button type="submit" class="secondary" th:attr="aria-label=${author.name + 'で投稿'}">この投稿者で投稿</button>
                 </form>
-                <form th:if="${author.postCount == 0}" th:action="@{/admin/users/{id}/delete(id=${author.id})}" method="post" data-ui-form
+                <form th:if="${author.usageCount == 0}" th:action="@{/admin/users/{id}/delete(id=${author.id})}" method="post" data-ui-form
                       th:attr="data-confirm=${'「' + author.name + '」を削除します。'}" data-busy-text="削除中…">
                   <button type="submit" class="outline secondary" th:attr="aria-label=${author.name + 'を削除'}">削除</button>
                 </form>

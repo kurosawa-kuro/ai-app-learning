@@ -38,7 +38,7 @@ class BacklogIntegrationTests {
     @BeforeEach void setup() {
         assertThat(jdbc.queryForObject("select current_schema()",String.class)).isEqualTo("app_template_backlog_test");
         jdbc.execute("alter table posts drop constraint if exists backlog_reject");
-        jdbc.update("delete from posts"); jdbc.update("delete from app_users"); jdbc.update("delete from image_cleanup"); jdbc.update("delete from post_requests");
+        jdbc.update("delete from posts"); jdbc.update("delete from app_users"); jdbc.update("delete from image_cleanup"); jdbc.update("delete from post_requests"); jdbc.update("delete from ai_requests");
         objects=new ConcurrentHashMap<>(); storage=mock(ImageStore.class);
         when(storage.bucket()).thenReturn("backlog-test"); when(storage.configured()).thenReturn(true);
         doAnswer(call->{objects.put(call.getArgument(0),((ImageData)call.getArgument(1)).bytes());return null;}).when(storage).upload(anyString(),any());
@@ -114,10 +114,13 @@ class BacklogIntegrationTests {
         authors.saveDefaultUser(author);
         jdbc.update("update app_settings set images_enabled=true,ai_enabled=true where id=1");
         jdbc.update("insert into user_icons values(?,?,?,?)",author,"backlog-test",original.imageKey(),original.imageType());
-        var recovery=new RecoveryService(jdbc,source,storage,manager); var archive=recovery.backup();
+        var aiId=UUID.randomUUID();
+        jdbc.update("insert into ai_requests(request_id,owner_id,fingerprint,model,prompt_version,state,result_text) values (?,?,?,?,?,'SUCCESS',?)",aiId,"backup-test","test-fingerprint","gemini-test","post-draft-v1","保存前のAI下書き");
+        var recovery=new RecoveryService(jdbc,source,storage,manager,new com.example.webapptemplate.bootstrap.internal.TemplateRecoveryDataset()); var archive=recovery.backup();
         String target="app_template_restore_unit_"+UUID.randomUUID().toString().substring(0,8);
         try {
             var restored=recovery.restore(archive,target);
+            assertThat(jdbc.queryForObject("select result_text from "+target+".ai_requests where request_id=?",String.class,aiId)).isEqualTo("保存前のAI下書き");
             assertThat(restored.posts()).isEqualTo(1); assertThat(restored.users()).isEqualTo(1); assertThat(restored.images()).isEqualTo(1);
             var restoredKey=jdbc.queryForObject("select image_key from "+target+".posts where id=?",String.class,id);
             assertThat(restoredKey).isNotEqualTo(original.imageKey()); assertThat(objects.get(restoredKey)).isEqualTo(objects.get(original.imageKey()));
@@ -130,5 +133,28 @@ class BacklogIntegrationTests {
             if(!target.matches("app_template_restore_unit_[a-f0-9]{8}")) throw new IllegalStateException();
             jdbc.execute("drop schema if exists "+target+" cascade"); Files.deleteIfExists(archive);
         }
+    }
+    @Test void userDirectoryWithoutPostModuleCanReadAndRecover() throws Exception {
+        var directory=new com.example.webapptemplate.authors.internal.adapter.persistence.JdbcAuthorStore(JdbcClient.create(jdbc),jdbc,List.of());
+        assertThat(directory.author(author).orElseThrow().usageCount()).isZero();
+        RecoveryDataset dataset=()->List.of(new RecoveryDataset.Table("app_users",false,true),new RecoveryDataset.Table("user_icons",true,true),new RecoveryDataset.Table("app_settings",false,true));
+        var recovery=new RecoveryService(jdbc,source,storage,manager,dataset);var archive=recovery.backup();
+        String target="app_template_restore_unit_"+UUID.randomUUID().toString().substring(0,8);
+        try {
+            var result=recovery.restore(archive,target);assertThat(result.users()).isEqualTo(1);assertThat(result.posts()).isZero();
+            assertThat(jdbc.queryForObject("select name from "+target+".app_users where id=?",String.class,author)).isEqualTo("編集検証");
+            assertThatThrownBy(()->new RecoveryService(jdbc,source,storage,manager,new com.example.webapptemplate.bootstrap.internal.TemplateRecoveryDataset()).restore(archive,target+"x")).hasRootCauseMessage("Unsupported backup format");
+        } finally {
+            if(!target.matches("app_template_restore_unit_[a-f0-9]{8}")) throw new IllegalStateException();
+            jdbc.execute("drop schema if exists "+target+" cascade");Files.deleteIfExists(archive);
+        }
+    }
+    @Test void queryPlansAndImageTupleConstraintAreVerified() throws Exception {
+        service.create(author,"検索対象","本文",null);
+        var plans=new StringBuilder();
+        for(String query:List.of("select * from posts order by created_at desc,id limit 10","select * from posts where user_id='"+author+"' order by created_at desc,id limit 10","select * from posts where title ilike '%検索%' or body ilike '%検索%' order by created_at desc,id limit 10"))
+            plans.append(String.join("\n",jdbc.queryForList("explain (analyze,buffers) "+query,String.class))).append("\n\n");
+        Files.writeString(Path.of("target/query-plans.txt"),plans);
+        assertThatThrownBy(()->jdbc.update("update posts set image_bucket='test',image_key='invalid',image_type=null where user_id=?",author)).isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
     }
 }

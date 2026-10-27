@@ -25,9 +25,9 @@ public class CsvExportController {
     @GetMapping("/admin/exports/users.csv")
     public ResponseEntity<byte[]> users() {
         var csv = new StringBuilder("\uFEFF");
-        row(csv, "ユーザーID", "ユーザー名", "投稿数", "作成日時（日本時間）");
+        row(csv, "ユーザーID", "ユーザー名", "利用件数", "作成日時（日本時間）");
         for (var user : authors.authors()) {
-            row(csv, user.id(), user.name(), user.postCount(), date(user.createdAt()));
+            row(csv, user.id(), user.name(), user.usageCount(), date(user.createdAt()));
         }
         return download("users", csv);
     }

@@ -24,7 +24,7 @@
       <p>画像投稿やAI連携を許可するか設定します。</p>
       <p><span class="admin-badge" th:text="${imagesEnabled ? '画像投稿：許可' : '画像投稿：禁止'}"></span>
         <span class="admin-badge" th:text="${aiEnabled ? 'AI連携：許可' : 'AI連携：禁止'}"></span></p>
-      <p class="ui-muted">AIの処理自体は未実装です。</p>
+      <p class="ui-muted">機能管理からGeminiへの接続を確認できます。</p>
       <a role="button" class="secondary" th:href="@{/admin/settings}">機能管理を開く</a>
     </div>
   </article>

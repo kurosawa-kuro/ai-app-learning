@@ -78,4 +78,8 @@ public class JdbcPostStore implements PostStore, ImageReferences {
         return db.sql("select exists(select 1 from posts where image_bucket=:bucket and image_key=:key)")
             .param("bucket",bucket).param("key",key).query(Boolean.class).single();
     }
+    public java.util.List<com.example.webapptemplate.platform.StoredImage> images() {
+        return db.sql("select id::text as label,image_bucket as bucket,image_key as key from posts where image_key is not null")
+            .query(com.example.webapptemplate.platform.StoredImage.class).list();
+    }
 }

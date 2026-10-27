@@ -18,12 +18,15 @@ import org.springframework.transaction.support.TransactionTemplate;
 /** Portable application-data archive. Restore always targets a new isolated schema and new image keys. */
 @Service
 public class RecoveryService {
-    private static final List<String> TABLES=List.of("app_users","posts","user_icons","app_settings","post_requests","operation_events","image_cleanup");
+    private final List<String> TABLES;
+    private final List<RecoveryDataset.Table> definitions;
     private final JdbcTemplate jdbc;
     private final DataSource source;
     private final ImageStore storage;
     private final TransactionTemplate snapshot;
-    public RecoveryService(JdbcTemplate jdbc,DataSource source,ImageStore storage,PlatformTransactionManager transactions) {
+    public RecoveryService(JdbcTemplate jdbc,DataSource source,ImageStore storage,PlatformTransactionManager transactions,RecoveryDataset dataset) {
+        definitions=List.copyOf(dataset.tables());
+        TABLES=definitions.stream().map(RecoveryDataset.Table::name).toList();
         this.jdbc=jdbc; this.source=source; this.storage=storage;
         snapshot=new TransactionTemplate(transactions);
         snapshot.setIsolationLevel(org.springframework.transaction.TransactionDefinition.ISOLATION_REPEATABLE_READ);
@@ -37,13 +40,13 @@ public class RecoveryService {
             try {
                 snapshot.executeWithoutResult(status -> {
                     try(var zip=new ZipOutputStream(Files.newOutputStream(partial,StandardOpenOption.CREATE_NEW))) {
-                        var manifest=new Properties(); manifest.setProperty("format","1"); manifest.setProperty("created",Instant.now().toString());
+                        var manifest=new Properties(); manifest.setProperty("format","2"); manifest.setProperty("tables",String.join(",",TABLES)); manifest.setProperty("created",Instant.now().toString());
                         manifest.setProperty("schema",jdbc.queryForObject("select current_schema()",String.class));
                         manifest.setProperty("migration",jdbc.queryForObject("select version from flyway_schema_history where success and version is not null order by installed_rank desc limit 1",String.class));
                         var tables=new LinkedHashMap<String,Properties>();
                         for(var table:TABLES) tables.put(table,readTable(table));
                         var refs=new LinkedHashMap<String,String[]>();
-                        for(var table:List.of("posts","user_icons")) {
+                        for(var table:definitions.stream().filter(RecoveryDataset.Table::images).map(RecoveryDataset.Table::name).toList()) {
                             var data=tables.get(table);
                             for(int row=0;row<Integer.parseInt(data.getProperty("rows"));row++) {
                                 String bucket=data.getProperty(row+".image_bucket"),key=data.getProperty(row+".image_key");
@@ -92,7 +95,7 @@ public class RecoveryService {
         var uploaded=new ArrayList<String>(); boolean committed=false;
         try(var zip=new ZipFile(archive.toFile())) {
             var manifest=load(zip,"manifest.xml");
-            if(!"1".equals(manifest.getProperty("format"))) throw new IllegalArgumentException("Unsupported backup format");
+            if(!"2".equals(manifest.getProperty("format")) || !String.join(",",TABLES).equals(manifest.getProperty("tables"))) throw new IllegalArgumentException("Unsupported backup format");
             String version=jdbc.queryForObject("select version from flyway_schema_history where success and version is not null order by installed_rank desc limit 1",String.class);
             if(!version.equals(manifest.getProperty("migration"))) throw new IllegalArgumentException("Backup migration version does not match this app.");
             var tables=new LinkedHashMap<String,Properties>();
@@ -118,7 +121,7 @@ public class RecoveryService {
                     connection.setSchema(schema);
                     for(var table:TABLES) {
                         // Retry state is quarantined in the archive, not activated against live bucket keys.
-                        if(table.equals("image_cleanup")) continue;
+                        if(!restorable(table)) continue;
                         var data=tables.get(table);
                         for(int row=0;row<Integer.parseInt(data.getProperty("rows"));row++) {
                             String old=data.getProperty(row+".image_key");
@@ -131,12 +134,12 @@ public class RecoveryService {
                         insert(connection,schema,table,data);
                     }
                     // Verify row values and relationships inside the target before commit.
-                    for(var table:TABLES) if(!table.equals("image_cleanup")) verify(connection,schema,table,tables.get(table));
+                    for(var table:TABLES) if(restorable(table)) verify(connection,schema,table,tables.get(table));
                     connection.commit(); committed=true;
                 } catch(Exception failure) { connection.rollback(); throw failure; }
                 finally { connection.setAutoCommit(true); }
             }
-            return new Restored(schema,Integer.parseInt(tables.get("posts").getProperty("rows")),Integer.parseInt(tables.get("app_users").getProperty("rows")),imageCount,
+            return new Restored(schema,rows(tables,"posts"),rows(tables,"app_users"),imageCount,
                 manifest.getProperty("created"),(System.nanoTime()-started)/1_000_000);
         } catch(Exception failure) { throw new IllegalStateException("Restore failed. Inspect the isolated target; the source is unchanged.",failure); }
         finally {
@@ -146,6 +149,8 @@ public class RecoveryService {
             }
         }
     }
+    private boolean restorable(String table) { return definitions.stream().anyMatch(t -> t.name().equals(table) && t.restore()); }
+    private static int rows(Map<String,Properties> tables,String table) { return tables.containsKey(table)?Integer.parseInt(tables.get(table).getProperty("rows")):0; }
     private static void insert(Connection connection,String schema,String table,Properties data) throws SQLException {
         List<String> columns=List.of(data.getProperty("columns").split(","));
         var types=new HashMap<String,Integer>();
