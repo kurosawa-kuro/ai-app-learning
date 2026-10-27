@@ -11,7 +11,10 @@ $allowed = @('DB_HOST', 'DB_PORT', 'DB_NAME', 'SPRING_DATASOURCE_URL',
     'SPRING_DATASOURCE_USERNAME', 'SPRING_DATASOURCE_PASSWORD', 'SUPABASE_URL',
     'SUPABASE_SECRET_KEY', 'SUPABASE_STORAGE_BUCKET', 'APP_IMAGES_ENABLED',
     'APP_DB_SCHEMA', 'SERVER_PORT')
+# Read by scripts/render.ps1 only; never passed to the app.
+$deployOnly = @('RENDER_API_KEY')
 foreach ($name in @($settings.Keys)) {
+    if ($name -in $deployOnly) { $settings.Remove($name); continue }
     if ($name -notin $allowed) { throw "Unsupported .env key: $name" }
 }
 # Existing process environment wins over the local file.

@@ -55,6 +55,7 @@ cp -n .env.example .env
 | `SUPABASE_STORAGE_BUCKET` | `template-post-images-dev`。最初の画像投稿時に非公開で作成 |
 | `APP_DB_SCHEMA` | 通常は `app_template` |
 | `SERVER_PORT` | 既定は8080 |
+| `RENDER_API_KEY` | `scripts/render.sh` 専用のRender APIキー。アプリには渡さない |
 
 優先順位は「起動引数・テスト専用設定 → 既存の環境変数 → `.env` → アプリの既定値」です。`-Images` は画像ON、`APP_IMAGES_ENABLED=false ./run-local.sh -Action run` はOFFを明示します。`.env` で `APP_IMAGES_ENABLED=true` にすれば通常の起動でも画像を利用できます。画像OFFではStorageへ接続しません。保存済み画像の情報は維持し、画像つき投稿の削除は画像ONで行います。
 
@@ -71,6 +72,16 @@ RenderがGitから [Dockerfile](Dockerfile) をビルドします。手元のDoc
 3. 作成時に `DB_HOST`・`SPRING_DATASOURCE_USERNAME`・`SPRING_DATASOURCE_PASSWORD` を入力します。値は `.env` と同じです。画像ONにする場合は `APP_IMAGES_ENABLED=true` と `SUPABASE_URL`・`SUPABASE_SECRET_KEY` をDashboardで追加します。
 
 [render.yaml](render.yaml) はfreeプラン・Singapore（Supabase Tokyoに最も近いリージョン）です。Dockerビルドではテストを実行しないため、pushの前に `./run-local.sh -Action test` を通します。`APP_DB_SCHEMA` を変えない限り、ローカルと同じ `app_template` のデータを使います。
+
+作成済みサービス `web-app-template` は [scripts/render.sh](scripts/render.sh) で操作します。`.env` の `RENDER_API_KEY` を使い、値は表示しません。masterへのpushで自動デプロイされます。
+
+```bash
+./scripts/render.sh status    # URL・停止状態・最新デプロイ
+./scripts/render.sh deploy    # 最新のpush済みコミットを再デプロイし、ページ応答まで待つ。未pushなら中止
+./scripts/render.sh suspend   # 公開停止（確認が終わったら実行）
+./scripts/render.sh resume    # 再開し、ページ応答まで待つ
+./scripts/render.sh env       # .env のDB接続情報をRenderへ反映。その後 deploy
+```
 
 公開URLは誰でもアクセスでき、認証なしで全投稿者・投稿の追加・削除と（画像ON時）Storageへのアップロードができます。DBもDashboardの管理用接続のままです。限定的な検証以外で公開し続ける前に、認証とアプリ専用DBロールを設計します。
 
