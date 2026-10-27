@@ -71,3 +71,9 @@ AI固定応答の確認と、実Geminiへの接続結果は区別する。Render
 - V12でタグマスター `diary_tag_catalog(id, name, version)` と中間テーブル `diary_tags(entry_id, tag_id)` を分離。既存の日記・タグ関連を移行し、名前変更後もIDで関連を維持する。
 - タグ名は30文字まで、重複名とカンマを禁止。変更競合はversionで検知する。
 - 管理画面のDB接続確認は手動のみ。接続情報・秘密値は表示しない。
+
+## 2026-10-28の改修・公開状況
+
+公開先：https://learning-photo-diary.onrender.com/diary 。タグ管理、画像の読込状態・再読込・拡大、手動DB接続確認を反映済み。18件の架空日記で公開受入を確認した。画像の表示にはテンプレート共通の画像UIを再利用する。
+
+最新の状態と検証記録：[5教材の横展開記録](../../docs/rollout-status.md)。
