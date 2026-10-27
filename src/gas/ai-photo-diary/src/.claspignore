@@ -1,0 +1,7 @@
+# clasp が GAS に上げるのは、アプリのファイルだけ（テスト・スクリプト・npm の設定・node_modules は上げない）
+**/**
+!appsscript.json
+!server/
+!server/**/*.js
+!client/
+!client/**/*.html

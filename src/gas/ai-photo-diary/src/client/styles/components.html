@@ -1,0 +1,124 @@
+<style>
+  /*
+   * app 固有の部品。色・余白・角丸は admin-pico のトークン（--admin-*）だけを使い、独自の色を作らない。
+   * admin-pico に既にある部品（admin-card / admin-news-card / admin-badge / admin-note …）はここで作り直さない。
+   */
+
+  /* 選択チップ（キーワードの絞り込み・選択）。押された状態だけライム */
+  .app-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .app-chip {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    min-height: 2.25rem; margin: 0; padding: 0.3rem 0.85rem;
+    border-radius: 999px; border: 1px solid var(--admin-border-strong);
+    background: var(--admin-bg-sub); color: var(--admin-text-sub);
+    font-size: 0.9rem; line-height: 1.3; cursor: pointer; width: auto;
+  }
+  .app-chip:hover, .app-chip:focus-visible { background: var(--admin-bg-hover); color: var(--admin-text-main); border-color: var(--admin-border-strong); }
+  .app-chip[aria-pressed="true"] {
+    background: var(--admin-accent-soft); color: var(--admin-accent-strong); border-color: var(--admin-accent-border);
+  }
+  .app-chip--static { cursor: default; }
+
+  /* キーワードの彩り（カード・詳細の、選択式でないチップ）。色はキーワードごとに App.ui.tagChip が選ぶ */
+  .app-chip--pop-1 { background: var(--admin-pop-1-bg); color: var(--admin-pop-1-fg); border-color: transparent; }
+  .app-chip--pop-2 { background: var(--admin-pop-2-bg); color: var(--admin-pop-2-fg); border-color: transparent; }
+  .app-chip--pop-3 { background: var(--admin-pop-3-bg); color: var(--admin-pop-3-fg); border-color: transparent; }
+  .app-chip--pop-4 { background: var(--admin-pop-4-bg); color: var(--admin-pop-4-fg); border-color: transparent; }
+  .app-chip[class*="app-chip--pop-"]:hover, .app-chip[class*="app-chip--pop-"]:focus-visible { filter: saturate(1.25); border-color: transparent; }
+
+  /* 主ボタン（日記を書く・保存する）：グラデーションの丸いボタン。補助のボタンも丸くする */
+  .app-primary {
+    background-color: transparent; background-image: var(--admin-accent-gradient);
+    border: 0; border-radius: 999px; color: var(--admin-on-accent); font-weight: 700;
+    box-shadow: var(--admin-shadow);
+  }
+  .app-primary:hover, .app-primary:focus-visible { background-image: var(--admin-accent-gradient-hover); color: var(--admin-on-accent); }
+  .app-primary:disabled { opacity: 0.6; }
+  button.secondary { border-radius: 999px; }
+
+  /* 一覧のカード（テンプレートの admin-news-card を使う） */
+  .app-feed { margin: 0; }
+  .app-feed .admin-news-card { cursor: pointer; display: flex; flex-direction: column; transition: border-color 0.2s ease; }
+  .app-feed .admin-news-card:hover, .app-feed .admin-news-card:focus-visible { border-color: var(--admin-border-strong); outline: none; }
+  .app-feed .admin-news-card.is-new { border-color: var(--admin-accent); }
+  .app-feed .admin-news-card__thumb { margin-top: 0; border-top: 0; min-height: 0; aspect-ratio: 16 / 9; }
+  .app-feed .admin-news-card__thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .app-feed .admin-news-card__thumb::after { display: none; }
+  .app-photo-count {
+    position: absolute; right: 0.6rem; bottom: 0.6rem; z-index: 1;
+    padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.78rem;
+    background: var(--admin-overlay); color: var(--admin-on-overlay);
+  }
+  .app-feed .admin-news-card__content { flex: 1; }
+  .app-feed .admin-news-card__content p { word-break: break-all; }
+  .app-feed .app-chips { gap: 0.35rem; }
+  .app-feed .app-chip { min-height: 1.9rem; padding: 0.15rem 0.65rem; font-size: 0.8rem; }
+
+  .app-empty { text-align: center; color: var(--admin-text-sub); padding: 1.5rem 0; }
+  .app-empty:empty { display: none; }
+  .app-empty button { margin: 0.75rem auto 0; display: block; width: auto; }
+
+  /* 作成フォーム */
+  .app-form-card { max-width: 60rem; }
+  .app-fieldset { margin: 0; padding: 0; border: 0; }
+  .app-fieldset legend { margin-bottom: 0.5rem; font-weight: 600; color: var(--admin-text-main); }
+  .app-hint { margin-left: 0.4rem; font-size: 0.8rem; font-weight: 400; color: var(--admin-text-muted); }
+  .app-req {
+    margin-left: 0.4rem; padding: 0.05rem 0.45rem; border-radius: 999px;
+    font-size: 0.72rem; color: var(--admin-danger); background: var(--admin-danger-soft);
+  }
+  #form label > input, #form label > textarea { margin-top: 0.35rem; margin-bottom: 0; }
+  #f-body { line-height: 1.9; }
+
+  .app-image-picker { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr)); gap: 0.6rem; }
+  .app-photo {
+    position: relative; margin: 0; padding: 0; width: 100%; aspect-ratio: 4 / 3; overflow: hidden;
+    border-radius: 0.9rem; border: 2px solid var(--admin-border); background: var(--admin-bg-sub); cursor: pointer;
+  }
+  .app-photo img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.75; }
+  .app-photo:hover img, .app-photo:focus-visible img { opacity: 1; }
+  .app-photo[aria-pressed="true"] { border-color: var(--admin-accent); }
+  .app-photo[aria-pressed="true"] img { opacity: 1; }
+  .app-photo__order {
+    position: absolute; top: 0.4rem; left: 0.4rem; min-width: 1.6rem; height: 1.6rem; padding: 0 0.35rem;
+    display: grid; place-items: center; border-radius: 999px; font-size: 0.85rem; font-weight: 700;
+    background: var(--admin-accent-gradient); color: var(--admin-on-accent);
+  }
+
+  .app-draft { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .app-draft button { margin: 0; width: auto; white-space: nowrap; }
+
+  .app-form-footer { display: flex; align-items: center; justify-content: flex-end; gap: 1rem; }
+  .app-form-footer button { margin-bottom: 0; min-width: 10rem; }
+
+  /* 詳細 */
+  .app-detail-card { max-width: 60rem; }
+  .app-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: 0.75rem; }
+  .app-gallery:empty { display: none; }
+  .app-photo-frame { position: relative; display: block; width: 100%; height: 100%; min-height: 8rem; }
+  .app-photo-frame img:not([src]) { visibility: hidden; }
+  .app-photo-status { position: absolute; left: 0.5rem; right: 0.5rem; bottom: 0.5rem; padding: 0.5rem; background: var(--admin-bg-elevated); color: var(--admin-text-main); border: 1px solid var(--admin-border); border-radius: 0.5rem; text-align: center; font-size: 0.8rem; }
+  .app-photo-frame button { position: absolute; top: 0.5rem; left: 0.5rem; z-index: 1; }
+  .app-gallery img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 0.9rem; border: 1px solid var(--admin-border); display: block; }
+  .app-diary-body { white-space: pre-wrap; word-break: break-word; line-height: 1.9; color: var(--admin-text-main); font-size: 1.02rem; }
+  .app-not-found { max-width: 40rem; }
+
+  /* 通知 */
+  .app-toast {
+    position: fixed; left: 50%; bottom: calc(1.5rem + env(safe-area-inset-bottom)); z-index: 40;
+    transform: translateX(-50%); max-width: calc(100% - 2rem);
+    padding: 0.7rem 1rem; border-radius: 0.9rem;
+    background: var(--admin-bg-elevated); color: var(--admin-text-main);
+    border: 1px solid var(--admin-success-border); box-shadow: var(--admin-shadow);
+  }
+  .app-toast.is-error { border-color: var(--admin-danger); color: var(--admin-danger); }
+
+  @media (max-width: 720px) {
+    .app-draft { flex-direction: column; align-items: stretch; }
+    .app-draft button { width: 100%; }
+    .app-form-footer .admin-actions, .app-form-footer button { width: 100%; }
+    .app-form-card > .admin-card__body, .app-detail-card > .admin-card__body { padding-inline: 0; }
+    .app-image-picker { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.45rem; }
+    .app-gallery { grid-template-columns: 1fr; }
+  }
+</style>

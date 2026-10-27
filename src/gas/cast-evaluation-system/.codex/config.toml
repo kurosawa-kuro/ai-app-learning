@@ -1,0 +1,8 @@
+# Optional navigation. See docs/runbooks/ai-coding.md before enabling.
+# From this repository root: codex -c mcp_servers.serena.enabled=true
+[mcp_servers.serena]
+command = "serena"
+args = ["start-mcp-server", "--project-from-cwd", "--context", "codex", "--agent-interface", "repl", "--enable-web-dashboard", "false", "--open-web-dashboard", "false", "--enable-gui-log-window", "false"]
+enabled = false
+startup_timeout_sec = 120
+tool_timeout_sec = 120

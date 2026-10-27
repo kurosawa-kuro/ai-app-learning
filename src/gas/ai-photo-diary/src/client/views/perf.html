@@ -1,0 +1,86 @@
+<script>
+  // 計測（#perf）：GAS の往復の時間と、サーバーの中の処理の時間を分けて計る（docs/GAS性能_調査と対応方針.md 6 章）。
+  // 計測が済んだら、このファイルと server/controllers/perf.js、index.html の view-perf を消す。
+  App.views.perf = (() => {
+    const { $, el } = App.dom
+    const RUNS = 5
+    const CASES = [
+      { fn: "perfPing", label: "1. 固定の文字を返すだけ（GAS の往復そのもの）" },
+      { fn: "perfReadOne", label: "2. Sheets から 1 表だけ読む（キャッシュなし）" },
+      { fn: "perfList", label: "3. 今の一覧（キャッシュあり）" },
+      { fn: "perfListNoCache", label: "4. 一覧（キャッシュなし＝前の版と同じ）" },
+    ]
+    let running = false
+
+    const median = (xs) => {
+      const s = xs.slice().sort((a, b) => a - b)
+      return s[Math.floor(s.length / 2)]
+    }
+    const ms = (n) => `${Math.round(n)} ms`
+
+    async function runCase(c, onProgress) {
+      const trips = []
+      const servers = []
+      for (let i = 0; i < RUNS; i++) {
+        const started = performance.now()
+        const data = await App.api.perf(c.fn)
+        trips.push(performance.now() - started)
+        servers.push(data.serverMs)
+        onProgress(i + 1)
+      }
+      return { label: c.label, trips, servers }
+    }
+
+    function render(results) {
+      const rows = $("perf-rows")
+      rows.textContent = ""
+      results.forEach((r) => {
+        const tr = el("tr")
+        const trip = median(r.trips)
+        const server = median(r.servers)
+        ;[r.label, ms(trip), `${ms(Math.min(...r.trips))} 〜 ${ms(Math.max(...r.trips))}`, ms(server), ms(trip - server)]
+          .forEach((text) => tr.appendChild(el("td", null, text)))
+        rows.appendChild(tr)
+      })
+      const lines = [
+        `GAS日記 速さの計測 ${new Date().toLocaleString("ja-JP")}（各 ${RUNS} 回）`,
+        `端末：${navigator.userAgent}`,
+        ...results.map((r) => `${r.label}：往復 中央値 ${ms(median(r.trips))}（${ms(Math.min(...r.trips))}〜${ms(Math.max(...r.trips))}）／サーバーの中 中央値 ${ms(median(r.servers))}`),
+        `生の値（往復 ms）：${results.map((r) => r.trips.map(Math.round).join(",")).join(" | ")}`,
+      ]
+      $("perf-text").value = lines.join("\n")
+    }
+
+    async function run() {
+      if (running) return
+      running = true
+      $("perf-run").disabled = true
+      $("perf-run").setAttribute("aria-busy", "true")
+      const results = []
+      try {
+        for (const c of CASES) {
+          results.push(await runCase(c, (n) => { $("perf-status").textContent = `${c.label}：${n}/${RUNS} 回目` }))
+          render(results)
+        }
+        $("perf-status").textContent = "終わりました。下の結果を共有してください。"
+      } catch (err) {
+        $("perf-status").textContent = `途中で失敗しました：${err.message}`
+      } finally {
+        running = false
+        $("perf-run").disabled = false
+        $("perf-run").setAttribute("aria-busy", "false")
+      }
+    }
+
+    return {
+      init() {
+        $("perf-run").addEventListener("click", run)
+      },
+
+      show() {
+        App.ui.setView("perf")
+        $("perf-status").textContent = "「計測する」を押すと始まります。"
+      },
+    }
+  })()
+</script>

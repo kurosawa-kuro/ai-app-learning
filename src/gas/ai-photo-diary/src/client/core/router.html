@@ -1,0 +1,66 @@
+<script>
+  // 画面の行き先（ルート）とブラウザの履歴。google.script.history をここに閉じ込める。
+  // ルート：{ view: "list", tag } -> #tag-<id> / { view: "new" } -> #new / { view: "detail", id } -> #post-<id>
+  App.router = (() => {
+    let onRoute = () => {}
+    let leaveGuard = () => true // 画面を離れてよいか（作成ビューの書きかけの確認）
+    let current = { view: "list", tag: null }
+    let seq = 0 // 画面を切り替えるたびに増える。古い応答・古い予約処理が新しい画面を壊さないための目印
+
+    function hashOf(route) {
+      if (route.view === "new") return "new"
+      if (route.view === "perf") return "perf" // 計測（client/views/perf.html）
+      if (route.view === "detail") return "post-" + route.id
+      if (route.view === "list" && route.tag) return "tag-" + route.tag
+      return ""
+    }
+
+    function parse(hash) {
+      if (hash === "new") return { view: "new" }
+      if (hash === "perf") return { view: "perf" }
+      if (hash && hash.indexOf("post-") === 0) return { view: "detail", id: hash.slice(5) }
+      if (hash && hash.indexOf("tag-") === 0) return { view: "list", tag: hash.slice(4) }
+      return { view: "list", tag: null }
+    }
+
+    function dispatch(route) {
+      seq += 1
+      current = route
+      onRoute(route)
+    }
+
+    /** mode：push（履歴に積む）/ replace（今の段を置き換える） */
+    function go(route, mode) {
+      if (mode === "push") google.script.history.push(route, null, hashOf(route))
+      if (mode === "replace") google.script.history.replace(route, null, hashOf(route))
+      dispatch(route)
+    }
+
+    /** アプリ内の一覧へ移動する。GASの外側・旧アプリの履歴は戻さない。 */
+    function back(listRoute) {
+      go(listRoute, "replace")
+    }
+
+    // スマホの「戻る」などで履歴が動いたとき
+    google.script.history.setChangeHandler((e) => {
+      const route = e.state && e.state.view ? e.state : parse(e.location && e.location.hash)
+      if (!leaveGuard(route)) {
+        google.script.history.push(current, null, hashOf(current)) // 離れないなら、今の画面を積み直す
+        return
+      }
+      dispatch(route)
+    })
+
+    return {
+      go,
+      back,
+      seq: () => seq,
+      setLeaveGuard(fn) { leaveGuard = fn },
+      /** URL の # から最初の画面を開く。 */
+      start(handler) {
+        onRoute = handler
+        google.script.url.getLocation((location) => go(parse(location.hash), "replace"))
+      },
+    }
+  })()
+</script>

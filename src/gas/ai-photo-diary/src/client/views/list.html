@@ -1,0 +1,174 @@
+<script>
+  // P01 日記一覧：取得・キーワードでの絞り込み・カードの描画。設計書 3 章。
+  App.views.list = (() => {
+    const { $, el } = App.dom
+    const store = App.store
+    let requestSequence = 0
+    const cards = new Map()
+
+    function load(tag, cursor = null) {
+      const request = ++requestSequence
+      const list = store.list
+      list.loading = true
+      list.requestedTag = tag
+      list.requestedCursor = cursor
+      list.error = null
+      render()
+      App.api.getAll(tag, cursor)
+        .then((data) => {
+          if (request !== requestSequence) return // 同じタグの再取得も要求順で判定する
+          const known = new Set(cursor ? list.posts.map((p) => p.id) : [])
+          list.posts = cursor ? list.posts.concat(data.posts.filter((p) => !known.has(p.id))) : data.posts
+          list.total = data.total
+          list.nextCursor = data.nextCursor || null
+          list.tag = data.tag
+          store.tags = data.tags
+          list.loaded = true
+          list.stale = false
+          list.error = null
+        })
+        .catch((err) => {
+          if (request !== requestSequence) return
+          if (err.code === "not_found") {
+            App.ui.toast(err.message, true)
+            App.router.go({ view: "list", tag: null }, "replace")
+            return
+          }
+          list.error = err.message
+          if (err.code === "invalid_cursor") list.requestedCursor = null
+        })
+        .finally(() => {
+          if (request !== requestSequence) return
+          list.loading = false
+          render()
+        })
+    }
+
+    function filterTo(tagId) {
+      const current = store.list.loading ? store.list.requestedTag : store.list.tag ? store.list.tag.id : null
+      if (App.ui.current() === "list" && current === tagId) return
+      App.router.go({ view: "list", tag: tagId }, "push")
+    }
+
+    function setStatus(text, withRetry) {
+      const box = $("list-status")
+      box.textContent = text
+      if (!withRetry) return
+      const retry = el("button", "secondary", "もう一度読み込む")
+      retry.type = "button"
+      retry.addEventListener("click", () => load(store.list.requestedTag == null ? null : store.list.requestedTag, store.list.requestedCursor || null))
+      box.appendChild(retry)
+    }
+
+    function renderFilter() {
+      const box = $("tag-filter")
+      box.textContent = ""
+      const list = store.list
+      const current = list.loading ? list.requestedTag : list.tag ? list.tag.id : null
+      box.appendChild(App.ui.tagChip({ name: "すべて" }, () => filterTo(null), current == null))
+      store.tags.forEach((t) => box.appendChild(App.ui.tagChip(t, () => filterTo(t.id), current === t.id)))
+    }
+
+    function card(post) {
+      const node = el("article", "admin-news-card item")
+      node.dataset.id = post.id
+      node.tabIndex = 0
+      if (post.id === store.highlightId) node.classList.add("is-new")
+
+      const thumb = el("div", "admin-news-card__thumb")
+      if (post.image) {
+        const img = App.photoView.img(post.image)
+        img.loading = "lazy"
+        thumb.appendChild(img)
+      }
+      if (post.imageCount > 1) thumb.appendChild(el("span", "app-photo-count", `写真 ${post.imageCount} 枚`))
+      node.appendChild(thumb)
+
+      const content = el("div", "admin-news-card__content")
+      content.appendChild(el("h3", "item-title", post.title))
+      content.appendChild(el("p", null, post.excerpt))
+      content.appendChild(el("small", null, App.format.date(post.created_at)))
+      if (post.tags.length) {
+        const chips = el("div", "app-chips")
+        post.tags.forEach((t) => chips.appendChild(App.ui.tagChip(t, (e) => {
+          e.stopPropagation()
+          filterTo(t.id)
+        })))
+        content.appendChild(chips)
+      }
+      node.appendChild(content)
+
+      const open = () => App.router.go({ view: "detail", id: post.id }, "push")
+      node.addEventListener("click", open)
+      node.addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target === node) open() })
+      return node
+    }
+
+    function render() {
+      if (App.ui.current() !== "list") return
+      renderFilter()
+      const { posts, tag, loaded, loading, error } = store.list
+      const showing = loaded && !loading
+      $("list-heading").textContent = showing && tag ? `「${tag.name}」の日記` : "すべての日記"
+      $("list-count").textContent = loading ? "読み込み中…" : loaded ? (store.list.total > posts.length ? `${posts.length} / ${store.list.total} 件` : `${posts.length} 件`) : "未取得"
+      $("list-more").hidden = !loaded || !store.list.nextCursor
+      $("list-more").disabled = loading
+
+      if (loading && !loaded) setStatus("読み込み中…")
+      else if (error) setStatus(error, true)
+      else if (showing && posts.length === 0) setStatus(tag ? "このキーワードの日記はまだありません。" : "まだ日記がありません。「日記を書く」から書いてみましょう。")
+      else setStatus("")
+
+      const box = $("list")
+      box.setAttribute("aria-busy", loading ? "true" : "false")
+      if (!loaded) return
+      // 同じ内容のカードと読込済み画像は再利用する。再取得のたびに画像を仮表示へ戻さない。
+      const keep = new Set()
+      posts.forEach((post, index) => {
+        const signature = JSON.stringify(post)
+        let cached = cards.get(post.id)
+        if (!cached || cached.signature !== signature) {
+          if (cached) cached.node.remove()
+          cached = { signature, node: card(post) }
+          cards.set(post.id, cached)
+        }
+        keep.add(post.id)
+        if (box.children[index] !== cached.node) box.insertBefore(cached.node, box.children[index] || null)
+      })
+      cards.forEach((cached, id) => { if (!keep.has(id)) { cached.node.remove(); cards.delete(id) } })
+
+      // 保存した日記の色付けは、取り直した一覧に出たときに 1 度だけ付けて消す（読み込み中の古い一覧では消費しない）
+      if (store.highlightId && !loading) {
+        store.highlightId = null
+        setTimeout(() => box.querySelectorAll(".admin-news-card.is-new").forEach((n) => n.classList.remove("is-new")), 2000)
+      }
+    }
+
+    return {
+      init() {
+        $("add").addEventListener("click", () => App.router.go({ view: "new" }, "push"))
+        $("reload").addEventListener("click", () => load(store.list.tag ? store.list.tag.id : null))
+        $("list-more").addEventListener("click", () => {
+          if (!store.list.loading && store.list.nextCursor)
+            load(store.list.tag ? store.list.tag.id : null, store.list.nextCursor)
+        })
+        // 別のタブ・アプリから戻ってきたら取り直す
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "visible" && App.ui.current() === "list" && store.list.loaded && !store.list.loading) {
+            load(store.list.tag ? store.list.tag.id : null)
+          }
+        })
+      },
+
+      show(route) {
+        App.ui.setView("list")
+        const tag = route.tag || null
+        const current = store.list.tag ? store.list.tag.id : null
+        if (!store.list.loaded || store.list.stale || current !== tag) load(tag)
+        else render()
+      },
+
+      filterTo,
+    }
+  })()
+</script>

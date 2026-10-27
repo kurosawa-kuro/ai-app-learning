@@ -1,0 +1,43 @@
+# マスターと初期データ。直したら src で `npm run build:data`（`npm test` と `npm run push` は自動で流す）
+# タグマスターは tags.csv（id,name）に置く。
+#
+# 注意：samplePosts と tags.csv のタグは「シートを新しく作ったとき」だけ入る。
+# 既にあるシートには反映されない。入れ直したいときは、スプレッドシートの該当シートを消してから開き直す。
+
+# ダミー写真の目録。images.file_id にはこの id だけを受け付ける（将来は Drive のファイル ID に替える）
+# hue は画面で描く絵の色相（0〜360）
+images:
+  - { id: sample-a, label: カフェ, hue: 28 }
+  - { id: sample-b, label: ケーキ, hue: 340 }
+  - { id: sample-c, label: 公園, hue: 125 }
+  - { id: sample-d, label: 海, hue: 200 }
+  - { id: sample-e, label: 夜景, hue: 255 }
+  - { id: sample-f, label: ごはん, hue: 45 }
+
+# 初期のサンプル日記（設計書 2.4）。images は表示順、tags は tags.csv の id
+samplePosts:
+  - id: "1"
+    title: カフェに行った
+    hoursAgo: 26
+    body: |-
+      今日はカフェでケーキを食べた。
+      窓ぎわの席が空いていて、ゆっくりできた。
+    images:
+      - { id: "101", file: sample-a }
+      - { id: "102", file: sample-b }
+    tags: ["10", "11", "12"]
+  - id: "2"
+    title: 休日のお出かけ
+    hoursAgo: 3
+    body: 天気が良かったので、少し遠くの公園まで歩いた。
+    images:
+      - { id: "103", file: sample-c }
+    tags: ["11"]
+
+# AI 下書きの固定の文章（Gemini はまだ呼ばない。設計書 3 章 P02）
+draft:
+  title: ゆったり過ごした一日
+  body: |-
+    今日は少し肩の力を抜いて過ごした。
+    写真を見返すと、そのときの空気や匂いまで思い出せる。
+    明日も、小さな楽しみをひとつ見つけたい。

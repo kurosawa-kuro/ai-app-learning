@@ -1,0 +1,94 @@
+<script>
+  // 写真の表示。サーバーの写真の提供元（server/services/photo/）が返す表示用の情報 { file_id, label, kind, url?, hue? } から
+  // <img> の src と alt を作る。url があればそれを使い（将来の Drive）、kind が dummy なら絵（SVG）を描く。
+  // 外部への通信はしない。
+  App.photoView = (() => {
+    const cache = new Map()
+    const realCache = new Map()
+    function load(id) {
+      if (!realCache.has(id)) {
+        if (realCache.size >= 12) realCache.delete(realCache.keys().next().value)
+        realCache.set(id, App.api.getPhoto(id).catch((error) => { realCache.delete(id); throw error }))
+      }
+      return realCache.get(id)
+    }
+
+    function dummySvg(photo) {
+      const known = photo.kind === "dummy"
+      const hue = known ? photo.hue : 210
+      const label = known ? photo.label : "画像なし"
+      // 明るい画面に合わせたパステルの絵（2026-10-24 の配色の刷新で、暗い絵から替えた）
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="hsl(${hue},${known ? 85 : 10}%,84%)"/>
+          <stop offset="1" stop-color="hsl(${hue + 40},${known ? 70 : 10}%,66%)"/>
+        </linearGradient></defs>
+        <rect width="400" height="300" fill="url(#g)"/>
+        <circle cx="306" cy="82" r="44" fill="#ffffff" opacity="0.55"/>
+        <circle cx="70" cy="60" r="18" fill="#ffffff" opacity="0.35"/>
+        <path d="M0 240 L110 150 L190 215 L265 160 L400 255 L400 300 L0 300 Z" fill="hsl(${hue + 20},${known ? 45 : 8}%,40%)" opacity="0.45"/>
+        <text x="24" y="246" font-family="sans-serif" font-size="30" font-weight="700" fill="#ffffff" stroke="hsl(${hue},40%,30%)" stroke-opacity="0.35" stroke-width="3" paint-order="stroke">${label}</text>
+      </svg>`
+      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg)
+    }
+
+    return {
+      src(photo) {
+        if (photo.url) return photo.url
+        const key = `${photo.kind}:${photo.file_id}`
+        if (!cache.has(key)) cache.set(key, dummySvg(photo))
+        return cache.get(key)
+      },
+
+      alt(photo) {
+        return photo.label ? `${photo.label}の写真` : "写真"
+      },
+
+      /** ダミーはimg、Driveは読込・失敗状態を持つ画像枠を作る。 */
+      img(photo) {
+        const img = App.dom.el("img")
+        if (photo.kind !== "drive") img.src = this.src(photo)
+        img.alt = this.alt(photo)
+        if (photo.kind === "drive") {
+          const frame = App.dom.el("span", "app-photo-frame")
+          const status = App.dom.el("span", "app-photo-status", "画像を読み込み中…")
+          const retry = App.dom.el("button", "secondary", "画像を再取得")
+          retry.type = "button"; retry.hidden = true
+          status.setAttribute("role", "status")
+          frame.append(img, status, retry)
+          const fetchImage = async () => {
+            retry.hidden = true; status.hidden = false; status.textContent = "画像を読み込み中…"
+            frame.dataset.state = "loading"
+            try {
+              const data = await load(photo.file_id)
+              if (!data || !["image/jpeg", "image/png"].includes(data.mimeType) || !data.base64) throw Error("invalid_image")
+              const src = "data:" + data.mimeType + ";base64," + data.base64
+              const decoded = new Image()
+              decoded.src = src
+              await decoded.decode()
+              img.src = src; img.alt = this.alt(photo)
+              frame.dataset.state = "ready"
+              if (decoded.naturalWidth === 1 && decoded.naturalHeight === 1) {
+                status.textContent = "1×1ピクセルの画像です"
+              } else status.hidden = true
+            } catch (_) {
+              realCache.delete(photo.file_id)
+              frame.dataset.state = "error"
+              status.textContent = "画像を表示できません"
+              retry.hidden = false
+            }
+          }
+          retry.onclick = (event) => { event.stopPropagation(); fetchImage() }
+          retry.onkeydown = (event) => event.stopPropagation()
+          img.loading = "lazy"
+          if (typeof IntersectionObserver === "function") {
+            const observer = new IntersectionObserver((entries) => { if (entries.some((entry) => entry.isIntersecting)) { observer.disconnect(); fetchImage() } })
+            observer.observe(frame)
+          } else fetchImage()
+          return frame
+        }
+        return img
+      },
+    }
+  })()
+</script>

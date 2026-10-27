@@ -1,0 +1,1 @@
+GASではなくNextjs-Vercel戦略

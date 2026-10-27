@@ -1,0 +1,108 @@
+<script>
+  // 静止画を縮小・JPEG再符号化して送信。EXIF等の原本メタデータは送らない。
+  App.photoUpload = (() => {
+    const { $, el } = App.dom
+    let entries = [], notify = () => {}, queue = Promise.resolve(), busy = false
+    const limits = () => CONFIG.uploads
+    async function encode(file) {
+      if (!["image/jpeg", "image/png"].includes(file.type) || file.size > 10 * 1024 * 1024) throw Error("JPEG・PNGの静止画を選んでください（元画像10MiB以下）。")
+      const raw = new Uint8Array(await file.arrayBuffer())
+      if (file.type === "image/png") {
+        const view = new DataView(raw.buffer)
+        for (let p = 8; p + 12 <= raw.length;) {
+          const n = view.getUint32(p)
+          if (String.fromCharCode(...raw.slice(p + 4, p + 8)) === "acTL") throw Error("アニメーション画像は使えません。")
+          p += 12 + n
+        }
+      }
+      const url = URL.createObjectURL(file)
+      try {
+        const img = new Image()
+        await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = () => reject(Error("画像を読み込めません。")); img.src = url })
+        if (!img.naturalWidth || !img.naturalHeight || img.naturalWidth * img.naturalHeight > 40000000) throw Error("画像の寸法が大きすぎます。")
+        const scale = Math.min(1, limits().maxEdge / Math.max(img.naturalWidth, img.naturalHeight))
+        const canvas = document.createElement("canvas")
+        canvas.width = Math.max(1, Math.round(img.naturalWidth * scale)); canvas.height = Math.max(1, Math.round(img.naturalHeight * scale))
+        const ctx = canvas.getContext("2d")
+        ctx.fillStyle = "white"; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+        for (const quality of [0.85, 0.7, 0.55]) {
+          const base64 = canvas.toDataURL("image/jpeg", quality).split(",")[1]
+          if (base64 && Math.floor(base64.length * 3 / 4) <= limits().maxBytes) return { mimeType: "image/jpeg", base64 }
+        }
+        throw Error("縮小しても1MiBを超えます。小さな画像を選んでください。")
+      } finally { URL.revokeObjectURL(url) }
+    }
+    function render() {
+      const box = $("upload-list"); box.textContent = ""
+      entries.forEach((entry, i) => {
+        const status = entry.status === "ready" ? "保存済み" : entry.status === "selected" ? "未送信" : entry.status === "failed" ? entry.error : "画像準備・送信中"
+        const row = el("div", "admin-stack"), label = el("p", null, (i + 1) + ". " + entry.name + "：" + status)
+        row.appendChild(label)
+        if (entry.payload) { const img = el("img"); img.src = "data:" + entry.payload.mimeType + ";base64," + entry.payload.base64; img.alt = "送信画像のプレビュー"; img.width = 160; row.appendChild(img) }
+        const controls = el("div", "admin-actions")
+        function button(text, action, disabled = false) { const b = el("button", "secondary", text); b.type = "button"; b.disabled = busy || disabled; b.addEventListener("click", action); controls.appendChild(b) }
+        button("外す", () => { entries.splice(i, 1); render(); notify() })
+        button("前へ", () => { [entries[i - 1], entries[i]] = [entries[i], entries[i - 1]]; render(); notify() }, i === 0)
+        button("後へ", () => { [entries[i + 1], entries[i]] = [entries[i], entries[i + 1]]; render(); notify() }, i === entries.length - 1)
+        if (entry.status === "failed") button("再送", () => schedule(entry))
+        row.appendChild(controls); box.appendChild(row)
+      })
+    }
+    function schedule(entry) {
+      entry.status = "waiting"; busy = true; render(); notify()
+      queue = queue.then(async () => {
+        try {
+          if (!entry.payload) entry.payload = await encode(entry.file)
+          const photo = await App.api.uploadPhoto({ uploadId: entry.id, ...entry.payload })
+          entry.photo = photo; entry.status = "ready"
+        } catch (error) { entry.status = "failed"; entry.error = error.message || "送信に失敗しました。再送できます。" }
+        busy = entries.some((e) => e.status === "waiting")
+        render(); notify()
+      })
+    }
+    return {
+      init(onChange) {
+        notify = onChange
+        if (!limits()) return
+        $("upload-panel").hidden = false
+        $("upload-start").addEventListener("click", () => { if (!busy) entries.filter((e) => e.status === "selected" || e.status === "failed").forEach(schedule) })
+        $("orphan-refresh").addEventListener("click", async () => {
+          const box = $("orphan-list"); box.textContent = "確認中…"
+          try {
+            const rows = await App.api.listOrphanUploads(); box.textContent = rows.length ? "" : "整理候補はありません。"
+            rows.forEach((row) => {
+              const item = el("div"), info = el("p", null, row.createdAt + "・" + Math.ceil(row.bytes / 1024) + "KiB")
+              // GASのHTML処理でURLを含むテンプレートリテラルが壊れる経路を避ける。
+              const link = el("a", null, "Driveで画像を確認"); link.href = "https://drive.google.com/file/d/" + encodeURIComponent(row.fileId) + "/view"; link.target = "_blank"; link.rel = "noopener"
+              const button = el("button", "secondary", "ゴミ箱へ移動"); button.type = "button"
+              button.onclick = async () => {
+                if (!confirm("この未添付画像をDriveのゴミ箱へ移動しますか？")) return
+                button.disabled = true
+                try { await App.api.trashOrphanUpload(row.uploadId); item.remove() } catch (error) { info.textContent = error.message; button.disabled = false }
+              }
+              item.append(info, link, button); box.appendChild(item)
+            })
+          } catch (error) { box.textContent = error.message }
+        })
+        $("upload-help").textContent = "最大" + limits().maxImages + "枚。長辺" + limits().maxEdge + "px・各1MiB以下のJPEGに縮小して非公開Driveへ保存します。先頭が代表画像です。"
+        $("photo-files").addEventListener("change", async () => {
+          const selected = [...$("photo-files").files]; $("photo-files").value = ""
+          if (entries.length + selected.length > limits().maxImages) { alert("写真は" + limits().maxImages + "枚までです。"); return }
+          busy = true
+          const added = selected.map((file) => ({ id: App.api.newRequestId(), name: file.name, file, status: "preparing" }))
+          entries.push(...added); render(); notify()
+          for (const entry of added) {
+            try { entry.payload = await encode(entry.file); entry.status = "selected" }
+            catch (error) { entry.status = "failed"; entry.error = error.message }
+          }
+          busy = false; render(); notify()
+        })
+      },
+      reset() { entries = []; busy = false; queue = Promise.resolve(); render() },
+      ids: () => entries.filter((e) => e.status === "ready").map((e) => e.photo.file_id),
+      blocked: () => entries.some((e) => e.status !== "ready"),
+      busy: () => busy,
+      setDisabled(value) { $("photo-files").disabled = value || busy; $("upload-start").disabled = value || busy || !entries.some((e) => ["selected", "failed"].includes(e.status)); render(); if (value) $("upload-list").querySelectorAll("button").forEach((b) => { b.disabled = true }) },
+    }
+  })()
+</script>

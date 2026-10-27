@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+  <head>
+    <base target="_top">
+    <meta charset="utf-8">
+    <!-- 見た目：Pico CSS ＋ admin-pico（vendor）＋ その補正と日本語向けの調整（overrides）＋ app の部品（components） -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.1.1/css/pico.min.css">
+    <?!= include("client/vendor/admin-pico/admin-theme") ?>
+    <?!= include("client/vendor/admin-pico/admin-layout") ?>
+    <?!= include("client/vendor/admin-pico/admin-components") ?>
+    <?!= include("client/styles/overrides") ?>
+    <?!= include("client/styles/components") ?>
+  </head>
+  <body class="admin-body" data-sidebar-open="false">
+    <button class="admin-mobile-toggle secondary" type="button" data-sidebar-toggle>メニュー</button>
+    <div class="admin-sidebar-backdrop" data-sidebar-backdrop></div>
+
+    <div class="admin-shell">
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar__inner">
+          <div class="admin-brand">
+            <!-- 名前は data/config.yaml の app から入る -->
+            <div class="admin-brand__mark" id="app-mark"></div>
+            <div>
+              <strong id="app-name"></strong>
+              <div class="admin-brand__eyebrow" id="app-tagline"></div>
+            </div>
+            <button class="secondary" type="button" data-sidebar-close>閉じる</button>
+          </div>
+          <nav class="admin-nav">
+            <details open>
+              <summary>日記</summary>
+              <ul>
+                <li><a class="admin-nav-item" href="#" id="nav-list" aria-current="page">一覧</a></li>
+                <li><a class="admin-nav-item" href="#" id="nav-new">日記を書く</a></li>
+              </ul>
+            </details>
+            <details open>
+              <summary>保存先</summary>
+              <ul>
+                <li><a class="admin-nav-item" id="nav-sheet" target="_blank" rel="noopener">スプレッドシートを開く</a></li>
+              </ul>
+            </details>
+          </nav>
+        </div>
+      </aside>
+
+      <main class="admin-main">
+        <!-- P01 日記一覧 -->
+        <div id="view-list" hidden>
+          <header class="admin-header">
+            <div>
+              <div class="admin-eyebrow">日記</div>
+              <h1>日記一覧</h1>
+              <p>新しい順に並びます。キーワードを選ぶと絞り込めます。</p>
+            </div>
+            <div class="admin-header__actions">
+              <button id="add" class="app-primary" type="button">日記を書く</button>
+            </div>
+          </header>
+
+          <section class="admin-content">
+            <article class="admin-card">
+              <header class="admin-toolbar">
+                <div class="admin-toolbar__group">
+                  <div>
+                    <div class="admin-eyebrow">キーワードで絞り込み</div>
+                    <h2 id="list-heading">すべての日記</h2>
+                  </div>
+                </div>
+                <div class="admin-toolbar__group">
+                  <span id="list-count" class="admin-badge admin-badge--neutral">読み込み待ち</span>
+                  <button id="reload" class="secondary" type="button">再取得</button>
+                </div>
+              </header>
+              <div class="admin-card__body">
+                <div id="tag-filter" class="app-chips" aria-label="キーワードで絞り込み"></div>
+              </div>
+            </article>
+
+            <div id="list-status" class="app-empty"></div>
+            <div id="list" class="admin-news-feed app-feed" aria-live="polite"></div>
+            <button id="list-more" type="button" class="secondary" hidden>もっと見る</button>
+          </section>
+        </div>
+
+        <!-- P02 日記作成 -->
+        <div id="view-form" hidden>
+          <header class="admin-header">
+            <div>
+              <div class="admin-eyebrow">日記</div>
+              <h1>日記を書く</h1>
+              <p>写真とキーワードを選んで「AI下書きを作る」を押すと、下書きが入ります。自由に直してから保存してください。</p>
+            </div>
+            <div class="admin-header__actions">
+              <button id="back" class="secondary" type="button">一覧へ戻る</button>
+            </div>
+          </header>
+
+          <section class="admin-content">
+            <article class="admin-card app-form-card">
+              <div class="admin-card__body">
+                <form id="form" class="admin-stack" novalidate>
+                  <div id="form-error" class="admin-note" role="alert" hidden></div>
+                  <details>
+                    <summary>30日経過したAI生成履歴の整理</summary>
+                    <p>入力と生成文を消去します。保存済み日記は残ります。</p>
+                    <button id="generation-refresh" type="button" class="secondary">履歴の整理候補を確認</button>
+                    <div id="generation-list" aria-live="polite"></div>
+                  </details>
+
+                  <fieldset class="app-fieldset">
+                    <legend>写真 <span class="app-hint">選んだ順に並びます（複数可）</span></legend>
+                    <div id="image-picker" class="app-image-picker"></div>
+                    <div id="upload-panel" hidden>
+                      <label for="photo-files">写真を追加（JPEG・PNG）</label>
+                      <input id="photo-files" type="file" accept="image/jpeg,image/png" multiple>
+                      <button id="upload-start" type="button" class="secondary">選択画像をアップロード</button>
+                      <p id="upload-help" class="app-hint"></p>
+                      <div id="upload-list" aria-live="polite"></div>
+                      <details>
+                        <summary>未添付画像の整理</summary>
+                        <p>24時間以上前に保存され、日記に添付されていない画像だけを候補にします。自動削除はしません。</p>
+                        <button id="orphan-refresh" type="button" class="secondary">整理候補を確認</button>
+                        <div id="orphan-list" aria-live="polite"></div>
+                      </details>
+                    </div>
+                  </fieldset>
+
+                  <fieldset class="app-fieldset">
+                    <legend>キーワード <span class="app-hint">保存するとタグになります（複数可）</span></legend>
+                    <div id="tag-picker" class="app-chips" aria-label="キーワード"></div>
+                  </fieldset>
+
+                  <div class="admin-note admin-note--neutral app-draft">
+                    <div>
+                      <strong>AI下書き</strong>
+                      <div id="ai-description"></div>
+                      <label id="ai-consent-label" hidden><input id="ai-consent" type="checkbox">Geminiへ送る内容に個人情報・機密情報が含まれないことを確認しました（無料枠の検証用）</label>
+                    </div>
+                    <button id="draft" class="secondary" type="button">AI下書きを作る</button>
+                    <button id="new-generation" class="secondary" type="button">新しい生成を開始</button>
+                    <button id="clear-generation" class="secondary" type="button">AI採用元の関連を解除</button>
+                  </div>
+
+                  <label for="f-title">タイトル<span class="app-req">必須</span>
+                    <input id="f-title" name="title" type="text" autocomplete="off" enterkeyhint="next">
+                  </label>
+                  <label for="f-body">本文<span class="app-req">必須</span>
+                    <textarea id="f-body" name="body" rows="8"></textarea>
+                  </label>
+                </form>
+              </div>
+              <footer class="app-form-footer">
+                <div class="admin-actions">
+                  <button id="save" class="app-primary" type="submit" form="form">保存する</button>
+                </div>
+              </footer>
+            </article>
+          </section>
+        </div>
+
+        <!-- 計測（#perf）。docs/GAS性能_調査と対応方針.md 6 章。計測が済んだら消す -->
+        <div id="view-perf" hidden>
+          <header class="admin-header">
+            <div>
+              <div class="admin-eyebrow">計測</div>
+              <h1>速さの計測</h1>
+              <p>サーバーを 4 種類の処理で 5 回ずつ呼び、往復の時間とサーバーの中の時間を比べます。1 分ほどかかります。</p>
+            </div>
+            <div class="admin-header__actions">
+              <button id="perf-run" class="app-primary" type="button">計測する</button>
+            </div>
+          </header>
+          <section class="admin-content">
+            <article class="admin-card">
+              <div class="admin-card__body admin-stack">
+                <p id="perf-status" class="app-hint"></p>
+                <div class="admin-table-wrap">
+                  <table class="admin-table app-perf-table">
+                    <thead><tr><th>処理</th><th>往復（中央値）</th><th>往復（最小〜最大）</th><th>サーバーの中（中央値）</th><th>差＝起動と通信</th></tr></thead>
+                    <tbody id="perf-rows"></tbody>
+                  </table>
+                </div>
+                <label for="perf-text">結果（このまま貼り付けて共有できます）
+                  <textarea id="perf-text" rows="9" readonly></textarea>
+                </label>
+              </div>
+            </article>
+          </section>
+        </div>
+
+        <!-- P03 日記詳細 -->
+        <div id="view-detail" hidden>
+          <header class="admin-header">
+            <div>
+              <div class="admin-eyebrow" id="detail-date"></div>
+              <h1 id="detail-title"></h1>
+            </div>
+            <div class="admin-header__actions">
+              <button id="detail-back" class="secondary" type="button">一覧へ戻る</button>
+            </div>
+          </header>
+
+          <section class="admin-content">
+            <div id="detail-status" class="app-empty"></div>
+            <article id="detail-card" class="admin-card app-detail-card" hidden>
+              <div class="admin-card__body admin-stack">
+                <div id="detail-images" class="app-gallery"></div>
+                <div id="detail-body" class="app-diary-body"></div>
+                <div>
+                  <div class="admin-eyebrow">キーワード</div>
+                  <div id="detail-tags" class="app-chips"></div>
+                </div>
+              </div>
+            </article>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <div id="toast" class="app-toast" role="status" aria-live="polite" hidden></div>
+
+    <!-- 起動時の設定（server/controllers/web.js の clientConfig_） -->
+    <script>
+      const CONFIG = <?!= serializeForScript_(config) ?>;
+    </script>
+    <!-- 共通部品（読み込み順：名前空間 -> 状態 -> 通信・整形・写真・UI -> ルーター） -->
+    <?!= include("client/core/dom") ?>
+    <?!= include("client/core/store") ?>
+    <?!= include("client/core/api") ?>
+    <?!= include("client/core/format") ?>
+    <?!= include("client/core/photo-view") ?>
+    <?!= include("client/core/photo-upload") ?>
+    <?!= include("client/core/ui") ?>
+    <?!= include("client/core/router") ?>
+    <!-- 画面ごとのビュー -->
+    <?!= include("client/views/list") ?>
+    <?!= include("client/views/detail") ?>
+    <?!= include("client/views/form") ?>
+    <?!= include("client/views/perf") ?>
+    <!-- 起動と配線 -->
+    <?!= include("client/app") ?>
+  </body>
+</html>

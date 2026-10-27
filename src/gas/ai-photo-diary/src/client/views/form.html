@@ -1,0 +1,232 @@
+<script>
+  // P02 日記作成：写真とキーワードの選択・AI 下書き・保存。設計書 3 章。
+  // 入力中の状態はこのビューの中に閉じる（他のビューは confirmLeave だけを使う）。
+  App.views.form = (() => {
+    const { $, el } = App.dom
+    const store = App.store
+    let state = blank()
+
+    function blank() {
+      return { imageIds: [], tagIds: [], requestId: null, sent: null, generationRequest: null, sourceGenerationId: "", dirty: false, saving: false, drafting: false }
+    }
+
+    function renderPhotoPicker() {
+      const box = $("image-picker")
+      box.textContent = ""
+      CONFIG.photos.forEach((photo) => {
+        const order = state.imageIds.indexOf(photo.file_id)
+        const button = el("button", "app-photo")
+        button.type = "button"
+        button.dataset.id = photo.file_id
+        button.setAttribute("aria-pressed", order === -1 ? "false" : "true")
+        button.setAttribute("aria-label", `${App.photoView.alt(photo)}${order === -1 ? "" : `（${order + 1}枚目）`}`)
+        const img = App.photoView.img(photo)
+        img.alt = ""
+        button.appendChild(img)
+        if (order !== -1) button.appendChild(el("span", "app-photo__order", String(order + 1)))
+        button.addEventListener("click", () => toggle("imageIds", photo.file_id, renderPhotoPicker))
+        box.appendChild(button)
+      })
+    }
+
+    function renderTagPicker() {
+      const box = $("tag-picker")
+      box.textContent = ""
+      store.tags.forEach((t) => box.appendChild(App.ui.tagChip(t, () => toggle("tagIds", t.id, renderTagPicker), state.tagIds.indexOf(t.id) !== -1)))
+    }
+
+    function toggle(key, id, rerender) {
+      if (state.saving || state.drafting) return
+      const list = state[key]
+      const i = list.indexOf(id)
+      if (i === -1) list.push(id)
+      else list.splice(i, 1)
+      state.dirty = true
+      rerender()
+    }
+
+    function setBusy() {
+      const { saving, drafting } = state
+      const blocked = App.photoUpload.blocked()
+      $("save").disabled = saving || drafting || blocked
+      $("save").setAttribute("aria-busy", saving ? "true" : "false") // Pico の読み込み表示
+      $("save").textContent = saving ? "保存中…" : "保存する"
+      $("draft").disabled = saving || drafting || blocked
+      App.photoUpload.setDisabled(saving || drafting)
+      $("f-title").disabled = saving || drafting
+      $("f-body").disabled = saving || drafting
+      $("new-generation").disabled = saving || drafting
+      $("clear-generation").disabled = saving || drafting
+      $("draft").setAttribute("aria-busy", drafting ? "true" : "false")
+      $("draft").textContent = drafting ? "作成中…" : "AI下書きを作る"
+    }
+
+    function showError(message) {
+      const box = $("form-error")
+      box.textContent = ""
+      box.appendChild(el("strong", null, "確認してください"))
+      box.appendChild(el("div", null, message))
+      box.hidden = false
+      window.scrollTo(0, 0)
+    }
+
+    function hideError() {
+      $("form-error").hidden = true
+    }
+
+    async function makeDraft() {
+      if (state.saving || state.drafting || App.photoUpload.blocked()) return
+      if (state.imageIds.length + App.photoUpload.ids().length === 0 && state.tagIds.length === 0) {
+        showError("写真かキーワードを1つ以上選んでください。")
+        return
+      }
+      const hasText = $("f-title").value.trim() !== "" || $("f-body").value.trim() !== ""
+      if (hasText && !confirm("入力中のタイトルと本文を、下書きで置き換えますか？")) return
+      hideError()
+      const mine = state
+      mine.drafting = true
+      setBusy()
+      const at = App.router.seq()
+      try {
+        const input = { imageIds: mine.imageIds.concat(App.photoUpload.ids()), tagIds: mine.tagIds.slice(), aiConsent: $("ai-consent").checked }
+        if (mine.generationRequest && JSON.stringify(mine.generationRequest.input) !== JSON.stringify(input)) {
+          throw { message: "前の生成要求と入力が異なります。「新しい生成を開始」を選んでください。" }
+        }
+        if (!mine.generationRequest) mine.generationRequest = { id: App.api.newRequestId(), input }
+        const draft = await App.api.generateDraft({ ...mine.generationRequest.input, requestId: mine.generationRequest.id })
+        if (App.router.seq() !== at) return
+        $("f-title").value = draft.title
+        $("f-body").value = draft.body
+        mine.sourceGenerationId = draft.generationId || ""
+        mine.generationRequest = null
+        mine.dirty = true
+        App.ui.toast("下書きを入れました。自由に直してください")
+      } catch (err) {
+        if (["invalid", "consent_required", "invalid_image"].includes(err.code)) mine.generationRequest = null
+        if (App.router.seq() === at) showError(err.message)
+      } finally {
+        if (App.router.seq() === at) {
+          mine.drafting = false
+          setBusy()
+        }
+      }
+    }
+
+    async function save() {
+      if (state.saving || state.drafting || App.photoUpload.blocked()) return
+      const title = $("f-title").value
+      const body = $("f-body").value
+      if (title.trim() === "") {
+        showError("タイトルを入力してください。")
+        $("f-title").focus()
+        return
+      }
+      if (body.trim() === "") {
+        showError("本文を入力してください。")
+        $("f-body").focus()
+        return
+      }
+      state.saving = true
+      setBusy()
+      hideError()
+      try {
+        const input = { title, body, imageIds: state.imageIds.concat(App.photoUpload.ids()), tagIds: state.tagIds.slice(), sourceGenerationId: state.sourceGenerationId }
+        let post
+        if (state.sent && JSON.stringify(state.sent) !== JSON.stringify(input)) {
+          const previous = await App.api.cancelCreate(state.requestId)
+          if (previous.state === "succeeded") {
+            post = await App.api.getOne(previous.postId)
+            App.ui.toast("前の送信内容で保存済みです。保存された日記を表示します")
+          } else {
+            state.requestId = App.api.newRequestId()
+            state.sent = null
+          }
+        }
+        if (!post) {
+          state.sent = input
+          post = await App.api.create(state.sent, state.requestId)
+        }
+        store.detailCache.set(post.id, post)
+        store.list.stale = true // 一覧は次に開いたときに取り直す
+        store.highlightId = post.id
+        state.dirty = false
+        App.router.go({ view: "detail", id: post.id }, "replace") // 保存後は詳細へ（設計書 3 章 P02）。戻ると一覧
+        App.ui.toast("保存しました")
+      } catch (err) {
+        state.saving = false // 入力は消さない。同じ requestId のまま再送できる
+        setBusy()
+        showError(err.message)
+      }
+    }
+
+    return {
+      init() {
+        App.photoUpload.init(() => { state.dirty = true; setBusy() })
+        $("ai-description").textContent = CONFIG.aiEnabled ? "選択したキーワードとアップロード画像をGeminiへ送信し、文体設定に沿った下書きを生成します。内容を確認してから保存してください。" : "今は決まった文章を返す試作版です。"
+        $("ai-consent-label").hidden = !CONFIG.aiEnabled
+        $("f-title").maxLength = CONFIG.limits.title
+        $("f-body").maxLength = CONFIG.limits.body
+        $("draft").addEventListener("click", makeDraft)
+        $("new-generation").addEventListener("click", () => {
+          if (!confirm("前の生成は再取得できなくなる場合があります。新しい生成を開始しますか？")) return
+          state.generationRequest = null
+          makeDraft()
+        })
+        $("clear-generation").addEventListener("click", () => { state.sourceGenerationId = ""; state.dirty = true; App.ui.toast("AI採用元の関連を解除しました") })
+        $("generation-refresh").addEventListener("click", async () => {
+          const box = $("generation-list")
+          box.textContent = "確認中…"
+          try {
+            const rows = await App.api.listGenerationHistoryForCleanup()
+            box.textContent = rows.length ? "" : "整理できる履歴はありません"
+            rows.forEach((row) => {
+              const item = el("div"), button = el("button", "secondary", "生成内容を整理")
+              button.type = "button"
+              item.appendChild(el("span", null, row.createdAt + " "))
+              button.addEventListener("click", async () => {
+                if (!confirm("この履歴の入力と生成文を消去します。保存済み日記は残ります。よろしいですか？")) return
+                button.disabled = true
+                try { await App.api.purgeGenerationHistory(row.id); item.remove() } catch (error) { showError(error.message); button.disabled = false }
+              })
+              item.appendChild(button); box.appendChild(item)
+            })
+          } catch (error) { box.textContent = error.message }
+        })
+        $("form").addEventListener("submit", (e) => {
+          e.preventDefault()
+          save()
+        })
+        // 1 行の入力欄で Enter を押しても送信しない（日本語入力の確定で保存されないように）。保存はボタンだけ
+        $("form").addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && e.target.tagName === "INPUT" && !e.isComposing && e.keyCode !== 229) e.preventDefault()
+        })
+        $("f-title").addEventListener("input", () => { state.dirty = true })
+        $("f-body").addEventListener("input", () => { state.dirty = true })
+        $("back").addEventListener("click", () => { if (this.confirmLeave()) App.router.back(store.listRoute()) })
+      },
+
+      show() {
+        state = blank()
+        App.photoUpload.reset()
+        state.requestId = App.api.newRequestId()
+        $("f-title").value = ""
+        $("f-body").value = ""
+        $("ai-consent").checked = false
+        renderPhotoPicker()
+        renderTagPicker()
+        hideError()
+        setBusy()
+        App.ui.setView("form")
+      },
+
+      /** 書きかけがあれば、離れる前に確かめる。離れてよければ true。 */
+      confirmLeave() {
+        if (App.ui.current() === "form" && (state.saving || state.drafting || App.photoUpload.busy())) { App.ui.toast("処理が終わるまでお待ちください"); return false }
+        if (App.ui.current() !== "form" || !state.dirty) return true
+        if (!confirm("書きかけの日記を破棄しますか？")) return false
+        state.dirty = false
+        return true
+      },
+    }
+  })()
+</script>

@@ -1,0 +1,16 @@
+<script>
+  // 画面側の名前空間 App と、DOM を作る小道具。画面の部品はすべて App.* に 1 つずつ置く。
+  window.App = window.App || { views: {} }
+
+  App.dom = {
+    $: (id) => document.getElementById(id),
+
+    /** 要素を作る。text はそのまま文字として入れる（HTML として解釈しない）。 */
+    el(tag, className, text) {
+      const node = document.createElement(tag)
+      if (className) node.className = className
+      if (text != null) node.textContent = text
+      return node
+    },
+  }
+</script>

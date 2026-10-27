@@ -1,0 +1,20 @@
+<script>
+  // 表示用の整形（日本語の日付）。
+  App.format = (() => {
+    const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"]
+
+    return {
+      /**
+       * サーバーの "2026-10-24T10:00:00+09:00" を、端末の時刻帯に関係なく書かれた日時のまま日本語にする。
+       * long：2026年10月24日（土） 10:00 / それ以外：2026/10/24（土） 10:00
+       */
+      date(iso, long) {
+        const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(iso || "")
+        if (!m) return ""
+        const [, y, mo, d, h, mi] = m
+        const w = WEEKDAYS[new Date(Date.UTC(+y, +mo - 1, +d)).getUTCDay()]
+        return long ? `${y}年${+mo}月${+d}日（${w}） ${h}:${mi}` : `${y}/${mo}/${d}（${w}） ${h}:${mi}`
+      },
+    }
+  })()
+</script>

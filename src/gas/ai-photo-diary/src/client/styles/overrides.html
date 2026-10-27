@@ -1,0 +1,16 @@
+<style>
+  /*
+   * admin-pico（vendor/admin-pico/）への日本語向けの調整。色の値はここに書かない（admin-theme.html だけ）。部品は components.html。
+   * Pico 2 の色の変数の補正と和文フォントの指定は、2026-10-24 の配色の刷新で admin-theme.html に移した。
+   */
+
+  /* 日本語向け：小見出しは英字向けの「大文字化＋広い字間」で、和文が「日 記」と間延びする。字間を詰める */
+  .admin-eyebrow,
+  .admin-brand__eyebrow {
+    text-transform: none;
+    letter-spacing: 0.04em;
+  }
+  h1, h2, h3 { letter-spacing: 0.01em; }
+
+  [hidden] { display: none !important; }
+</style>

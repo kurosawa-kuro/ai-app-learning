@@ -1,0 +1,38 @@
+# 動作の設定。直したら src で `npm run build:data`（`npm test` と `npm run push` は自動で流す）
+# GAS はこのファイルを読めないので、src/config.generated.js（APP_CONFIG）に書き出して使う。
+
+app:
+  name: GAS日記        # サイドバーとブラウザのタブに出る名前
+  tagline: 学習用MVP   # 名前の下の小さな文字
+  mark: 日             # サイドバーのアイコンの 1 文字
+
+limits:
+  title: 100     # タイトルの最大文字数
+  body: 5000     # 本文の最大文字数
+  excerpt: 80    # 一覧に出す本文の冒頭の文字数
+  tags: 10       # 1 つの日記に付けられるキーワードの数（写真の上限は sample-data.yaml の写真の数）
+
+# 差し替えられる機能の提供元。本物に替えるときは、提供元のファイルを 1 本足して名前をここで切り替える
+#   photo：写真（dummy = sample-data.yaml の目録から描く絵。将来 drive）
+#   draft：AI 下書き（mock = sample-data.yaml の固定の文章。将来 gemini）
+providers:
+  photo: drive
+  draft: gemini
+
+ai:
+  model: gemini-3.5-flash-lite
+  maxOutputTokens: 2048
+
+uploads:
+  maxImages: 3
+  maxBytes: 1048576
+  maxTotalBytes: 3145728
+  maxEdge: 1600
+  retentionHours: 24
+
+requestCacheSeconds: 600   # 同じ保存の再送を「済み」と見なす時間（二重登録の防止）
+lockWaitMs: 10000          # 書き込みのロックを待つ時間
+
+# 廃止したシート。開いたときに見つけたら消す（書籍管理 books は 2026-10-24 に廃止。データは試行用）
+retiredSheets:
+  - books

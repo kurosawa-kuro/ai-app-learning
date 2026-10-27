@@ -1,0 +1,39 @@
+<script>
+  // サーバー（server/controllers/api.js）の呼び出し。google.script.run をここに閉じ込め、Promise にする。
+  // 失敗は { code, message } で返す。code が network なら通信の失敗、それ以外はサーバーが返した理由。
+  App.api = (() => {
+    function call(fn, ...args) {
+      return new Promise((resolve, reject) => {
+        google.script.run
+          .withSuccessHandler((res) => {
+            if (res && res.ok) resolve(res.data)
+            else reject(res && res.error ? res.error : { code: "internal", message: "処理に失敗しました。もう一度お試しください。" })
+          })
+          .withFailureHandler(() => reject({ code: "network", message: "通信に失敗しました。電波の良い所でもう一度お試しください。" }))
+          [fn](...args)
+      })
+    }
+
+    return {
+      getAll: (tagId, cursor = null) => call("getAll", tagId, cursor),
+      getOne: (id) => call("getOne", id),
+      create: (input, requestId) => call("create", input, requestId),
+      cancelCreate: (requestId) => call("cancelCreate", requestId),
+      listGenerationHistoryForCleanup: () => call("listGenerationHistoryForCleanup"),
+      purgeGenerationHistory: (id) => call("purgeGenerationHistory", id),
+      generateDraft: (input) => call("generateDraft", input),
+      uploadPhoto: (input) => call("uploadPhoto", input),
+      getPhoto: (id) => call("getPhoto", id),
+      listOrphanUploads: () => call("listOrphanUploads"),
+      trashOrphanUpload: (id) => call("trashOrphanUpload", id),
+      /** 計測用（client/views/perf.html）。計測が済んだら消す。 */
+      perf: (name) => (["perfPing", "perfReadOne", "perfList", "perfListNoCache"].includes(name) ? call(name) : Promise.reject({ code: "invalid", message: name })),
+
+      /** 作成の二重登録を防ぐための、1 回の作成ごとの ID。 */
+      newRequestId() {
+        if (window.crypto && crypto.randomUUID) return crypto.randomUUID()
+        return Date.now().toString(36) + Math.random().toString(36).slice(2)
+      },
+    }
+  })()
+</script>

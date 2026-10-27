@@ -1,0 +1,62 @@
+<script>
+  // P03 日記詳細：全写真・本文・全キーワード。無い日記は「日記が見つかりません」。設計書 3 章。
+  App.views.detail = (() => {
+    const { $, el } = App.dom
+    const store = App.store
+
+    function render(post) {
+      $("detail-status").textContent = ""
+      $("detail-date").textContent = App.format.date(post.created_at, true)
+      $("detail-title").textContent = post.title
+      const gallery = $("detail-images")
+      gallery.textContent = ""
+      post.images.forEach((photo) => gallery.appendChild(App.photoView.img(photo)))
+      $("detail-body").textContent = post.body
+      const tags = $("detail-tags")
+      tags.textContent = ""
+      if (post.tags.length === 0) tags.appendChild(el("span", "app-hint", "なし"))
+      post.tags.forEach((t) => tags.appendChild(App.ui.tagChip(t, () => App.router.go({ view: "list", tag: t.id }, "push"))))
+      $("detail-card").hidden = false
+    }
+
+    function renderLoading() {
+      $("detail-title").textContent = ""
+      $("detail-date").textContent = ""
+      $("detail-card").hidden = true
+      $("detail-status").textContent = "読み込み中…"
+    }
+
+    return {
+      init() {
+        $("detail-back").addEventListener("click", () => App.router.back(store.listRoute()))
+      },
+
+      show(id) {
+        App.ui.setView("detail")
+        // 一覧で受け取った日記（本文・全写真を含む）か、作成直後の日記があれば、往復せずに出す
+        const cached = store.detailCache.get(id) || store.list.posts.find((p) => p.id === id && p.body != null)
+        if (cached) {
+          render(cached)
+          return
+        }
+        renderLoading()
+        const at = App.router.seq()
+        App.api.getOne(id)
+          .then((post) => {
+            if (App.router.seq() !== at) return // その間に別の画面へ移った
+            store.detailCache.set(post.id, post)
+            render(post)
+          })
+          .catch((err) => {
+            if (App.router.seq() !== at) return
+            if (err.code === "not_found") {
+              $("detail-title").textContent = "日記が見つかりません"
+              $("detail-status").textContent = "URL が古いか、日記が無くなった可能性があります。"
+            } else {
+              $("detail-status").textContent = err.message
+            }
+          })
+      },
+    }
+  })()
+</script>

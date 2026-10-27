@@ -1,0 +1,46 @@
+<script>
+  // 起動と配線だけを受け持つ。ルートに応じてビューを呼び、サイドバーのナビをつなぐ。描画や通信はここに書かない。
+  (() => {
+    const { $ } = App.dom
+    const { list, detail, form, perf } = App.views
+
+    // 固定の表示（data/config.yaml の app と保存先）
+    $("app-mark").textContent = CONFIG.app.mark
+    $("app-name").textContent = CONFIG.app.name
+    $("app-tagline").textContent = CONFIG.app.tagline
+    $("nav-sheet").href = CONFIG.sheetUrl
+
+    App.ui.init()
+    list.init()
+    detail.init()
+    form.init()
+    perf.init()
+
+    $("nav-list").addEventListener("click", (e) => {
+      e.preventDefault()
+      if (App.ui.current() === "list") {
+        list.filterTo(null)
+        App.ui.setSidebarOpen(false)
+      } else if (form.confirmLeave()) {
+        App.router.go({ view: "list", tag: null }, "push")
+      }
+    })
+    $("nav-new").addEventListener("click", (e) => {
+      e.preventDefault()
+      if (App.ui.current() === "form") App.ui.setSidebarOpen(false)
+      else App.router.go({ view: "new" }, "push")
+    })
+
+    // 作成画面に書きかけがあるとき、履歴の移動（スマホの「戻る」）でも確かめる
+    App.router.setLeaveGuard((route) => route.view === "new" || form.confirmLeave())
+
+    App.router.start((route) => {
+      App.ui.setSidebarOpen(false)
+      App.ui.setNavCurrent(route.view)
+      if (route.view === "list") list.show(route)
+      else if (route.view === "new") form.show()
+      else if (route.view === "perf") perf.show()
+      else detail.show(route.id)
+    })
+  })()
+</script>

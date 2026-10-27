@@ -1,0 +1,69 @@
+<script>
+  // 画面の共通部品：表示する画面の切り替え・サイドバー・通知・キーワードのチップ。
+  App.ui = (() => {
+    const VIEWS = ["list", "form", "detail", "perf"] // index.html の view-* と対応
+    const POP_COLORS = 4 // admin-theme.html の --admin-pop-1〜4
+    let current = null
+    let toastTimer = null
+
+    /** キーワードの ID から、毎回同じ彩りの番号（1〜4）を決める。 */
+    function popIndex(id) {
+      const sum = String(id).split("").reduce((s, ch) => s + ch.charCodeAt(0), 0)
+      return (sum % POP_COLORS) + 1
+    }
+
+    return {
+      current: () => current,
+
+      /** 3 つの画面のうち 1 つだけを見せる。 */
+      setView(name) {
+        current = name
+        VIEWS.forEach((v) => { App.dom.$(`view-${v}`).hidden = v !== name })
+        window.scrollTo(0, 0)
+      },
+
+      /** サイドバーの「今いる場所」の印。 */
+      setNavCurrent(routeView) {
+        App.dom.$("nav-list").setAttribute("aria-current", routeView === "list" ? "page" : "false")
+        App.dom.$("nav-new").setAttribute("aria-current", routeView === "new" ? "page" : "false")
+      },
+
+      setSidebarOpen(open) {
+        document.body.dataset.sidebarOpen = open ? "true" : "false"
+      },
+
+      /** 数秒で消える通知。isError ならピンク。 */
+      toast(message, isError) {
+        const box = App.dom.$("toast")
+        box.textContent = message
+        box.classList.toggle("is-error", !!isError)
+        box.hidden = false
+        clearTimeout(toastTimer)
+        toastTimer = setTimeout(() => { box.hidden = true }, isError ? 4000 : 2500)
+      },
+
+      /**
+       * キーワードのチップ。pressed を渡すと選択式（aria-pressed）になる。
+       * 選択式でないチップ（カード・詳細）は、キーワードごとに決まった彩り（app-chip--pop-1〜4）にする。
+       */
+      tagChip(tag, onClick, pressed) {
+        const chip = App.dom.el("button", "app-chip", tag.name)
+        chip.type = "button"
+        if (pressed != null) chip.setAttribute("aria-pressed", pressed ? "true" : "false")
+        else if (tag.id != null) chip.classList.add(`app-chip--pop-${popIndex(tag.id)}`)
+        chip.addEventListener("click", onClick)
+        return chip
+      },
+
+      /** サイドバーの開閉（admin-pico の admin.js と同じ振る舞い）。 */
+      init() {
+        document.querySelector("[data-sidebar-toggle]").addEventListener("click", () => {
+          this.setSidebarOpen(document.body.dataset.sidebarOpen !== "true")
+        })
+        document.querySelector("[data-sidebar-close]").addEventListener("click", () => this.setSidebarOpen(false))
+        document.querySelector("[data-sidebar-backdrop]").addEventListener("click", () => this.setSidebarOpen(false))
+        document.addEventListener("keydown", (e) => { if (e.key === "Escape") this.setSidebarOpen(false) })
+      },
+    }
+  })()
+</script>
