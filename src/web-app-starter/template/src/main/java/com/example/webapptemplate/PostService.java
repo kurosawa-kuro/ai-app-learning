@@ -15,7 +15,7 @@ class PostService {
     PostService(PostRepository repository, ImageStorage storage, ImageValidator validator, TransactionTemplate transactions) {
         this.repository = repository; this.storage = storage; this.validator = validator; this.transactions = transactions;
     }
-    void create(UUID author, String title, String body, MultipartFile file) {
+    UUID create(UUID author, String title, String body, MultipartFile file) {
         repository.requireAuthor(author);
         title = title.strip(); body = body.strip();
         if (title.isEmpty() || title.length() > 120 || body.length() > 5000)
@@ -35,7 +35,7 @@ class PostService {
             }
         }
         var post = new PostRepository.Post(id, author, "", title, body,
-                key == null ? null : storage.bucket(), key, image == null ? null : image.type());
+                key == null ? null : storage.bucket(), key, image == null ? null : image.type(), null);
         try { transactions.executeWithoutResult(status -> repository.insert(post)); }
         catch (RuntimeException failure) {
             if (key != null) {
@@ -43,6 +43,7 @@ class PostService {
             }
             throw failure;
         }
+        return id;
     }
     private void cleanupAfterFailure(String key, RuntimeException failure) {
         try { storage.delete(storage.bucket(), key); }

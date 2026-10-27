@@ -1,19 +1,20 @@
 package com.example.webapptemplate;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.CacheControl;
-import org.springframework.dao.DataAccessException;
 
 @Controller
 class PostController {
+    record PostForm(UUID userId, String title, String body) {}
     private final PostRepository repository;
     private final PostService service;
     private final ImageStorage storage;
@@ -21,39 +22,53 @@ class PostController {
         this.repository = repository; this.service = service; this.storage = storage;
     }
     @GetMapping("/")
-    String index(@RequestParam(required = false) UUID userId, Model model) {
-        model.addAttribute("authors", repository.authors());
+    String home() { return "redirect:/posts"; }
+
+    @GetMapping("/posts")
+    String list(@RequestParam(required = false) UUID userId, Model model) {
+        var authors = repository.authors();
+        model.addAttribute("authors", authors);
+        model.addAttribute("selectedAuthor", authors.stream().filter(a -> a.id().equals(userId)).findFirst().orElse(null));
         model.addAttribute("posts", repository.posts(userId));
-        model.addAttribute("selectedUser", userId);
-        model.addAttribute("imagesEnabled", storage.enabled());
-        return "posts";
+        return "posts/list";
     }
-    @PostMapping("/users")
-    String addUser(@RequestParam String name, RedirectAttributes flash) {
-        name = name.strip();
-        if (name.isEmpty() || name.length() > 80) throw new IllegalArgumentException("投稿者名は1〜80文字で入力してください。");
-        repository.addAuthor(name);
-        flash.addFlashAttribute("message", "投稿者を登録しました。");
-        return "redirect:/";
-    }
-    @PostMapping("/users/{id}/delete")
-    String deleteUser(@PathVariable UUID id, RedirectAttributes flash) {
-        repository.deleteAuthor(id);
-        flash.addFlashAttribute("message", "投稿者を削除しました。");
-        return "redirect:/";
+    @GetMapping("/posts/new")
+    String newPost(@RequestParam(required = false) UUID userId, Model model) {
+        var current = (PostRepository.Author) model.getAttribute("currentAuthor");
+        var author = userId != null ? userId : current == null ? null : current.id();
+        model.addAttribute("form", new PostForm(author, "", ""));
+        return form(model);
     }
     @PostMapping("/posts")
-    String create(@RequestParam UUID userId, @RequestParam String title, @RequestParam(defaultValue = "") String body,
-                  @RequestParam(required = false) MultipartFile image, RedirectAttributes flash) {
-        service.create(userId, title, body, image);
+    String create(@RequestParam(required = false) UUID userId, @RequestParam String title, @RequestParam(defaultValue = "") String body,
+                  @RequestParam(required = false) MultipartFile image, Model model,
+                  HttpServletRequest request, HttpServletResponse response, RedirectAttributes flash) {
+        UUID id;
+        try { id = service.create(userId, title, body, image); }
+        catch (IllegalArgumentException | IllegalStateException invalid) {
+            // Re-render instead of redirecting so the typed title and body survive.
+            model.addAttribute("error", invalid.getMessage());
+            model.addAttribute("form", new PostForm(userId, title, body));
+            return form(model);
+        }
+        PageContext.selectAuthor(userId, request, response);
         flash.addFlashAttribute("message", "投稿を保存しました。");
-        return "redirect:/";
+        return "redirect:/posts/" + id;
+    }
+    private String form(Model model) {
+        model.addAttribute("authors", repository.authors());
+        return "posts/form";
+    }
+    @GetMapping("/posts/{id}")
+    String detail(@PathVariable UUID id, Model model) {
+        model.addAttribute("post", repository.post(id));
+        return "posts/detail";
     }
     @PostMapping("/posts/{id}/delete")
     String delete(@PathVariable UUID id, RedirectAttributes flash) {
         service.delete(id);
         flash.addFlashAttribute("message", "投稿を削除しました。");
-        return "redirect:/";
+        return "redirect:/posts";
     }
     @GetMapping("/posts/{id}/image")
     ResponseEntity<byte[]> image(@PathVariable UUID id) {
@@ -61,20 +76,5 @@ class PostController {
         if (!storage.enabled() || post.imageKey() == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).contentType(MediaType.parseMediaType(post.imageType()))
                 .body(storage.download(post.imageBucket(), post.imageKey()));
-    }
-    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
-    String invalid(RuntimeException error, RedirectAttributes flash) {
-        flash.addFlashAttribute("error", error.getMessage());
-        return "redirect:/";
-    }
-    @ExceptionHandler(DataAccessException.class)
-    String dbFailure(RedirectAttributes flash) {
-        flash.addFlashAttribute("error", "保存・削除できませんでした。投稿が残っている投稿者は削除できません。接続状態も確認してください。");
-        return "redirect:/";
-    }
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    String tooLarge(RedirectAttributes flash) {
-        flash.addFlashAttribute("error", "画像は5MB以下にしてください。");
-        return "redirect:/";
     }
 }

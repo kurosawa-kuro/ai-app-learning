@@ -5,7 +5,8 @@
 ## できること
 
 - 投稿者の登録、一覧、投稿のない投稿者の削除。
-- 投稿者を選んでタイトル・本文を投稿、一覧表示、投稿者ごとの絞込み、投稿削除。
+- 投稿一覧（投稿者で絞込み）・投稿詳細・新規投稿・投稿者の管理を、サイドバーで行き来する。
+- 選択中の投稿者をヘッダーに表示し、新規投稿の初期値にする。入力エラー時も入力内容を保持。
 - 画像ON時は、1投稿にJPEG・PNGを任意で1枚添付。画像なしの投稿も可能。
 - 添付画像はSupabase Storageの非公開バケットへ保存し、Spring Boot経由で表示。
 - PostgreSQLへ投稿者・投稿の関連を保存し、再読込後も表示。
@@ -26,7 +27,7 @@ Git Bashでこのフォルダーを開きます。Java 17が必要です。Maven
 
 [run-local.sh](run-local.sh)は引数をそのまま [run-local.ps1](run-local.ps1) へ渡す入口です。PowerShellからは `.\run-local.ps1 -Action run` でも同じです。
 
-ブラウザーで http://127.0.0.1:8080/ を開きます。停止はCtrl+Cです。最初に投稿者を追加し、その投稿者で複数の投稿を保存できます。初回起動時にFlywayが専用スキーマとテーブルを作成します。
+ブラウザーで http://127.0.0.1:8080/ を開きます。停止はCtrl+Cです。最初にサイドバーの「投稿者の管理」で投稿者を追加し、「新規投稿」から投稿します。初回起動時にFlywayが専用スキーマとテーブルを作成します。
 
 認証なしのため、画面にアクセスできる人はすべての投稿者・投稿を操作できます。初期設定は `127.0.0.1` へのバインドです。外部公開する場合は利用範囲に応じた認証・権限設計を別途行います。
 
@@ -135,7 +136,7 @@ PlaywrightがSpring Bootを起動して終了します。通常の開発サー�
 2026-10-27、Windows・Temurin JDK 17.0.14・実Supabaseで以下を確認しました。
 
 - Java：7テスト成功。実DB接続・SQL、日本語データの書込み・読取り、画像検証、失敗時の処理。
-- Playwright：画像ON・OFFで計4ケース成功。認証なしの画面、1対多、再読込、絞込み、実Storageへの保存・画像表示・削除、不正画像拒否、CSRF拒否に加え、Pico資産のローカル読込み・モバイルメニュー・横はみ出しを検証。
+- Playwright：画像ON・OFFで計4ケース成功。サイドバーでの画面移動、投稿者の追加・選択と記憶、入力エラー時の入力保持、1対多、詳細、再読込、絞込み、確認つき削除、404、実Storageへの保存・画像表示・削除、不正画像拒否、CSRF拒否に加え、Pico資産のローカル読込み・モバイルメニュー・全画面の横はみ出しなしを検証。
 - テスト用バケットが非公開で、テスト終了後のオブジェクト数が0であることを確認。
 
 実Storageの正常系と、模擬したDB・Storage障害のテストは区別しています。2026-10-27、Render（free・Singapore・画像OFF）でDockerビルド・起動、投稿者・投稿の追加・表示・削除、CSRFなしPOSTの拒否、HTTPSへのリダイレクトを確認しました。Render上の画像ONは未検証です。
@@ -156,12 +157,12 @@ PlaywrightがSpring Bootを起動して終了します。通常の開発サー�
 
 ### admin-picoの利用・更新
 
-画面は [admin-pico](admin-pico/README.md) のサイドバー・ヘッダー・カード・ニュース一覧・バッジ・フォーム配置・モバイルメニューを利用します。色・共通レイアウトを投稿画面で独自に再定義することは避けます。
+画面は [admin-pico](admin-pico/README.md) のサイドバー・ヘッダー・ユーザーチップ・カード・テーブル・詳細項目・バッジ・フォーム配置・モバイルメニューを利用します。色・共通レイアウトを画面ごとに独自に再定義することは避けます。
 
 - `admin-pico/src/css/admin-theme.css`、`admin-layout.css`、`admin-components.css`、`js/admin.js` とサンプルアプリのfaviconを、Mavenのresources設定でそのまま `static/admin-pico/` へ取り込みます。複製したソースを別管理しません。
 - 元の `css/pico.css` はCDN importのため、Pico本体のみ [vendor/pico](src/main/resources/static/vendor/pico/README.md) に2.1.1を固定して同梱します。MITライセンスも保持し、画面表示時のCDN接続は不要です。
-- `src/main/resources/templates/posts.html` は既存のニュース画面の構造をThymeleafへ組み込みます。サンプルのログイン表示・架空の集計・未実装メニューは持ち込みません。
-- `src/main/resources/static/app.css` は投稿画像・投稿者の行配置と、Pico 2のボタン色・カード余白の調整だけを担当します。
+- `src/main/resources/templates/layout.html` がサイドバー・ヘッダー・通知を持つ共通の枠です。各画面（`posts/list`・`posts/detail`・`posts/form`・`users/list`・`error`）は `layout :: page(...)` に見出し・操作ボタン・本文を渡します。新しい画面はテンプレートを足し、`layout.html` のメニューに項目を追加します。サンプルのログイン表示・架空の集計・未実装メニューは持ち込みません。
+- `src/main/resources/static/app.css` は部品の組合せ調整、Pico 2のボタン色・カード余白、モバイル幅での表の縦積みだけを担当します。
 - 共通デザインを変更するときは `admin-pico/src` を更新して再起動・再ビルドし、Playwrightで画像ON・OFFとモバイル表示を確認します。現在の取込み対象以外の資産を使う場合は `pom.xml` のincludesも追加します。
 
 接続・Storage・テストの参照資料（確認日：2026-10-27）：[Supabase接続](https://supabase.com/docs/guides/database/connecting-to-postgres)、[Storage API](https://supabase.com/docs/reference/self-hosting-storage/introduction)、[APIキー](https://supabase.com/docs/guides/getting-started/api-keys)、[SpringのDB初期化](https://docs.spring.io/spring-boot/how-to/data-initialization.html)、[Playwrightのサーバー起動](https://playwright.dev/docs/test-webserver)。

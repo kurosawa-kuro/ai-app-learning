@@ -1,4 +1,4 @@
-/* App-specific additions only. Theme, layout, forms and cards come from admin-pico. */
+/* App-specific additions only. Theme, layout, forms, tables and cards come from admin-pico. */
 :root {
   --pico-font-size: 16px;
   /* Map the template palette to Pico 2's separate button background tokens. */
@@ -12,8 +12,7 @@
   --pico-secondary-border: var(--admin-border-strong);
 }
 /* The admin components own card spacing; avoid Pico article spacing twice. */
-.admin-card,
-.admin-news-card {
+.admin-card {
   padding: 0;
   margin: 0;
 }
@@ -21,79 +20,156 @@
 .admin-card > footer {
   margin: 0;
 }
+.admin-card h2 {
+  margin: 0;
+}
 .admin-sidebar__inner {
   overflow-y: auto;
 }
-.author-row {
-  display: flex;
-  align-items: center;
-  gap: .25rem;
-  min-width: 0;
+/* Without an explicit track, wide tables stretch the page instead of scrolling inside .admin-table-wrap. */
+.admin-content {
+  grid-template-columns: minmax(0, 1fr);
 }
-.author-row .admin-nav-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: .5rem;
-  flex: 1;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-.author-row form,
-.notes-author-form,
-.admin-card form,
-.post form {
+.admin-content form,
+.admin-content [role="button"],
+.admin-content button {
   margin-bottom: 0;
 }
-.author-row .notes-remove-author {
-  padding: .2rem .4rem;
-  margin: 0;
+.notes-sidebar-footer {
+  margin-top: auto;
 }
-.notes-author-form button {
-  width: 100%;
+.notes-page-actions {
+  display: flex;
+  gap: .75rem;
+  flex-wrap: wrap;
 }
-.notes-form-footer {
-  align-items: flex-end;
+.notes-author-chip {
+  color: inherit;
+  text-decoration: none;
 }
-.notes-form-footer > div {
-  min-width: 0;
+.notes-author-chip:hover {
+  border-color: var(--admin-border-strong);
 }
-.notes-form-footer input[type="file"] {
-  max-width: 100%;
-  margin-bottom: .3rem;
+.admin-header h1.notes-title {
+  overflow-wrap: anywhere;
 }
-.notes-form-footer small {
+/* Lists: titles wrap, the rest stays on one line. */
+.notes-table {
+  min-width: 40rem;
+}
+.notes-post-link {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.notes-excerpt {
   display: block;
+  max-width: 40rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--admin-text-muted);
 }
-.notes-form-footer > button {
-  margin-left: auto;
+.notes-filter select,
+.notes-filter button {
   width: auto;
-  flex: 0 0 auto;
+  margin-bottom: 0;
 }
+.notes-row-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: .5rem;
+}
+.notes-row-actions button {
+  width: auto;
+  padding: .35rem .75rem;
+  font-size: .9rem;
+}
+.admin-user__meta .admin-badge {
+  justify-self: start;
+}
+/* Detail */
 .notes-post-body {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-}
-.post h3,
-.admin-news-card__tags .admin-badge {
-  overflow-wrap: anywhere;
-}
-.admin-news-card__tags .admin-badge {
-  white-space: normal;
+  line-height: 1.8;
 }
 .notes-post-image {
   display: block;
   width: 100%;
-  max-height: 22rem;
+  max-height: 32rem;
   object-fit: contain;
   border-radius: var(--pico-border-radius);
 }
-.post .admin-actions {
-  margin-top: .5rem;
+.notes-muted {
+  margin-bottom: 0;
+  color: var(--admin-text-muted);
+}
+.notes-danger {
+  width: 100%;
+  --pico-background-color: transparent;
+  --pico-border-color: var(--admin-pink-main);
+  --pico-color: var(--admin-pink-main);
+}
+.notes-danger:is(:hover, :focus-visible):not(:disabled) {
+  --pico-background-color: var(--admin-pink-soft);
+  --pico-border-color: var(--admin-pink-main);
+  --pico-color: var(--admin-text-main);
+}
+.admin-stack > [role="button"] {
+  width: 100%;
+}
+/* Form */
+.notes-form-card {
+  max-width: 52rem;
+}
+.notes-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: .75rem;
+}
+/* Pico makes submit buttons full width; keep paired actions side by side. */
+.notes-form-actions > * {
+  width: auto;
+  white-space: nowrap;
 }
 @media (max-width: 720px) {
-  .notes-form-footer > button {
+  .notes-form-actions > * {
+    flex: 1;
+  }
+  /* Stack table rows as cards so row actions stay on screen. */
+  .notes-table {
+    min-width: 0;
+  }
+  .notes-table thead {
+    display: none;
+  }
+  .notes-table,
+  .notes-table tbody,
+  .notes-table tr,
+  .notes-table td {
+    display: block;
     width: 100%;
-    margin-left: 0;
+  }
+  .notes-table tr {
+    padding: .8rem .9rem;
+    border-bottom: 1px solid var(--admin-border);
+  }
+  .notes-table tbody tr:last-child {
+    border-bottom: 0;
+  }
+  .notes-table td {
+    padding: .15rem 0;
+    border: 0;
+    white-space: normal;
+    text-align: left;
+  }
+  .notes-table td[data-label]::before {
+    content: attr(data-label) "：";
+    color: var(--admin-text-muted);
+    font-size: .85rem;
+  }
+  .notes-row-actions {
+    justify-content: flex-start;
+    margin-top: .5rem;
   }
 }

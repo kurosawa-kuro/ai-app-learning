@@ -30,7 +30,7 @@ class PostServiceTests {
         var repository = mock(PostRepository.class);
         var storage = mock(ImageStorage.class);
         var id = UUID.randomUUID();
-        when(repository.post(id)).thenReturn(new PostRepository.Post(id, UUID.randomUUID(), "", "", "", "test", "object.png", "image/png"));
+        when(repository.post(id)).thenReturn(new PostRepository.Post(id, UUID.randomUUID(), "", "", "", "test", "object.png", "image/png", null));
         doThrow(new IllegalStateException("storage unavailable")).when(storage).delete("test", "object.png");
         var service = new PostService(repository, storage, mock(ImageValidator.class), mock(TransactionTemplate.class));
         assertThatThrownBy(() -> service.delete(id)).hasMessage("storage unavailable");
