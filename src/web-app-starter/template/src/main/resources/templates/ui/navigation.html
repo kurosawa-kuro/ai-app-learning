@@ -1,0 +1,12 @@
+<nav xmlns:th="http://www.thymeleaf.org" th:fragment="links(items)" th:remove="tag">
+  <ul class="ui-nav-list"><li th:each="item : ${items}">
+    <a class="admin-nav-item" th:href="${item.url}" th:text="${item.label}" th:attr="aria-current=${item.active ? 'page' : null}"></a>
+  </li></ul>
+</nav>
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="management" class="ui-popup-host">
+  <button type="button" class="admin-nav-item ui-popup-trigger" popovertarget="management-popup" aria-haspopup="dialog" aria-expanded="false">管理・設定<span aria-hidden="true">⌃</span></button>
+  <section id="management-popup" class="ui-popup" popover aria-labelledby="management-popup-title" role="dialog">
+    <div class="ui-popup-heading"><h2 id="management-popup-title">管理・設定</h2><button type="button" class="secondary" popovertarget="management-popup" popovertargetaction="hide" aria-label="管理メニューを閉じる">×</button></div>
+    <nav aria-label="管理メニュー" th:insert="~{ui/navigation :: links(${managementLinks})}"></nav>
+  </section>
+</div>

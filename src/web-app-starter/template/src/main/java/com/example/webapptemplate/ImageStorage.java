@@ -14,30 +14,36 @@ import org.springframework.web.client.RestClientException;
 
 @Component
 class ImageStorage {
-    private final boolean enabled;
+    private final AppSettings settings;
     private final String bucket;
     private final RestClient client;
-    ImageStorage(@Value("${app.images.enabled}") boolean enabled,
+    ImageStorage(AppSettings settings,
                  @Value("${app.storage.url}") String url,
                  @Value("${app.storage.key}") String key,
                  @Value("${app.storage.bucket}") String bucket) {
-        this.enabled = enabled;
+        this.settings = settings;
         this.bucket = bucket;
-        if (!enabled) { this.client = null; return; }
         if (!url.matches("https://[a-z0-9]+\\.supabase\\.co") || !key.startsWith("sb_secret_")
                 || !bucket.matches("[a-z0-9][a-z0-9-]{2,62}"))
-            throw new IllegalStateException("Set the Supabase URL, secret key and private bucket before enabling images.");
+            { this.client = null; return; }
         var factory = new JdkClientHttpRequestFactory(HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build());
         factory.setReadTimeout(Duration.ofSeconds(30));
         this.client = RestClient.builder().baseUrl(url + "/storage/v1").requestFactory(factory)
                 .defaultHeader("apikey", key).build();
     }
-    boolean enabled() { return enabled; }
+    boolean enabled() { return settings.imagesEnabled() && configured(); }
+    boolean configured() { return client != null; }
     String bucket() { return bucket; }
-    void requireEnabled() { if (!enabled) throw new IllegalArgumentException("画像機能はOFFです。画像なしで投稿してください。"); }
+    void requireEnabled() {
+        if (!settings.imagesEnabled()) throw new IllegalArgumentException("画像投稿はOFFです。画像なしで投稿してください。");
+        requireConfigured();
+    }
+    private void requireConfigured() {
+        if (!configured()) throw new IllegalStateException("画像ストレージの接続情報が未設定です。提供者に設定を依頼してください。");
+    }
 
     synchronized void ensureBucket() {
-        requireEnabled();
+        requireConfigured();
         try {
             Map<?, ?> info = client.get().uri("/bucket/{bucket}", bucket).retrieve().body(Map.class);
             if (info == null || !Boolean.FALSE.equals(info.get("public")))
@@ -64,12 +70,12 @@ class ImageStorage {
         } catch (RestClientException e) { throw unavailable(); }
     }
     byte[] download(String storedBucket, String key) {
-        requireEnabled();
+        requireConfigured();
         try { return client.get().uri("/object/authenticated/{bucket}/{key}", storedBucket, key).retrieve().body(byte[].class); }
         catch (RestClientException e) { throw unavailable(); }
     }
     void delete(String storedBucket, String key) {
-        requireEnabled();
+        requireConfigured();
         try {
             client.method(org.springframework.http.HttpMethod.DELETE).uri("/object/{bucket}", storedBucket)
                     .contentType(MediaType.APPLICATION_JSON).body(Map.of("prefixes", List.of(key)))

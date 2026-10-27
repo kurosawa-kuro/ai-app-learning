@@ -1,4 +1,6 @@
 const { defineConfig, devices } = require('@playwright/test');
+const path = require('node:path');
+const os = require('node:os');
 
 const selected = process.argv.find(a => a.startsWith('--project='))?.split('=')[1];
 const servers = [
@@ -23,6 +25,7 @@ module.exports = defineConfig({
     reuseExistingServer: false,
     stdout: 'ignore', stderr: 'pipe',
     env: { SERVER_PORT: String(s.port), APP_DB_SCHEMA: s.schema, APP_IMAGES_ENABLED: String(s.images),
-      SUPABASE_STORAGE_BUCKET: 'template-post-images-e2e', DEBUG: 'false' }
+      SUPABASE_STORAGE_BUCKET: 'template-post-images-e2e', DEBUG: 'false',
+      LOGGING_FILE_NAME: path.join(os.tmpdir(), `template-ui-${s.name}.log`) }
   }))
 });

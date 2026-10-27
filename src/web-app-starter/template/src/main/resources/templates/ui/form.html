@@ -1,0 +1,22 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="text(id, label, required, help, value, limit, problem)" class="ui-field">
+  <label th:for="${id}"><span th:text="${label}"></span> <span class="ui-field-kind" th:text="${required ? '必須' : '任意'}"></span></label>
+  <p class="ui-help" th:id="${id + '-help'}" th:text="${help}"></p>
+  <input th:id="${id}" th:name="${id}" th:value="${value}" th:maxlength="${limit}" th:required="${required}"
+         th:attr="aria-describedby=${id + '-help ' + id + '-error'},aria-invalid=${problem != null ? 'true' : null}">
+  <p class="ui-field-error" th:id="${id + '-error'}" th:text="${problem}"></p>
+</div>
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="textAreaField(id, label, help, value, limit, problem)" class="ui-field">
+  <label th:for="${id}"><span th:text="${label}"></span> <span class="ui-field-kind">任意</span></label>
+  <p class="ui-help" th:id="${id + '-help'}" th:text="${help}"></p>
+  <textarea th:id="${id}" th:name="${id}" th:maxlength="${limit}" rows="9" th:text="${value}"
+            th:attr="aria-describedby=${id + '-help ' + id + '-error'},aria-invalid=${problem != null ? 'true' : null}"></textarea>
+  <p class="ui-field-error" th:id="${id + '-error'}" th:text="${problem}"></p>
+</div>
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="actions(cancelUrl, cancelText, submitText)" class="ui-actions">
+  <a role="button" class="secondary" th:href="${cancelUrl}" th:text="${cancelText}"></a>
+  <button type="submit" th:text="${submitText}"></button>
+</div>
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="switch(id, label, help, checked)" class="admin-switch">
+  <div><label th:for="${id}" th:text="${label}"></label><p th:id="${id + '-help'}" th:text="${help}"></p></div>
+  <input type="checkbox" role="switch" value="true" th:id="${id}" th:name="${id}" th:checked="${checked}" th:attr="aria-describedby=${id + '-help'}">
+</div>

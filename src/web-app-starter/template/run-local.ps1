@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('test', 'run', 'package')]
+    [ValidateSet('test', 'run', 'package', 'seed-preview', 'seed', 'seed-reset', 'seed-cleanup')]
     [string]$Action = 'run',
     [switch]$Images
 )
@@ -47,17 +47,17 @@ if ($PSBoundParameters.ContainsKey('Images')) {
 }
 # Both test and package execute tests; always isolate them from normal app data.
 if ($Action -in @('test', 'package')) { $settings['APP_DB_SCHEMA'] = 'app_template_test' }
+if ($Action -like 'seed*' -and $settings['APP_DB_SCHEMA'] -and $settings['APP_DB_SCHEMA'] -notin @('app_template', 'app_template_seed_test')) {
+    throw 'Seed commands only support the app_template or app_template_seed_test development schema.'
+}
 if ($settings['APP_DB_SCHEMA'] -and $settings['APP_DB_SCHEMA'] -notmatch '^[a-z][a-z0-9_]{0,62}$') {
     throw 'APP_DB_SCHEMA must be a lowercase SQL identifier.'
 }
 if ($settings['APP_IMAGES_ENABLED'] -and $settings['APP_IMAGES_ENABLED'] -notin @('true', 'false')) {
     throw 'APP_IMAGES_ENABLED must be true or false.'
 }
-if ($settings['APP_IMAGES_ENABLED'] -eq 'true' -and
-    ([string]::IsNullOrWhiteSpace($settings['SUPABASE_URL']) -or
-     $settings['SUPABASE_SECRET_KEY'] -notlike 'sb_secret_*')) {
-    throw 'Images require SUPABASE_URL and SUPABASE_SECRET_KEY in .env or the environment.'
-}
+# APP_IMAGES_ENABLED only seeds a new schema. Persisted feature settings take precedence.
+# Missing Storage credentials are reported in the management UI; text posts remain usable.
 $previous = @{}
 foreach ($name in $settings.Keys) {
     $previous[$name] = [Environment]::GetEnvironmentVariable($name, 'Process')
@@ -73,7 +73,17 @@ try {
         'package' { 'package' }
         'run' { 'spring-boot:run' }
     }
-    & (Join-Path $PSScriptRoot 'mvnw.cmd') -B $goal
+    if ($Action -like 'seed*') {
+        $seedAction = switch ($Action) {
+            'seed-preview' { 'preview' }
+            'seed' { 'add' }
+            'seed-reset' { 'reset' }
+            'seed-cleanup' { 'cleanup' }
+        }
+        & (Join-Path $PSScriptRoot 'mvnw.cmd') -B spring-boot:run "-Dspring-boot.run.arguments=--seed.action=$seedAction --server.port=0"
+    } else {
+        & (Join-Path $PSScriptRoot 'mvnw.cmd') -B $goal
+    }
     $result = $LASTEXITCODE
 } finally {
     foreach ($name in $settings.Keys) {

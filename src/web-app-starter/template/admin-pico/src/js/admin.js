@@ -1,6 +1,4 @@
-document.documentElement.classList.add("dark");
-document.documentElement.style.colorScheme = "dark";
-localStorage.setItem("dark-mode", "true");
+// テーマは共通シェルと photo-diary-theme.css で指定する。
 
 const body = document.body;
 const toggleButton = document.querySelector("[data-sidebar-toggle]");

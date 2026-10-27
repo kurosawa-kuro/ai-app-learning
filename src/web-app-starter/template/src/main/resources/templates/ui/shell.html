@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ja" data-theme="light" xmlns:th="http://www.thymeleaf.org" th:fragment="app(title, kind, heading, actions, content)">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fff7fa">
+  <meta name="csrf-token" th:content="${_csrf.token}">
+  <meta name="csrf-header" th:content="${_csrf.headerName}">
+  <title th:replace="${title}">アプリ</title>
+  <link rel="icon" th:href="@{/ui/favicon.svg}">
+  <link rel="stylesheet" th:href="@{/vendor/pico/pico.min.css}">
+  <link rel="stylesheet" th:href="@{/admin-pico/css/admin-layout.css}">
+  <link rel="stylesheet" th:href="@{/admin-pico/css/admin-components.css}">
+  <link rel="stylesheet" th:href="@{/ui/ui.css}">
+  <link rel="stylesheet" th:href="@{/ui/photo-diary-theme.css}">
+  <link rel="stylesheet" th:each="asset : ${appStyles}" th:href="${asset}">
+</head>
+<body class="admin-body" data-sidebar-open="false" th:classappend="${navigation.sidebar ? 'ui-with-sidebar' : 'ui-without-sidebar'}">
+<a class="ui-skip" href="#main">本文へスキップ</a>
+<header class="ui-topbar">
+  <button th:if="${navigation.sidebar}" type="button" class="secondary" data-sidebar-toggle aria-controls="sidebar" aria-expanded="false">メニュー</button>
+  <a class="ui-brand" th:href="${navigation.home}" th:text="${navigation.name}"></a>
+  <nav th:unless="${navigation.sidebar}" aria-label="メインメニュー" th:insert="~{ui/navigation :: links(${navigation.links})}"></nav>
+  <th:block th:unless="${navigation.sidebar}"><div th:replace="~{ui/navigation :: management}"></div></th:block>
+</header>
+<div th:if="${navigation.sidebar}" class="admin-sidebar-backdrop" data-sidebar-backdrop></div>
+<div class="admin-shell">
+  <aside th:if="${navigation.sidebar}" class="admin-sidebar" id="sidebar" aria-label="アプリのメニュー">
+    <div class="admin-sidebar__inner">
+      <a class="ui-brand" th:href="${navigation.home}" th:text="${navigation.name}"></a>
+      <button type="button" class="secondary" data-sidebar-close>閉じる</button>
+      <div class="ui-app-navigation"><small class="ui-nav-caption">アプリ</small><nav class="admin-nav" aria-label="メインメニュー" th:insert="~{ui/navigation :: links(${navigation.links})}"></nav></div>
+      <div th:replace="~{ui/navigation :: management}"></div>
+      <section class="ui-sidebar-context" th:if="${sidebarContext != null}" aria-labelledby="sidebar-context-label">
+        <small id="sidebar-context-label" th:text="${sidebarContext.label}"></small>
+        <button type="button" class="ui-user-trigger" popovertarget="user-popup" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="sidebar-context-label sidebar-current-user">
+          <span data-current-avatar><span th:replace="~{ui/avatar :: avatar(${sidebarContext.value}, ${sidebarContext.iconUrl})}"></span></span>
+          <strong id="sidebar-current-user" th:text="${sidebarContext.value}"></strong><span aria-hidden="true">⌃</span>
+        </button>
+        <small data-user-status role="status" aria-live="polite"></small>
+        <section id="user-popup" class="ui-popup" popover role="dialog" aria-labelledby="user-popup-title" th:attr="data-selected-user=${sidebarContext.selectedId}" data-user-options="/admin/current-user">
+          <div class="ui-popup-heading"><h2 id="user-popup-title">ユーザーを切り替え</h2><button type="button" class="secondary" popovertarget="user-popup" popovertargetaction="hide" aria-label="ユーザー切替を閉じる">×</button></div>
+          <p class="ui-muted">このブラウザーで使うユーザーを選びます。</p>
+          <label for="user-search">ユーザーを検索</label><input id="user-search" type="search" placeholder="名前で検索" autocomplete="off">
+          <p data-user-error role="alert" hidden></p>
+          <div class="ui-user-options" data-user-options-list aria-live="polite"></div>
+          <a class="ui-popup-footer" th:href="${sidebarContext.url}" th:text="${sidebarContext.action}"></a>
+        </section>
+      </section>
+    </div>
+  </aside>
+  <main class="admin-main" id="main" tabindex="-1">
+    <div th:replace="~{ui/page :: layout(${kind}, ${heading}, ${actions}, ${content})}"></div>
+  </main>
+</div>
+<dialog id="ui-confirm" aria-labelledby="ui-confirm-title" aria-describedby="ui-confirm-description">
+  <article class="admin-card">
+    <header><h2 id="ui-confirm-title">削除の確認</h2></header>
+    <div class="admin-card__body">
+      <p id="ui-confirm-description"></p><p>削除すると元に戻せません。</p>
+      <div class="ui-actions"><button type="button" class="secondary" data-confirm-cancel autofocus>キャンセル</button>
+        <button type="button" class="ui-danger" data-confirm-accept>削除する</button></div>
+    </div>
+  </article>
+</dialog>
+<script th:src="@{/admin-pico/js/admin.js}"></script>
+<script th:src="@{/ui/ui.js}"></script>
+<script th:src="@{/ui/image-preview.js}"></script>
+<script th:each="asset : ${appScripts}" th:src="${asset}"></script>
+</body>
+</html>

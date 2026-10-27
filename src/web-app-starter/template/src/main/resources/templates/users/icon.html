@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page(~{::title}, 'form', ~{::#heading}, ~{::#actions}, ~{::#content})}">
+<head><title>ユーザーアイコン | 投稿ノート</title></head>
+<body>
+<div id="heading"><h1>ユーザーアイコン</h1><p th:text="${author.name + 'のアイコンを変更します。'}"></p></div>
+<div id="actions"><a th:href="@{/admin/users}">ユーザー管理へ戻る</a></div>
+<div id="content" class="ui-stack">
+  <article class="admin-card"><div class="admin-card__body ui-stack">
+    <div class="ui-profile-avatar"><span th:replace="~{ui/avatar :: avatar(${author.name}, ${userIconIds.contains(author.id) ? '/admin/users/' + author.id + '/icon' : null})}"></span></div>
+    <form th:if="${storageConfigured}" class="ui-stack" th:action="@{/admin/users/{id}/icon(id=${author.id})}" method="post" enctype="multipart/form-data" data-ui-form>
+      <div data-image-picker data-image-square>
+        <label for="icon-image">アイコン画像</label>
+        <p class="ui-help" id="icon-help">JPEG・PNG、5MB・1600万画素まで。中央を正方形に切り抜き、256pxで保存します。</p>
+        <input id="icon-image" type="file" name="image" accept="image/jpeg,image/png" required aria-describedby="icon-help" data-image-input>
+        <img class="ui-image-preview ui-icon-preview" data-image-preview alt="新しいアイコンのプレビュー" hidden>
+        <p data-image-preview-error class="ui-field-error" role="alert"></p>
+      </div>
+      <div th:replace="~{ui/form :: actions('/admin/users', 'キャンセル', 'アイコンを保存')}"></div>
+    </form>
+    <p th:unless="${storageConfigured}" class="admin-note">画像ストレージの設定が必要です。提供者に接続設定を依頼してください。</p>
+  </div></article>
+  <details class="ui-danger-zone" th:if="${hasIcon}"><summary>アイコンを削除する</summary>
+    <p>頭文字の表示に戻ります。ユーザーと投稿は削除しません。</p>
+    <form th:action="@{/admin/users/{id}/icon/delete(id=${author.id})}" method="post" data-ui-form data-confirm="アイコンを削除して、頭文字の表示に戻します。">
+      <button type="submit" class="ui-danger">アイコンを削除</button>
+    </form>
+  </details>
+</div>
+</body></html>

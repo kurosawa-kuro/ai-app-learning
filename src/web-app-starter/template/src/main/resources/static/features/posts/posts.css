@@ -1,0 +1,14 @@
+/* Post-specific presentation; /features/ keeps assets outside the /posts/{id} routes. */
+.post-body { white-space: pre-wrap; line-height: 1.85; }
+.post-image { display: block; width: 100%; max-height: 34rem; object-fit: contain; border-radius: .75rem; margin: 1.5rem auto 0; }
+.post-author { border: 1px solid var(--admin-border-strong); border-radius: .75rem; padding: 1rem; margin-bottom: 0; }
+.post-author > summary { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+.post-author summary strong { overflow-wrap: anywhere; }
+.post-author summary span { color: var(--ui-text-secondary); font-size: .875rem; }
+.post-author[open] > summary { margin-bottom: 1rem; }
+.post-author-new { border-top: 1px solid var(--admin-border); margin-top: 1rem; padding-top: 1rem; }
+.post-author-new button { width: auto; margin-top: .75rem; }
+.post-list-title { font-weight: 650; }
+.post-thumbnail { display: block; width: min(100%, 12rem); margin-bottom: .75rem; }
+.post-thumbnail img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: .65rem; background: var(--admin-bg-header); }
+.post-list-excerpt { color: var(--ui-text-secondary); }

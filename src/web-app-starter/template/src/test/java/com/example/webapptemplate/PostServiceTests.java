@@ -38,7 +38,7 @@ class PostServiceTests {
     }
     @Test
     void rejectsImageWhenOptionIsDisabled() {
-        var storage = new ImageStorage(false, "", "", "unused");
+        var storage = new ImageStorage(mock(AppSettings.class), "", "", "unused");
         var service = new PostService(mock(PostRepository.class), storage, new ImageValidator(), mock(TransactionTemplate.class));
         assertThatThrownBy(() -> service.create(UUID.randomUUID(), "投稿", "", new MockMultipartFile("image", new byte[]{1})))
                 .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("OFF");
