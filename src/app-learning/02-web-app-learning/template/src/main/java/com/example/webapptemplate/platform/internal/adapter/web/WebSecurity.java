@@ -11,7 +11,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 @Configuration
 public class WebSecurity {
  @Bean SecurityFilterChain security(HttpSecurity http) throws Exception {
-  return http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+  var csrf=new org.springframework.security.web.csrf.CookieCsrfTokenRepository();
+  csrf.setHeaderName("X-CSRF-TOKEN");
+  csrf.setCookieCustomizer(cookie -> cookie.sameSite("Lax"));
+  return http.csrf(config -> config.csrfTokenRepository(csrf)).authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
    .httpBasic(AbstractHttpConfigurer::disable).formLogin(AbstractHttpConfigurer::disable)
    .logout(AbstractHttpConfigurer::disable).build();
  }

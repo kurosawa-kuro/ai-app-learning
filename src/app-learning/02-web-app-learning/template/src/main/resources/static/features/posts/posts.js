@@ -68,6 +68,18 @@
     let saved = false;
     try {
       const response = await fetch(form.action, { method: 'POST', body: data, headers: { 'X-UI-Form': 'true', 'X-CSRF-TOKEN': csrf.value } });
+      if (response.status === 403) {
+        try {
+          const renewed = await fetch('/csrf', { cache: 'no-store' });
+          if (!renewed.ok) throw new Error();
+          const token = (await renewed.json()).token;
+          if (!token) throw new Error();
+          document.querySelectorAll('input[name="_csrf"]').forEach(input => input.value = token);
+          document.querySelector('meta[name="csrf-token"]').content = token;
+          showError('送信の準備を更新しました。本文と画像は残っています。もう一度「投稿を保存」を押してください。');
+        } catch { showError('接続を回復できませんでした。本文と画像は残っています。少し待ってから「投稿を保存」を押してください。'); }
+        return;
+      }
       if (!response.headers.get('content-type')?.includes('json')) {
         showError(response.status === 413 ? '画像は5MB以下にしてください。タイトルと本文は残っています。' : '保存を確認できませんでした。入力内容は残っています。投稿一覧を確認してから再試行してください。'); return;
       }

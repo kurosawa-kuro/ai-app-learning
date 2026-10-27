@@ -41,3 +41,5 @@ AI下書きは1ブラウザーセッションの直近1件だけを保存する�
 - 再発防止：[事故記録](education-scope-incident.md)、[変更ルール](../AGENTS.md)。
 
 起動設定の比較：デモ用コンテナーで `-XX:TieredStopAtLevel=1` を試す。長期の最大スループットより起動の軽さを優先するJVM設定であり、機能や常駐処理は増やさない。実測前に速度改善を断定しない。根拠：[Spring公式](https://spring.io/blog/2018/12/12/how-fast-is-spring/)。
+
+画像保存の再接続修正：CSRFを再起動に依存しないCookie方式へ変更。403時はトークンだけ更新し、入力・画像・要求IDを保持して手動再保存する。PublicAccessTests 3件、再接続E2E 1件成功。公開反映後の実画像保存を確認する。
