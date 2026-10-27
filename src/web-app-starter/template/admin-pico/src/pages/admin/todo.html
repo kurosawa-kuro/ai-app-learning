@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Pico Admin - Todo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="../../images/favicons/todo.svg">
+  <link rel="stylesheet" href="../../css/pico.css">
+  <link rel="stylesheet" href="../../css/admin-theme.css">
+  <link rel="stylesheet" href="../../css/admin-layout.css">
+  <link rel="stylesheet" href="../../css/admin-components.css">
+</head>
+<body class="admin-body" data-sidebar-open="false">
+  <button class="admin-mobile-toggle secondary" type="button" data-sidebar-toggle>メニュー</button>
+  <div class="admin-sidebar-backdrop" data-sidebar-backdrop></div>
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar__inner">
+        <div class="admin-brand">
+          <div class="admin-brand__mark">P</div>
+          <div>
+            <strong>Pico Admin</strong>
+            <div class="admin-brand__eyebrow">Dark Console</div>
+          </div>
+          <button class="secondary" type="button" data-sidebar-close>閉じる</button>
+        </div>
+        <nav class="admin-nav">
+          <details open>
+            <summary>ダッシュボード</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="../../index.html">概要</a></li>
+              <li><a class="admin-nav-item" href="./analytics.html">分析</a></li>
+            </ul>
+          </details>
+          <details open>
+            <summary>運用</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="./customers.html">顧客</a></li>
+              <li><a class="admin-nav-item" href="./orders.html">受注</a></li>
+              <li><a class="admin-nav-item" href="./news.html">ニュース</a></li>
+              <li><a class="admin-nav-item" aria-current="page" href="./todo.html">Todo</a></li>
+              <li><a class="admin-nav-item" href="./ajax.html">非同期サンプル</a></li>
+            </ul>
+          </details>
+          <details>
+            <summary>システム</summary>
+            <ul>
+              <li><a class="admin-nav-item" href="./settings.html">設定</a></li>
+            </ul>
+          </details>
+        </nav>
+      </div>
+    </aside>
+    <main class="admin-main">
+      <header class="admin-header">
+        <div>
+          <div class="admin-eyebrow">Todo 運用</div>
+          <h1>Todo</h1>
+          <p>担当、期限、進行状態をデスクトップ前提で横並び確認するタスク管理画面です。</p>
+        </div>
+        <div class="admin-header__actions">
+          <div class="admin-search">
+            <input type="search" placeholder="タスク名、担当者、案件名で検索">
+          </div>
+          <button type="button">Todo を追加</button>
+          <div class="admin-header-presence" aria-label="ログインユーザー">
+            <button class="secondary admin-icon-button" type="button" aria-label="通知">
+              <span aria-hidden="true">●</span>
+              <span class="admin-icon-button__badge"></span>
+            </button>
+            <button class="secondary admin-user-chip" type="button" aria-label="ユーザーメニュー">
+              <span class="admin-avatar admin-avatar--image" aria-hidden="true">
+                <img src="../../images/admin-user-male-30s.png" alt="">
+              </span>
+              <span class="admin-user__meta">
+                <strong>中村 恒一</strong>
+                <small>管理者 / ログイン中</small>
+              </span>
+              <span class="admin-user-chip__caret" aria-hidden="true">▾</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <section class="admin-content">
+        <div class="admin-grid admin-grid--4">
+          <article class="admin-card admin-card--compact admin-card--dense">
+            <div class="admin-card__body admin-kpi admin-kpi--dense">
+              <span class="admin-eyebrow">未着手</span>
+              <strong class="admin-kpi__value">26</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--neutral">本日</span><span>新規起票分を含む</span></div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact admin-card--dense">
+            <div class="admin-card__body admin-kpi admin-kpi--dense">
+              <span class="admin-eyebrow">進行中</span>
+              <strong class="admin-kpi__value">41</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--lime">順調</span><span>期限内で推移</span></div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact admin-card--dense">
+            <div class="admin-card__body admin-kpi admin-kpi--dense">
+              <span class="admin-eyebrow">期限超過</span>
+              <strong class="admin-kpi__value">5</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--pink">確認要</span><span>レビュー待ちが停滞</span></div>
+            </div>
+          </article>
+          <article class="admin-card admin-card--compact admin-card--dense">
+            <div class="admin-card__body admin-kpi admin-kpi--dense">
+              <span class="admin-eyebrow">今週完了率</span>
+              <strong class="admin-kpi__value">82%</strong>
+              <div class="admin-kpi__meta"><span class="admin-badge admin-badge--neutral">維持</span><span>前週比 +4pt</span></div>
+            </div>
+          </article>
+        </div>
+
+        <article class="admin-card">
+          <header class="admin-toolbar">
+            <div class="admin-toolbar__group">
+              <div>
+                <div class="admin-eyebrow">Todo 一覧</div>
+                <h2>直近のタスク</h2>
+              </div>
+              <div class="admin-segmented">
+                <a aria-current="page" href="./todo.html">全体</a>
+                <a href="#0">進行中</a>
+                <a href="#0">期限超過</a>
+              </div>
+            </div>
+            <div class="admin-toolbar__group">
+              <label class="admin-inline-control">
+                <span>並び替え</span>
+                <select data-table-sort="todo-table">
+                  <option value="time-desc" selected>期限が近い順</option>
+                  <option value="priority-desc">優先度が高い順</option>
+                  <option value="health-risk">停滞リスク順</option>
+                </select>
+              </label>
+              <span class="admin-badge admin-badge--neutral">3 分前更新</span>
+              <button class="secondary" type="button">出力</button>
+            </div>
+          </header>
+          <div class="admin-table-wrap">
+            <table id="todo-table" class="admin-table">
+              <thead>
+                <tr>
+                  <th>Todo</th>
+                  <th>担当</th>
+                  <th>案件</th>
+                  <th>期限</th>
+                  <th>状態</th>
+                  <th>優先度</th>
+                  <th class="admin-text-right">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-time-rank="4" data-priority-rank="1" data-health-rank="3">
+                  <td><strong>#TODO-2084</strong><br><small>請求前倒し回収の確認</small></td>
+                  <td>佐藤 彩夏</td>
+                  <td>Astra Trade</td>
+                  <td>本日 16:00</td>
+                  <td><span class="admin-badge admin-badge--lime">進行中</span></td>
+                  <td><span class="admin-badge admin-badge--pink">高</span></td>
+                  <td class="admin-text-right"><a href="#0">詳細</a></td>
+                </tr>
+                <tr data-time-rank="3" data-priority-rank="2" data-health-rank="2">
+                  <td><strong>#TODO-2083</strong><br><small>返金導線の訴求差分レビュー</small></td>
+                  <td>高橋 未来</td>
+                  <td>トライアル改善</td>
+                  <td>本日 18:30</td>
+                  <td><span class="admin-badge admin-badge--neutral">レビュー待ち</span></td>
+                  <td><span class="admin-badge admin-badge--neutral">通常</span></td>
+                  <td class="admin-text-right"><a href="#0">詳細</a></td>
+                </tr>
+                <tr data-time-rank="2" data-priority-rank="1" data-health-rank="4">
+                  <td><strong>#TODO-2082</strong><br><small>North Signal の解約予兆ヒアリング</small></td>
+                  <td>星野 美奈</td>
+                  <td>CS レビュー</td>
+                  <td>昨日 17:00</td>
+                  <td><span class="admin-badge admin-badge--pink">期限超過</span></td>
+                  <td><span class="admin-badge admin-badge--pink">高</span></td>
+                  <td class="admin-text-right"><a href="#0">詳細</a></td>
+                </tr>
+                <tr data-time-rank="1" data-priority-rank="3" data-health-rank="1">
+                  <td><strong>#TODO-2081</strong><br><small>アップセル候補 3 社の会議準備</small></td>
+                  <td>田中 恒一</td>
+                  <td>営業レビュー</td>
+                  <td>明日 10:00</td>
+                  <td><span class="admin-badge">未着手</span></td>
+                  <td><span class="admin-badge admin-badge--neutral">通常</span></td>
+                  <td class="admin-text-right"><a href="#0">詳細</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="admin-pager">
+            <span class="admin-pager__summary">1 - 4 / 72 件を表示</span>
+            <nav class="admin-pager__nav" aria-label="Todo 一覧のページ切替">
+              <a class="admin-pager__button" href="#0">前へ</a>
+              <a class="admin-pager__button" aria-current="page" href="#0">1</a>
+              <a class="admin-pager__button" href="#0">2</a>
+              <a class="admin-pager__button" href="#0">3</a>
+              <span class="admin-pager__ellipsis">...</span>
+              <a class="admin-pager__button" href="#0">18</a>
+              <a class="admin-pager__button" href="#0">次へ</a>
+            </nav>
+          </div>
+        </article>
+
+        <div class="admin-grid admin-grid--2">
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <div class="admin-eyebrow">詳細導線</div>
+                <h2>Todo プレビュー</h2>
+              </div>
+              <span class="admin-badge admin-badge--pink">#TODO-2082</span>
+            </header>
+            <div class="admin-card__body admin-stack">
+              <div class="admin-detail-grid">
+                <div class="admin-detail-item">
+                  <span>担当</span>
+                  <strong>星野 美奈</strong>
+                </div>
+                <div class="admin-detail-item">
+                  <span>期限</span>
+                  <strong>昨日 17:00</strong>
+                </div>
+                <div class="admin-detail-item">
+                  <span>状態</span>
+                  <strong>期限超過</strong>
+                </div>
+                <div class="admin-detail-item">
+                  <span>関連案件</span>
+                  <strong>North Signal</strong>
+                </div>
+              </div>
+              <div class="admin-note">
+                <strong>Todo は別モーダルへ逃がさず、この画面内で優先順位と次アクションを判断できる構成にしています。</strong>
+                <div>担当、期限、関連案件、停滞理由を先に見せて、詳細遷移は最後にします。</div>
+              </div>
+              <ol class="admin-checklist">
+                <li>CS ヒアリング日程を当日中に再確定する</li>
+                <li>停滞理由を案件メモへ追記する</li>
+                <li>営業レビューにエスカレーション要否を付ける</li>
+              </ol>
+              <div class="admin-actions">
+                <button type="button">担当へ通知</button>
+                <button class="secondary" type="button">案件メモを開く</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <div class="admin-eyebrow">停滞対応</div>
+                <h2>期限超過の Todo</h2>
+              </div>
+            </header>
+            <div class="admin-card__body">
+              <ul class="admin-list admin-list--dense">
+                <li>
+                  <div class="admin-metric">
+                    <strong>#TODO-2082</strong>
+                    <span>North Signal のヒアリングが未実施です。</span>
+                  </div>
+                  <span class="admin-badge admin-badge--pink">重要</span>
+                </li>
+                <li>
+                  <div class="admin-metric">
+                    <strong>#TODO-2075</strong>
+                    <span>法人請求の社内承認が止まっています。</span>
+                  </div>
+                  <span class="admin-badge admin-badge--pink">承認</span>
+                </li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="admin-card">
+            <header class="admin-section-heading">
+              <div>
+                <div class="admin-eyebrow">運用メモ</div>
+                <h2>タスク監視の方針</h2>
+              </div>
+            </header>
+            <div class="admin-card__body">
+              <div class="admin-note admin-note--neutral">
+                <strong>Todo 画面は期限、担当、案件を同じテーブルで扱い、横並び比較を優先する方針です。</strong>
+                <div>確認作業を 1 画面に寄せ、デスクトップでの停滞把握を優先しています。</div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="../../js/admin.js"></script>
+</body>
+</html>

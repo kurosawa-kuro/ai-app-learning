@@ -1,0 +1,99 @@
+/* App-specific additions only. Theme, layout, forms and cards come from admin-pico. */
+:root {
+  --pico-font-size: 16px;
+  /* Map the template palette to Pico 2's separate button background tokens. */
+  --pico-primary-background: var(--admin-lime-main);
+  --pico-primary-border: var(--admin-lime-main);
+  --pico-primary-hover-background: var(--admin-lime-accent);
+  --pico-primary-hover-border: var(--admin-lime-accent);
+  --pico-secondary: var(--admin-text-sub);
+  --pico-secondary-hover: var(--admin-text-main);
+  --pico-secondary-background: var(--admin-bg-elevated);
+  --pico-secondary-border: var(--admin-border-strong);
+}
+/* The admin components own card spacing; avoid Pico article spacing twice. */
+.admin-card,
+.admin-news-card {
+  padding: 0;
+  margin: 0;
+}
+.admin-card > header,
+.admin-card > footer {
+  margin: 0;
+}
+.admin-sidebar__inner {
+  overflow-y: auto;
+}
+.author-row {
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  min-width: 0;
+}
+.author-row .admin-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.author-row form,
+.notes-author-form,
+.admin-card form,
+.post form {
+  margin-bottom: 0;
+}
+.author-row .notes-remove-author {
+  padding: .2rem .4rem;
+  margin: 0;
+}
+.notes-author-form button {
+  width: 100%;
+}
+.notes-form-footer {
+  align-items: flex-end;
+}
+.notes-form-footer > div {
+  min-width: 0;
+}
+.notes-form-footer input[type="file"] {
+  max-width: 100%;
+  margin-bottom: .3rem;
+}
+.notes-form-footer small {
+  display: block;
+}
+.notes-form-footer > button {
+  margin-left: auto;
+  width: auto;
+  flex: 0 0 auto;
+}
+.notes-post-body {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.post h3,
+.admin-news-card__tags .admin-badge {
+  overflow-wrap: anywhere;
+}
+.admin-news-card__tags .admin-badge {
+  white-space: normal;
+}
+.notes-post-image {
+  display: block;
+  width: 100%;
+  max-height: 22rem;
+  object-fit: contain;
+  border-radius: var(--pico-border-radius);
+}
+.post .admin-actions {
+  margin-top: .5rem;
+}
+@media (max-width: 720px) {
+  .notes-form-footer > button {
+    width: 100%;
+    margin-left: 0;
+  }
+}

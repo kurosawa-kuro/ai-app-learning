@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ja" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>投稿ノート</title>
+  <link rel="icon" type="image/svg+xml" th:href="@{/admin-pico/images/favicons/sample-app.svg}">
+  <link rel="stylesheet" th:href="@{/vendor/pico/pico.min.css}">
+  <link rel="stylesheet" th:href="@{/admin-pico/css/admin-theme.css}">
+  <link rel="stylesheet" th:href="@{/admin-pico/css/admin-layout.css}">
+  <link rel="stylesheet" th:href="@{/admin-pico/css/admin-components.css}">
+  <link rel="stylesheet" th:href="@{/app.css}">
+</head>
+<body class="admin-body" data-sidebar-open="false">
+<button class="admin-mobile-toggle secondary" type="button" data-sidebar-toggle>メニュー</button>
+<div class="admin-sidebar-backdrop" data-sidebar-backdrop></div>
+<div class="admin-shell">
+  <aside class="admin-sidebar" aria-label="投稿者メニュー">
+    <div class="admin-sidebar__inner">
+      <div class="admin-brand">
+        <div class="admin-brand__mark">N</div>
+        <div><strong>投稿ノート</strong><div class="admin-brand__eyebrow">Pico Notes</div></div>
+        <button class="secondary" type="button" data-sidebar-close>閉じる</button>
+      </div>
+      <nav class="admin-nav" aria-label="投稿者で絞り込み">
+        <details open>
+          <summary>投稿者</summary>
+          <ul>
+            <li><a class="admin-nav-item" th:href="@{/}" th:attr="aria-current=${selectedUser == null ? 'page' : null}">すべての投稿</a></li>
+            <li class="author-row" th:each="author : ${authors}" th:attr="data-author=${author.name}">
+              <a class="admin-nav-item" th:href="@{/(userId=${author.id})}" th:attr="aria-current=${selectedUser == author.id ? 'page' : null}">
+                <span th:text="${author.name}"></span>
+                <small th:text="${author.postCount}"></small>
+              </a>
+              <form th:if="${author.postCount == 0}" th:action="@{/users/{id}/delete(id=${author.id})}" method="post">
+                <button class="outline secondary notes-remove-author" th:attr="aria-label=${author.name + 'を削除'}">×</button>
+              </form>
+            </li>
+          </ul>
+        </details>
+      </nav>
+      <form th:action="@{/users}" method="post" class="notes-author-form">
+        <label for="name">投稿者名</label>
+        <input id="name" name="name" maxlength="80" required placeholder="例：山田">
+        <button type="submit">追加</button>
+      </form>
+      <small>名前ごとに投稿をまとめます。</small>
+    </div>
+  </aside>
+  <main class="admin-main">
+    <header class="admin-header">
+      <div>
+        <div class="admin-eyebrow">YOUR EVERYDAY NOTES</div>
+        <h1>ひとつの投稿から、始めよう。</h1>
+        <p>投稿者を選んで、メモや写真を残せます。</p>
+      </div>
+      <div class="admin-header__actions">
+        <span class="admin-badge" th:classappend="${imagesEnabled ? 'admin-badge--lime' : 'admin-badge--neutral'}"
+              th:text="${imagesEnabled ? '画像添付 ON' : 'テキスト投稿'}"></span>
+      </div>
+    </header>
+    <section class="admin-content">
+      <div class="admin-note admin-note--neutral" role="status" th:if="${message}" th:text="${message}"></div>
+      <div class="admin-note" role="alert" th:if="${error}" th:text="${error}"></div>
+      <article class="admin-card">
+        <header class="admin-toolbar">
+          <div><div class="admin-eyebrow">NEW NOTE</div><h2>新しい投稿</h2></div>
+          <span class="admin-badge admin-badge--neutral">メモを残す</span>
+        </header>
+        <div class="admin-card__body">
+          <p th:if="${#lists.isEmpty(authors)}">メニューで投稿者を追加すると、投稿を始められます。</p>
+          <form th:unless="${#lists.isEmpty(authors)}" th:action="@{/posts}" method="post" enctype="multipart/form-data">
+            <div class="admin-field-grid">
+              <div>
+                <label for="userId">投稿者</label>
+                <select id="userId" name="userId" required>
+                  <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.name}" th:selected="${selectedUser == author.id}"></option>
+                </select>
+              </div>
+              <div>
+                <label for="title">タイトル <small>必須</small></label>
+                <input id="title" name="title" maxlength="120" required placeholder="今日残しておきたいこと">
+              </div>
+            </div>
+            <label for="body">本文</label>
+            <textarea id="body" name="body" maxlength="5000" rows="3" placeholder="気づいたこと、試したこと、次にやりたいこと。"></textarea>
+            <div class="admin-toolbar notes-form-footer">
+              <div th:if="${imagesEnabled}">
+                <label for="image">画像 <small>任意・1枚</small></label>
+                <input id="image" type="file" name="image" accept="image/jpeg,image/png" aria-describedby="image-help">
+                <small id="image-help">JPEG・PNG / 5MB・1600万画素まで</small>
+              </div>
+              <button type="submit">投稿を保存</button>
+            </div>
+          </form>
+        </div>
+      </article>
+      <section aria-labelledby="posts-heading">
+        <div class="admin-section-heading">
+          <div><div class="admin-eyebrow">NOTES</div><h2 id="posts-heading">投稿一覧</h2></div>
+          <span class="admin-badge admin-badge--neutral" th:text="${#lists.size(posts) + ' 件'}"></span>
+        </div>
+        <div th:if="${#lists.isEmpty(posts)}" class="admin-note admin-note--neutral">
+          <strong>まだ投稿はありません</strong><div>最初のメモを残してみましょう。</div>
+        </div>
+        <div class="admin-news-feed">
+          <article class="post admin-news-card" th:each="post : ${posts}" th:attr="data-post-id=${post.id},data-author=${post.userName}">
+            <div class="admin-news-card__meta">
+              <div class="admin-news-card__tags">
+                <span class="admin-badge admin-badge--neutral" th:text="${post.userName}"></span>
+                <span class="admin-badge admin-badge--lime" th:if="${post.imageKey != null}">写真つき</span>
+              </div>
+            </div>
+            <div class="admin-news-card__content">
+              <h3 th:text="${post.title}"></h3>
+              <p class="notes-post-body" th:text="${post.body}"></p>
+              <img class="notes-post-image" th:if="${imagesEnabled and post.imageKey != null}"
+                   th:src="@{/posts/{id}/image(id=${post.id})}" th:alt="${post.title + 'の添付画像'}" loading="lazy">
+              <small th:if="${!imagesEnabled and post.imageKey != null}">画像機能をONにすると表示できます。</small>
+              <form th:action="@{/posts/{id}/delete(id=${post.id})}" method="post" class="admin-actions">
+                <button class="outline secondary" th:disabled="${!imagesEnabled and post.imageKey != null}">投稿を削除</button>
+              </form>
+            </div>
+          </article>
+        </div>
+      </section>
+    </section>
+  </main>
+</div>
+<script th:src="@{/admin-pico/js/admin.js}"></script>
+</body>
+</html>
