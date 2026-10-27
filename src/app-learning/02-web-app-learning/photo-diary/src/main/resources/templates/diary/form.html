@@ -6,7 +6,7 @@
 <input type="hidden" name="requestId" th:value="${requestId}"><p data-diary-error class="ui-notice ui-notice--error" role="alert" hidden></p>
 <label>書く人<select name="userId" required><option value="">選んでください</option><option th:each="a:${authors}" th:value="${a.id}" th:text="${a.name}" th:selected="${currentAuthor != null and currentAuthor.id == a.id}"></option></select></label>
 <p class="ui-help" th:if="${#lists.isEmpty(authors)}">まず<a th:href="@{/admin/users}">ユーザー管理</a>で名前を登録してください。</p>
-<label>日付<input type="date" name="entryDate" th:value="${today}" required></label>
+<label>日付<input type="date" name="entryDate" th:value="${#temporals.format(today,'yyyy-MM-dd')}" required></label>
 <label>タイトル<input name="title" maxlength="120" placeholder="今日の小さな発見" required></label>
 <fieldset data-tag-picker data-limit="5"><legend>タグ（複数選択・5個まで）</legend>
 <input type="hidden" name="tags" value=""><div class="tag-options"><label th:each="t:${tags}" class="tag-option"><input type="checkbox" data-tag th:value="${t}"><span th:text="${t}"></span></label></div>
