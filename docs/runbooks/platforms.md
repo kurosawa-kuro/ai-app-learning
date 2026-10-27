@@ -1,6 +1,8 @@
 # GAS・Retoolの選択と作業の境界
 
-この文書は生成環境のGAS・Retool運用を扱う。リポジトリのWebアプリとGAS教材の発展版は[ADR 0001](../adr/0001-web-app-stack.md)によりSpring Boot＋Thymeleaf＋Render＋Supabaseへ統一した。具体的な支援方針・構成・検証は[Webアプリ支援戦略](../../src/web-app-starter/GASではなくSpringBoot-render-supabase戦略.md)を参照する。
+この文書は生成環境のGAS・Retool運用を扱う。リポジトリのWebアプリとGAS教材の発展版は[ADR 0001](../adr/0001-web-app-stack.md)によりSpring Boot＋Thymeleaf＋Render＋Supabaseへ統一した。具体的な支援方針・構成・検証は[Webアプリ支援戦略](../../src/web-app-starter/web-app-support-strategy.md)を参照する。
+
+以下は提供者向けの生成環境の参考手順。Retoolを第五の学習入口やWeb標準基盤に加える意味ではなく、全員の受講条件でもない。教材ごとの実行・公開は個別READMEとrunbookを確認する。
 
 生成kindはstandard / gas / retool / gas-retool。standardは汎用、他のkindは共通のCodex・Claude環境に選択した作業基盤を追加する。すでに作成済みのprojectへ追加する場合は、一時生成先との比較で統合し、既存設定を一括置換しない。
 

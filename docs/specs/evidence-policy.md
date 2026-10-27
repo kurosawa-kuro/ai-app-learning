@@ -6,6 +6,8 @@
 
 ## 中核ルール
 
+本書は教材を整備する開発作業の証拠区分。[ルート3文書の方針](../00_index.md#権威順位)と[検証戦略](../07_test_strategy.md)に従い、学習者の初回成功・支援終了は別に確認する。開発者向けのEvidence Levelを、受講者の必修段階にしない。
+
 > エージェントの「完了しました」は証拠ではない。証拠とは diff / test 出力 / コマンドログ / 実ファイル / 実行時の挙動 / 永続化された成果である。
 > **done は Evidence Level ≥2 が下限（docs-only タスクを除く）。本番影響のある変更は Level 4 + owner approval。**
 
@@ -15,7 +17,7 @@
 |---:|---|---|
 | 0 | Claim Only | 「動くはず」 — 受理しない |
 | 1 | Static | diff、実ファイル内容、`cargo check` / 型チェック / lint — docs-only や trivial 編集 |
-| 2 | Test | `make test` 出力、修正前fail→修正後pass — **標準の下限** |
+| 2 | Test | 対象教材で実装されたテストの出力、修正前fail→修正後pass — **標準の下限**。ルートの`make test`は対象外 |
 | 3 | Runtime | ローカル実行＋永続化された成果（下表のいずれか） |
 | 4 | Production | 本番ログ / 監視チェック / ロールバック準備（`docs/08_release_runbook.md`）— owner approval 必須 |
 
@@ -38,5 +40,5 @@
 ## ルール
 
 - すべての PASS に `file:line` かコマンド出力を引用する。未証明は UNVERIFIED であり PASS にしない。
-- 確実な成果チェックの無い「緑のワークフロー」は最大でも Level 1 で、done ではない。
+- 確実な成果チェックの無い「緑のワークフロー」は最大でもLevel 1で、実装・実環境受入のdoneではない。文書のみの作業は、指定された正本との整合・差分・リンク確認をもって完了できる。
 - 本番検証は runbook（`docs/08_release_runbook.md`）であって、ビルド成功ではない。

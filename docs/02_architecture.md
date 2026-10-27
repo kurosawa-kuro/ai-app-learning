@@ -1,54 +1,43 @@
 # 02 アーキテクチャ
 
-## 概要
+[ルート3文書](00_index.md#権威順位)の方針に基づき、独立した入口を同じリポジトリで管理する。共通のアプリ実行環境や、全員が順番に履修するシステムではない。
 
-本リポジトリは複数の教材と学習支援を扱う。WebアプリとGAS教材の発展版の採用構成は、[ADR 0001](adr/0001-web-app-stack.md)によりSpring Boot＋Thymeleaf＋Render＋Supabaseとする。Next.js＋Vercel案は廃止した。
+## 構成と責務
 
-採用構成：ブラウザ → Render上のSpring Boot／Thymeleaf → Supabase PostgreSQL。画像・添付は必要時にSupabase Storageを利用する。詳細は[Webアプリ支援戦略](../src/web-app-starter/GASではなくSpringBoot-render-supabase戦略.md)を参照。これは実装・接続・公開済みの構成図ではない。
+| 場所 | 責務 |
+|---|---|
+| [gas-app-learning](../src/gas-app-learning/README.md) | 既存5教材、対象者別の学習設計、体験と改善の支援 |
+| [web-app-starter](../src/web-app-starter/web-app-support-strategy.md) | 非エンジニアが自分用・業務用アプリを使うための支援戦略 |
+| [java-career-learning](../src/java-career-learning/java-career-learning-strategy.md) | Java・Oracleの資格と実習を仕事へつなぐ戦略 |
+| [office-automation-starter](../src/office-automation-starter/README.md) | Windowsでの事務処理教材・プロンプト・サンプル |
+| [docs](00_index.md) | 共通の要件・作業・検証・支援終了の具体化 |
+| [AGENTS.md](../AGENTS.md) / [CLAUDE.md](../CLAUDE.md) | 共通の作業方針 / Claude Code固有の案内 |
 
-既存GAS版、Oracle資格実習、Cursor事務処理教材はそれぞれの構成を維持する。以下の汎用図や未記入欄を、採用決定に代わる具体仕様として扱わない。
+GASの5教材はそれぞれ独立している。ゲームのポイントと店舗の評価ポイント、英語の学習履歴と日記の記録など、同じ語が出ても業務上の意味は統合しない。共通化は必要性と既存実装を確認して判断する。
+
+## Webアプリの採用構成
+
+[ADR 0001](adr/0001-web-app-stack.md)により、WebアプリとGAS教材の発展版は次の構成を採用する。Next.js＋Vercel案は廃止済み。
 
 ```text
-入力
-  -> アプリケーション
-  -> 出力
+ブラウザー
+  → Render上のSpring Boot / Spring MVC / Thymeleaf
+  → Supabase PostgreSQL
+  → 必要な場合のみSupabase Storage
 ```
 
-## 構成要素
+これは採用方針であり、接続・公開済みの構成図ではない。認証、サービスプラン、環境変数、公開・復旧手順は対象アプリの実装時に確定・検証する。詳細は[Webアプリ支援戦略](../src/web-app-starter/web-app-support-strategy.md)に従う。
 
-| 構成要素 | 役割 | 担当パス |
-|---|---|---|
-| TODO | TODO | TODO |
-| エージェントガイド | Codex / 他エージェント向けの repo ガイド | `AGENTS.md` |
-| Claude ガイド | Claude Code の司令ルール | `CLAUDE.md` |
-| タスク文書 | 一回性の作業計画・実装タスク | `docs/tasks/` |
-| Claude skills | Claude Code で繰り返し使う作業手順 | `.claude/skills/` |
+Java・SQL、ひな形、AIへの指示、検証・復旧手順は提供者側で再利用する。利用者にすべての構成技術の習得を要求しない。既存GAS版は維持し、発展版は同じ題材の要件と受入条件で1題材ずつ整備する。
 
-## Golden Path とアーキテクチャ
+## 共通化しない境界
 
-要件で定義した Critical User Journey / Golden Path（[01_requirements.md](./01_requirements.md)）が、どの構成要素・境界を通るかを写像する。設計判断（責務配置・境界・依存）は、まずこの一本道を壊さない・遅くしないことを優先条件にする。
+- Oracle資格に固有の管理・SQL実習はOracleで扱う。Web教材のPostgreSQLで代替済みとしない。
+- Linux・AWSは志望する仕事に応じた追加学習。Web教材の標準公開先はRender。
+- 業務効率化教材は追加のPython・Node.jsを前提にせず、元ファイルを保全するコピー操作と単独プロンプトを維持する。
+- 設定・秘密情報・保存先は各教材の方式に従う。ルートのenvやDopplerを一律に導入しない。
+- Codex向けの共通指示はAGENTS.mdへ置く。Claude専用のrules・skillsを全エージェントが読む前提にしない。
 
-| Golden Path ステップ | 通る構成要素 | 通る境界 / データ | 単一障害点（切れると journey が止まる） |
-|---|---|---|---|
-| 1. TODO | TODO | TODO | TODO |
-| 2. TODO | TODO | TODO | TODO |
-| 3. TODO | TODO | TODO | TODO |
-| 4. TODO | TODO | TODO | TODO |
+## 支援の流れを支えるもの
 
-> 例（ショッピングアプリ・比喩）: 「商品を見る」→ 一覧/検索 + 商品DB、「カートに入れる」→ カート状態、「購入する」→ 決済 + 在庫、「購入履歴を確認する」→ 注文DB。決済が単一障害点なら、そこを最優先で堅牢化・監視する。
-
-- 新しい構成要素・adapter・依存を足すときは、この表の Golden Path 上に不要な単一障害点を増やしていないかを確認する。
-- Golden Path 上の構成要素の変更は、リリース Runbook の smoke 対象（[08_release_runbook.md](./08_release_runbook.md)）と整合させる。
-
-## 境界
-
-- ソースコードは、別の境界を定義しない限り `src/` 配下に置く。
-- 非機密の設定は `env/config.yaml` に置く。
-- ローカル秘密情報は ignore したまま。共有・本番の秘密情報は Doppler などの secret manager に置く。
-- Codex が `.claude/rules/` や `.claude/skills/` を読む前提にしない。Codex / 他エージェント向けに永続させたい指針は `AGENTS.md` に置く。
-
-## 関連タスク
-
-- 構造変更、責務移動、adapter 追加、共通化は、実装前に `docs/tasks/03_active/` へ task を作る。
-- 中規模以上の変更では、task に Skeleton / Plan / Acceptance Criteria を書いてから実装する。
-- 確定した設計判断は task から `docs/adr/` またはこの文書へ昇格する。
+[初回支援の流れ](01_requirements.md#初回支援の中核の流れgolden-path)は、本人の課題と[支援シート](templates/ai-pairing-session.md)、検証した教材環境、AIとのやり取り、結果確認、引き渡しで成立する。教材の追加や技術の乗換えを、支援を終えるための条件として増やさない。

@@ -1,9 +1,0 @@
-# Project path/name source of truth.
-#
-# Edit this file after moving or renaming the project, then run:
-#   make render-project-config
-
-projectName: cast-evaluation-system
-repoRoot: C:\Users\owner\.ssh\dev\gas\cast-evaluation-system
-workspaceRoot: C:\Users\owner\.ssh\dev\gas
-homeDir: C:\Users\owner

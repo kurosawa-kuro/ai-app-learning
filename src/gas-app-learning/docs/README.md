@@ -12,11 +12,11 @@
 
 | プロジェクト | 元資料に記載された現状の要約 |
 |---|---|
-| [ai-photo-diary](../ai-photo-diary/README.md) | ローカル実装・検証の記録あり。既存公開環境への最新修正反映・実環境受入が残る |
-| [ai-english-trainer](../ai-english-trainer/README.md) | G3までローカル実装・検証済み。実環境受入・公開・コピー配布は未実施 |
-| [ec-shop](../ec-shop/README.md) | 設計段階 |
-| [skill-janken](../skill-janken/README.md) | ローカル実装あり。2026-10-26のDB・UI再設計は未検証・実GAS未反映 |
-| [cast-evaluation-system](../cast-evaluation-system/README.md) | ナイトワーク特化の初期MVP設計段階。アプリケーション実装は未着手 |
+| [photo-diary](../photo-diary/README.md) | ローカル実装・検証の記録あり。既存公開環境への最新修正反映・実環境受入が残る |
+| [english-trainer](../english-trainer/README.md) | G3までローカル実装・検証済み。実環境受入・公開・コピー配布は未実施 |
+| [online-shop](../online-shop/README.md) | 設計段階 |
+| [skill-janken-game](../skill-janken-game/README.md) | ローカル実装あり。2026-10-26のDB・UI再設計は未検証・実GAS未反映 |
+| [cast-evaluation](../cast-evaluation/README.md) | ナイトワーク特化の初期MVP設計段階。アプリケーション実装は未着手 |
 
 出典は添付READMEの2026-10-27時点の記載。今回、コード・個別仕様・公開環境の再検証は行っていない。詳しい状況・制約・正本参照は[ポートフォリオ](01_portfolio.md)にまとめる。
 
@@ -29,6 +29,7 @@
 | [03 技術基盤と検証](03_platforms-and-validation.md) | GAS／発展版の比較、共通受入条件、検証と段階的な進め方 |
 | [04 拡張カタログ](04_extension-catalog.md) | 専門領域・AIの追加候補、AI利用金額の構想 |
 | [05 事業仮説](05_business-hypotheses.md) | 将来の商品構成・仮価格・需要検証・内製化支援 |
+| [06 初回のAI並走](06_first-pairing-pilot.md) | 1人・1課題の候補、初回成功、任意の横展開、提供者の支援終了 |
 | [応用パターン資料](reference/01_application-patterns.md) | 既存の型の応用先と、別途必要な設計 |
 | [出典・編集対応表](reference/00_source-map.md) | 元資料の移動先、保留箇所、文書更新・配置方法 |
 

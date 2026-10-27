@@ -6,7 +6,7 @@
 
 ## 題材を固定し技術レベルを広げる
 
-2026-10-27の[採用決定](../../../docs/adr/0001-web-app-stack.md)により、発展版のNext.js＋Vercel案は廃止し、Spring Boot＋Thymeleaf＋Render＋Supabaseに統一した。[Webアプリ支援戦略](../../web-app-starter/GASではなくSpringBoot-render-supabase戦略.md)の構成と検証方針に従う。DBはPostgreSQL、Storageは必要時に利用する。既存GAS版の個別仕様は維持する。
+2026-10-27の[採用決定](../../../docs/adr/0001-web-app-stack.md)により、発展版のNext.js＋Vercel案は廃止し、Spring Boot＋Thymeleaf＋Render＋Supabaseに統一した。[Webアプリ支援戦略](../../web-app-starter/web-app-support-strategy.md)の構成と検証方針に従う。DBはPostgreSQL、Storageは必要時に利用する。既存GAS版の個別仕様は維持する。
 
 サーバー側の認可、DB接続ロール、データの公開範囲を設計し、必要なRLSが実際の接続経路で有効かを検証する。技術の共通化と、利用者のゴール・スタート支援・成功条件の共通化は分ける。Oracle固有の実習は資格学習側で行う。
 
@@ -16,19 +16,19 @@
 
 | 学習の入口・発展 | 技術・道具 | 学ぶこと |
 |---|---|---|
-| Level 1：GAS | Google Apps Script＋Google Sheets | データの関係、登録・参照、業務ルール、AIへの開発指示。更新・削除は各アプリの仕様に応じて扱う |
-| Level 2：Web開発 | Spring Boot＋Thymeleaf＋Render＋Supabase | Java・SQL、画面とフォーム、リレーショナルDB、認証・認可、デプロイ、テスト、運用 |
-| Level 3：AIによる改善 | Devin等＋仕様・テスト・模範実装 | 独自要件を整理し、AIの変更案を検証・比較して改善する |
+| GASで体験・利用 | Google Apps Script＋Google Sheets | データの関係、登録・参照、業務ルール、AIへの開発指示。更新・削除は各アプリの仕様に応じて扱う |
+| Webアプリを開発・利用 | Spring Boot＋Thymeleaf＋Render＋Supabase | Java・SQL、画面とフォーム、リレーショナルDB、認証・認可、デプロイ、テスト、運用 |
+| AIと改善 | Devin等＋仕様・テスト・模範実装 | 独自要件を整理し、AIの変更案を検証・比較して改善する |
 
-GASを修了しなければ発展版へ進めない、という制約は設けない。経験・関心・目的に応じて入口を選ぶ。Level 3のAI活用は両基盤で行え、本人の理解・判断・検証を伴う改善を目指す。
+これは必修の段階ではなく、目的に応じて選ぶ活動。GASを修了しなければ発展版へ進めない、という制約は設けない。経験・関心・目的に応じて入口を選ぶ。AI活用は最初から両基盤で行え、本人の理解・判断・検証を伴う改善を目指す。
 
 | 既存教材 | GAS版を通じて学ぶこと | 発展版で深める観点 |
 |---|---|---|
-| skill-janken | 条件分岐・状態管理・仲間とスキルの関係 | ゲームロジックとDB設計、更新の整合性 |
-| ai-english-trainer | AI API・問題と回答・評価・学習履歴 | 認証・AI連携・学習データの管理 |
-| ai-photo-diary | 写真・日記の登録と参照・タグ | Storage、リレーショナルDB、画像と記録の権限 |
-| cast-evaluation-system | 実績・評価ルール・期間集計 | サーバー側の認可、DB権限、複数利用者を扱う場合のデータ分離 |
-| ec-shop | 商品・注文・明細・確定時点の保存 | 注文整合性、DBトランザクション |
+| skill-janken-game | 条件分岐・状態管理・仲間とスキルの関係 | ゲームロジックとDB設計、更新の整合性 |
+| english-trainer | AI API・問題と回答・評価・学習履歴 | 認証・AI連携・学習データの管理 |
+| photo-diary | 写真・日記の登録と参照・タグ | Storage、リレーショナルDB、画像と記録の権限 |
+| cast-evaluation | 実績・評価ルール・期間集計 | サーバー側の認可、DB権限、複数利用者を扱う場合のデータ分離 |
+| online-shop | 商品・注文・明細・確定時点の保存 | 注文整合性、DBトランザクション |
 
 発展の観点を、現在のGAS版の追加要件にしない。特にキャスト用画面・複数店舗・複数利用者への拡張は、既存の管理者限定MVPとは別に範囲と受入条件を決める。認証機構が異なっても、同じ基本課題では元の利用者・公開範囲を尊重する。
 
@@ -53,7 +53,7 @@ GASを修了しなければ発展版へ進めない、という制約は設け�
 ### 教材の管理構成案
 
 ```text
-skill-janken/
+skill-janken-game/
 ├── spec/       # 共通の機能仕様・非対象
 ├── gas/        # GAS模範実装
 ├── spring-boot/     # Spring Boot＋Thymeleaf＋Render＋Supabase模範実装

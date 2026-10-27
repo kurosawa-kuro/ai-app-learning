@@ -1,0 +1,21 @@
+project_name: 'cast-evaluation'
+# Keep only languages used by this project before enabling Serena.
+languages: [rust, python, typescript]
+encoding: utf-8
+agent_interface: REPL
+read_only: true
+ignore_all_files_in_gitignore: true
+ignored_paths:
+  - env/**
+  - external/**
+  - '**/node_modules/**'
+  - '**/target/**'
+  - '**/dist/**'
+  - '**/build/**'
+  - '**/.venv/**'
+  - '**/__pycache__/**'
+  - .git/**
+  - .serena/**
+  - artifacts/**
+  - '**/.env'
+  - '**/.env.*'

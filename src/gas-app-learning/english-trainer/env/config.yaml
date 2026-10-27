@@ -1,0 +1,15 @@
+﻿# ビルド時に検証し、GAS用の非機密定数へ変換する。
+projectName: english-trainer
+language: ja
+timeZone: Asia/Tokyo
+distributionModel: A
+ai:
+  model: gemini-3.5-flash-lite
+  maxOutputTokens: 4096
+  dailyLimit: 30
+  runningTimeoutMinutes: 15
+limits:
+  answer: 2000
+  snapshotBytes: 24000
+  talkTurns: 30
+  historyTurns: 10

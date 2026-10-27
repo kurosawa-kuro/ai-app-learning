@@ -8,16 +8,20 @@ IT入門者がAIを活用して、ITの基礎、プログラミング、業務�
 
 まず [AGENTS.md](AGENTS.md) の対象者別の方針を読み、対象教材のガイドへ進む。作業のGoal / Doneには、対象者と本人のゴールを反映する。日本語で前提と確認方法を示し、AIの生成結果と本人の習得、構想と実装・検証済みの状態を区別する。
 
+初回は、何か1課題でAIに希望を伝え、試し、結果を確認できれば成功。提供者が支援してよい。全教材・全技術をプログラマーになる条件にせず、自立・横展開・資格を初回の必修課題へ足さない。
+
+提供者が支援を終えられる設計を守る。[初回支援シート](docs/templates/ai-pairing-session.md)で対象課題と支援の枠を決め、再利用できる依頼文・確認方法・戻し方を渡す。追加要望は別相談とし、未達・提供物の不具合・学習の継続を区別する。無期限のフォローを約束する文言を追加しない。
+
 | 対象者・ゴール | 優先資料 | スタート支援とAIによる横展開 |
 |---|---|---|
 | 子供・英語学習者・写真日記の利用者・店長等、それぞれの興味や課題 | [GASアプリ集](src/gas-app-learning/README.md) | 題材の体験と小さな変更を支援し、AIで次の変更へ応用。子供の楽しさ・理解、学習への活用、店舗業務の運用を別々に評価する |
-| 自分用・業務用のアプリを作って使いたい非エンジニア | [Webアプリ・公開戦略メモ](src/web-app-starter/GASではなくSpringBoot-render-supabase戦略.md) | 要望整理、ひな形、環境、最初の公開を支援。動いたアプリをAIと用途に合わせて変え、別の身近な業務へ応用。実利用と変更結果の確認を成果にする |
-| Java・Oracle系の仕事を目指すIT未経験者 | [Java・Oracle Bronze × Devin 学習戦略](<src/java-career-learning/Java・Oracle Bronze × Devin 実務直結型学習戦略.md>) | 環境と最初のJava・SQL課題を支援。AIの例題・解説・レビューで別課題に応用し、同じアプリを育てる。自力修正・テスト・資格と実習成果を確認する |
+| 自分用・業務用のアプリを作って使いたい非エンジニア | [Webアプリ・公開戦略メモ](src/web-app-starter/web-app-support-strategy.md) | 要望整理、ひな形、環境、最初の公開を支援。動いたアプリをAIと用途に合わせて変え、別の身近な業務へ応用。実利用と変更結果の確認を成果にする |
+| Java・Oracle系の仕事を目指すIT未経験者 | [Java・Oracle Bronze × Devin 学習戦略](<src/java-career-learning/java-career-learning-strategy.md>) | 環境と最初のJava・SQL課題を支援。AIの例題・解説・レビューで別課題に応用し、同じアプリを育てる。自力修正・テスト・資格と実習成果を確認する |
 | 日々の事務処理を減らしたい非エンジニア、特にIT人材・SES営業 | [Cursor業務効率化スターター](src/office-automation-starter/README.md) | 導入・サンプル・プロンプトで1業務を支援。入力・条件・出力をAIと調整し、別の集計・資料整理等へ応用。正確さ・時間・再現性を確認する |
 
 全ルートを同じ学習段階や成功条件に揃えない。GASの6工程と対面90分案はGAS教材内の枠組みであり、全員の必修ではない。Java学習で求める自力のコード・SQL修正を、業務効率化やアプリ実利用の全員へ課さない。
 
-WebアプリとGAS教材の発展版は、**Spring Boot＋Thymeleaf＋Render＋Supabase**に統一する。Next.js＋Vercel案は2026-10-27に廃止。[採用判断](docs/adr/0001-web-app-stack.md)と[Web支援戦略](src/web-app-starter/GASではなくSpringBoot-render-supabase戦略.md)を参照する。採用決定を実装・公開・受入済みと混同しない。サービス対応・料金・コマンドは未検証の会話メモから転記しない。
+WebアプリとGAS教材の発展版は、**Spring Boot＋Thymeleaf＋Render＋Supabase**に統一する。Next.js＋Vercel案は2026-10-27に廃止。[採用判断](docs/adr/0001-web-app-stack.md)と[Web支援戦略](src/web-app-starter/web-app-support-strategy.md)を参照する。採用決定を実装・公開・受入済みと混同しない。サービス対応・料金・コマンドは未検証の会話メモから転記しない。
 
 Web教材のDBはSupabaseのPostgreSQL、画像保存は必要時にStorageを使う。Oracle資格の固有実習と、志望する仕事に応じたLinux・AWS学習は独立して扱う。スタックの統一を、利用者の目的・学習順・成功条件の統一へ広げない。
 

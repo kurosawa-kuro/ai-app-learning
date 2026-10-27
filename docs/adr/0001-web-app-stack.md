@@ -32,6 +32,6 @@ Java・SQLの知識と実装例を、資格／実務学習とWebアプリ支援�
 
 ## 参照
 
-- [Webアプリ支援戦略](../../src/web-app-starter/GASではなくSpringBoot-render-supabase戦略.md)：構成、支援方法、横展開、公式資料、検証項目
+- [Webアプリ支援戦略](../../src/web-app-starter/web-app-support-strategy.md)：構成、支援方法、横展開、公式資料、検証項目
 - [GASアプリ集](../../src/gas-app-learning/README.md)：5教材の役割分担と段階的な整備
-- [Java・Oracle学習戦略](<../../src/java-career-learning/Java・Oracle Bronze × Devin 実務直結型学習戦略.md>)：資格と実務の独立した学習入口
+- [Java・Oracle学習戦略](<../../src/java-career-learning/java-career-learning-strategy.md>)：資格と実務の独立した学習入口

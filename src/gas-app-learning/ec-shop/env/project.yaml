@@ -1,9 +1,0 @@
-# Project path/name source of truth.
-#
-# Edit this file after moving or renaming the project, then run:
-#   make render-project-config
-
-projectName: ec-shop
-repoRoot: C:\Users\owner\.ssh\dev\gas\ec-shop
-workspaceRoot: C:\Users\owner\.ssh\dev\gas
-homeDir: C:\Users\owner

@@ -4,6 +4,8 @@
 
 ## 最小ループ（毎タスク）
 
+適用する全体方針は[ルート3文書](../00_index.md#権威順位)。Goal / Scope / Doneには対象教材・対象者・本人の目的を反映する。初回支援は一つの課題で区切り、全教材・全技術・自立・資格を完了条件へ追加しない。これは提供者の開発手順で、学習者の受講手順ではない。
+
 1. Goal / Scope / Done を言い直す。
 2. Weight Class を判定 — Light / Standard / Heavy（`classify-task`）。
 3. owner-only 判断を確認（`scan-decisions`）。
@@ -11,7 +13,7 @@
 5. allowed / forbidden paths を確認（`change-boundary.md`）。
 6. Standard/Heavy は skeleton + TDD contract を先に（`plan-skeleton`）。
 7. scope 内で最小十分な変更を当てる。
-8. 必要な Evidence Level で検証（`evidence-policy.md`）。
+8. 必要なEvidence Levelで検証（`evidence-policy.md`）。文書のみは正本との整合・差分・リンクを確認し、アプリ試験や実環境受入を実施済みとしない。
 9. scope 拡大・保護境界接触・二度違う理由で検証失敗 → 停止（`reconcile-task`）。
 10. 非自明な判断を下した時だけ記録（`log-decision`）。
 
@@ -22,7 +24,7 @@
 - `env/secret/**`、`infra/**`、`**/terraform/**`、`.github/workflows/**` を編集する（`detect-safety-boundary` hook が強制）
 - 本番デプロイ / secret push / 生インフラ・DBツールの副作用操作（settings.json の `ask`）
 - DB schema 変更 / migration
-- TODO: このプロジェクトの **loss-critical 資産**（本番 / マスターデータ）への書き込み
+- 各教材の実データ・マスター・写真・学習記録など、失われると困る資産への書き込み。対象と保存先は個別教材の正本で確認する
 - 課金が発生する操作 / 外部通知の送信
 - ドメインモデル名・ビジネスルールの意味を変える（`docs/03_domain_model.md`）
 - 受け入れ意図を捨てて実装に合わせるためだけに test を変更する
