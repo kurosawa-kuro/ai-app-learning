@@ -41,3 +41,10 @@ WindowsからPlaywright Chromiumで測定。各gotoからnetworkidleまでの時
 Render無料Webサービスは15分アクセスがないと休止し、次のアクセスで再起動する。公式では起動に約1分とされている。今回の通常操作改善では、このサービス制限を解除していない。デモ直前に起動・画面表示を確認する必要があり、いつ開いても即時表示が必要なら常時稼働する構成を別途選ぶ。料金プランは変更していない。
 
 公式根拠（2026-10-27確認）：[Spring Securityの認証状態保存](https://docs.spring.io/spring-security/reference/servlet/authentication/session-management.html)、[Render無料枠の休止](https://render.com/docs/free)。
+
+
+## V10公開後（2026-10-27）
+
+1765c88。既存13投稿・5画像参照を保持して測定。デプロイ後最初の投稿一覧は9.404秒、稼働後3.869秒、再訪3.821秒、AI管理画面1.042秒。networkidleの500ms静止待ちと画像通信を含む。ユーザーは今回、初回起動を別扱いとし、2回目以降の実用性を基準とする方針。DB再設計だけで画面全体の高速化が完了したと評価しない。
+
+公開切替・画像保存の検証は[DB再設計記録](tasks/db-redesign-20261027.md)を参照。

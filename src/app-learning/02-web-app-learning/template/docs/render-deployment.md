@@ -27,3 +27,13 @@ node tests/render-performance.cjs
 - 起動直後の遅さを隠さず、稼働後・画像取得・再訪を分けて記録。
 
 サービス：web-app-template、URL：https://web-app-template-ofb7.onrender.com 。デプロイごとの完了状況は[最小構成](educational-baseline.md)と[性能記録](performance-validation.md)を参照。
+
+## V10の公開切替（2026-10-27）
+
+通常の自動デプロイは旧版と新版が重なる。非互換なDB移行ではそのまま使わない。今回は自動デプロイを一時停止し、サービス停止を確認して切り替えた。
+
+Render APIはsuspend中のdeployを拒否し、resumeは最後の稼働版・設定を再起動した。Docker Commandを変更してもresume時には反映されなかった。このため、DBは変更しないまま再停止し、切替中だけ `app_settings` の初期INSERTを新接続識別子のクライアントに限定する一時トリガーを設けた。旧版の起動時INSERTが拒否され、新版だけ許可されることをDBで確認した。
+
+新版は一時的にJDBCのApplicationNameを `template-v10-cutover` として起動し、Flyway V10を適用。切替後に一時トリガー・関数・接続URLの上書きを解除済み。テンプレートへメンテナンス機能・認証・監視基盤を追加する対応ではない。同じDDLを無条件に次の移行へ使い回さない。
+
+Renderの通常デプロイと旧版の継続稼働は[公式のデプロイ手順](https://render.com/docs/deploys#zero-downtime-deploys)を参照。
