@@ -5,9 +5,20 @@
 <body>
 <div id="heading"><h1>投稿一覧</h1><p>投稿を読む・書く。残した内容を、次の一歩につなげましょう。</p></div>
 <div id="actions"><a role="button" th:href="@{/posts/new}">新規投稿</a></div>
-<div id="content"><article th:replace="~{ui/collection :: list(~{::#toolbar}, ~{::#entries}, ~{::#empty}, ${!#lists.isEmpty(posts)})}"></article></div>
+<div id="content">
+  <article th:replace="~{ui/collection :: list(~{::#toolbar}, ~{::#entries}, ~{::#empty}, ${!#lists.isEmpty(posts)})}"></article>
+  <nav class="post-pagination" aria-label="投稿一覧のページ">
+    <a class="secondary" role="button" th:if="${postPage.hasPrevious()}" th:href="@{/posts(userId=${filterUserId},page=${postPage.number - 1})}" rel="prev">前へ</a>
+    <button class="secondary" type="button" th:unless="${postPage.hasPrevious()}" disabled>前へ</button>
+    <span aria-current="page" th:text="${postPage.number + ' / ' + postPage.totalPages() + 'ページ'}"></span>
+    <a class="secondary" role="button" th:if="${postPage.hasNext()}" th:href="@{/posts(userId=${filterUserId},page=${postPage.number + 1})}" rel="next">次へ</a>
+    <button class="secondary" type="button" th:unless="${postPage.hasNext()}" disabled>次へ</button>
+  </nav>
+</div>
 <div id="toolbar" class="ui-toolbar">
-  <h2 th:text="${#lists.size(posts) + '件の投稿'}"></h2>
+  <div><h2 th:text="${postPage.total + '件の投稿'}"></h2>
+    <small class="ui-muted" th:if="${postPage.total > 0}" th:text="${postPage.firstItem() + '〜' + postPage.lastItem() + '件を表示'}"></small>
+  </div>
   <form method="get" th:action="@{/posts}">
     <label>投稿者で絞込み<select name="userId" aria-label="投稿者で絞込み">
       <option value="">すべての投稿者</option>
@@ -21,7 +32,6 @@
   <thead><tr><th style="width:50%">タイトル</th><th>投稿者</th><th>投稿日時</th></tr></thead>
   <tbody><tr th:each="post : ${posts}" th:attr="data-post-id=${post.id}">
     <td><a class="post-thumbnail" th:if="${storageConfigured and post.imageKey != null}" th:href="@{/posts/{id}(id=${post.id})}" th:attr="aria-label=${post.title + 'の画像を見る'}"><img th:src="@{/posts/{id}/image(id=${post.id})}" alt="" loading="lazy"></a><a class="post-list-title" th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}"></a>
-      <span class="admin-badge" th:if="${post.imageKey != null}">画像あり</span>
       <small class="post-list-excerpt" th:if="${!#strings.isEmpty(post.body)}" th:text="${post.excerpt()}"></small></td>
     <td data-label="投稿者"><span class="ui-author-label"><span th:replace="~{ui/avatar :: avatar(${post.userName}, ${userIconIds.contains(post.userId) ? '/admin/users/' + post.userId + '/icon' : null})}"></span><span th:text="${post.userName}"></span></span></td>
     <td data-label="投稿日時" th:text="${post.createdLabel()}"></td>

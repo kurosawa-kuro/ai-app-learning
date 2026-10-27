@@ -1,5 +1,13 @@
 package com.example.webapptemplate;
 
+import com.example.webapptemplate.platform.ImageStore;
+import com.example.webapptemplate.platform.internal.adapter.storage.SupabaseImageStore;
+import com.example.webapptemplate.authors.AuthorOperations;
+import com.example.webapptemplate.settings.SettingsOperations;
+import com.example.webapptemplate.settings.internal.application.SettingsService;
+import com.example.webapptemplate.settings.internal.adapter.persistence.JdbcSettingsStore;
+import com.example.webapptemplate.settings.internal.adapter.web.SettingsController;
+
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,46 +22,46 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 @Transactional
 class AppSettingsTests {
-    @Autowired AppSettings settings;
+    @Autowired JdbcSettingsStore settings;
+    @Autowired SettingsOperations policy;
     @Autowired JdbcTemplate jdbc;
-    @Autowired PostRepository repository;
+    @Autowired AuthorOperations repository;
 
     @Test
     void persistedSettingsSurviveReconstructionAndIgnoreStartupDefault() {
         var user = repository.addAuthor("設定検証");
-        settings.saveDefaultUser(user);
+        repository.saveDefaultUser(user);
         settings.saveFeatures(true, true);
-        var reloaded = new AppSettings(jdbc, false);
+        var reloaded = new JdbcSettingsStore(jdbc, false);
         assertThat(reloaded.imagesEnabled()).isTrue();
         assertThat(reloaded.aiEnabled()).isTrue();
-        assertThat(reloaded.defaultUserId()).isEqualTo(user);
+        assertThat(repository.defaultUserId()).isEqualTo(user);
         settings.saveFeatures(false, false);
         assertThat(reloaded.imagesEnabled()).isFalse();
-        assertThatThrownBy(reloaded::requireAiEnabled).hasMessageContaining("禁止");
+        assertThatThrownBy(policy::requireAiEnabled).hasMessageContaining("禁止");
     }
 
     @Test
     void defaultUserIsFallbackAndDeletionClearsIt() {
         var fallback = repository.addAuthor("既定");
         var chosen = repository.addAuthor("選択");
-        settings.saveDefaultUser(fallback);
-        var context = new PageContext(repository, mock(ImageStorage.class), settings, mock(UserIconService.class));
-        assertThat(context.currentAuthor(null).id()).isEqualTo(fallback);
-        assertThat(context.currentAuthor("invalid").id()).isEqualTo(fallback);
-        assertThat(context.currentAuthor(UUID.randomUUID().toString()).id()).isEqualTo(fallback);
-        assertThat(context.currentAuthor(chosen.toString()).id()).isEqualTo(chosen);
+        repository.saveDefaultUser(fallback);
+        assertThat(repository.selected(null).id()).isEqualTo(fallback);
+        assertThat(repository.selected("invalid").id()).isEqualTo(fallback);
+        assertThat(repository.selected(UUID.randomUUID().toString()).id()).isEqualTo(fallback);
+        assertThat(repository.selected(chosen.toString()).id()).isEqualTo(chosen);
         repository.deleteAuthor(fallback);
-        assertThat(settings.defaultUserId()).isNull();
-        assertThat(context.currentAuthor(null)).isNull();
+        assertThat(repository.defaultUserId()).isNull();
+        assertThat(repository.selected(null)).isNull();
     }
 
     @Test
     void failedStorageValidationDoesNotPartiallySaveFeatures() {
         settings.saveFeatures(false, false);
-        var storage = mock(ImageStorage.class);
+        var storage = mock(ImageStore.class);
         doThrow(new IllegalStateException("接続できません")).when(storage).ensureBucket();
         var model = new ExtendedModelMap();
-        var controller = new SettingsController(settings, storage);
+        var controller = new SettingsController(new SettingsService(settings, storage), storage);
         assertThat(controller.save(true, true, model, new RedirectAttributesModelMap())).isEqualTo("settings/index");
         assertThat(model.get("imagePosting")).isEqualTo(true);
         assertThat(model.get("aiIntegration")).isEqualTo(true);
@@ -64,15 +72,15 @@ class AppSettingsTests {
 
     @Test
     void missingCredentialsCannotEnableImagesAndOffNeverContactsStorage() {
-        var storage = new ImageStorage(settings, "", "", "unused");
+        var storage = new SupabaseImageStore("", "", "unused");
         assertThat(storage.configured()).isFalse();
         assertThatThrownBy(storage::ensureBucket).hasMessageContaining("未設定");
-        var mockedStorage = mock(ImageStorage.class);
-        var controller = new SettingsController(settings, mockedStorage);
+        var mockedStorage = mock(ImageStore.class);
+        var controller = new SettingsController(new SettingsService(settings, mockedStorage), mockedStorage);
         assertThat(controller.save(false, true, new ExtendedModelMap(), new RedirectAttributesModelMap()))
                 .isEqualTo("redirect:/admin/settings");
         verifyNoInteractions(mockedStorage);
         assertThat(settings.aiEnabled()).isTrue();
-        assertThatCode(settings::requireAiEnabled).doesNotThrowAnyException();
+        assertThatCode(policy::requireAiEnabled).doesNotThrowAnyException();
     }
 }

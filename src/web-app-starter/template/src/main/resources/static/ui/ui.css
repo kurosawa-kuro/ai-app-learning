@@ -92,7 +92,8 @@ button, [role="button"], .admin-nav-item, summary { min-height: 44px; }
 .admin-switch label { font-weight: 650; }
 .admin-switch p { margin: .4rem 0 0; color: var(--ui-text-secondary); font-size: .875rem; }
 .admin-sidebar__inner { overflow-y: auto; gap: 2rem; }
-.ui-sidebar-context { margin-top: auto; padding: 1rem .25rem max(.25rem, env(safe-area-inset-bottom)); border-top: 1px solid var(--admin-border); display: grid; gap: .5rem; flex-shrink: 0; }
+.admin-sidebar__inner > .ui-popup-host { margin-top: auto; flex-shrink: 0; }
+.ui-sidebar-context { padding: 1rem .25rem max(.25rem, env(safe-area-inset-bottom)); border-top: 1px solid var(--admin-border); display: grid; gap: .5rem; flex-shrink: 0; }
 .ui-sidebar-context strong { font-size: 1rem; color: var(--admin-text-main); overflow-wrap: anywhere; line-height: 1.5; }
 .ui-sidebar-context a { font-size: .875rem; min-height: 44px; display: flex; align-items: center; }
 .ui-nav-caption { display: block; padding: 0 .75rem .5rem; color: var(--ui-text-secondary); }

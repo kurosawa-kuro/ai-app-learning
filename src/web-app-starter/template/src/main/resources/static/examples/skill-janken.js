@@ -1,11 +1,7 @@
 (() => {
   const game = document.querySelector('[data-janken]');
   if (!game) return;
-  // Fixed sample data: not the production GAS masters or saved player state.
-  const skills = { win: ['かちボーナス', '勝ったら +1ポイント'], lose: ['まけボーナス', '負けたら +1ポイント'], draw: ['あいこボーナス', 'あいこなら +1ポイント'] };
-  const affinities = { hinoko: ['win', 'lose'], shizuku: ['lose', 'draw'], konoha: ['win', 'draw'] };
-  const names = { rock: 'グー', scissors: 'チョキ', paper: 'パー' };
-  const beats = { rock: 'scissors', scissors: 'paper', paper: 'rock' };
+  const { skills, affinities, names, resolveRound } = window.JankenRules;
   const character = game.querySelector('#character'), skill = game.querySelector('#skill');
   const play = game.querySelector('#play-round'), result = game.querySelector('#game-result');
   let total = 0, resolved = false;
@@ -22,8 +18,7 @@
     if (!hand) return;
     resolved = true; play.disabled = true;
     const cpu = Object.keys(names)[Math.floor(Math.random() * 3)];
-    const outcome = hand === cpu ? 'draw' : beats[hand] === cpu ? 'win' : 'lose';
-    const base = outcome === 'win' ? 2 : 1, bonus = skill.value === outcome ? 1 : 0;
+    const { outcome, base, bonus } = resolveRound(hand, cpu, skill.value);
     total += base + bonus;
     game.querySelector('#round-title').textContent = { win: 'あなたの勝ち！', draw: 'あいこ！', lose: '今回はCPUの勝ち' }[outcome];
     game.querySelector('#round-detail').textContent = `あなた：${names[hand]} ／ CPU：${names[cpu]}`;

@@ -1,5 +1,17 @@
 package com.example.webapptemplate;
 
+import com.example.webapptemplate.platform.ImageCleanup;
+import com.example.webapptemplate.platform.ImageStore;
+import com.example.webapptemplate.platform.ImageUpload;
+import com.example.webapptemplate.platform.internal.adapter.image.ImageIoCodec;
+import com.example.webapptemplate.platform.internal.adapter.persistence.SpringUnitOfWork;
+import com.example.webapptemplate.authors.AuthorOperations;
+import com.example.webapptemplate.authors.internal.application.AuthorService;
+import com.example.webapptemplate.authors.internal.application.AuthorStore;
+import com.example.webapptemplate.authors.internal.application.IconStore;
+import com.example.webapptemplate.authors.internal.application.UserIconService;
+import com.example.webapptemplate.bootstrap.internal.adapter.persistence.SeedFixtures;
+
 import java.io.ByteArrayInputStream;
 import java.util.UUID;
 import javax.imageio.ImageIO;
@@ -8,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.support.TransactionTemplate;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -21,23 +32,29 @@ import static org.mockito.Mockito.*;
 class UserIconTests {
     @Autowired JdbcTemplate jdbc;
     @Autowired TransactionTemplate transaction;
-    @Autowired PostRepository repository;
-    ImageStorage storage;
+    @Autowired AuthorStore authorStore;
+    @Autowired IconStore iconStore;
+    AuthorOperations repository;
+    ImageCleanup cleanup;
+    ImageStore storage;
     UserIconService service;
     UUID user;
-    MockMultipartFile file;
+    ImageUpload file;
 
     @BeforeEach void setup() {
         assertThat(jdbc.queryForObject("select current_schema()", String.class)).isEqualTo("app_template_seed_test");
         jdbc.update("delete from posts"); jdbc.update("delete from app_users"); jdbc.update("delete from image_cleanup");
-        storage = mock(ImageStorage.class); when(storage.bucket()).thenReturn("icons-test");
-        service = new UserIconService(jdbc, transaction, storage, new ImageValidator(), repository);
+        storage = mock(ImageStore.class); when(storage.bucket()).thenReturn("icons-test");
+        cleanup = TestInfrastructure.cleanup(jdbc, storage);
+        var tx = new SpringUnitOfWork(transaction);
+        repository = new AuthorService(authorStore, iconStore, tx, cleanup);
+        service = new UserIconService(authorStore, iconStore, tx, storage, new ImageIoCodec(), cleanup);
         user = repository.addAuthor("アイコン検証");
-        file = new MockMultipartFile("image", "sample.png", "image/png", SeedFixtures.image("focus").bytes());
+        file = new ImageUpload(SeedFixtures.image("focus").bytes());
     }
 
     @Test void cropsToSquareReplacesAndRemovesOnlyTheIcon() throws Exception {
-        var square = UserIconService.square(new ImageValidator().read(file));
+        var square = new ImageIoCodec().square(new ImageIoCodec().read(file));
         var image = ImageIO.read(new ByteArrayInputStream(square.bytes()));
         assertThat(image.getWidth()).isEqualTo(256); assertThat(image.getHeight()).isEqualTo(256);
         assertThat(service.save(user, file)).isZero();
@@ -55,28 +72,28 @@ class UserIconTests {
         doThrow(new IllegalStateException("offline")).when(storage).delete(anyString(), anyString());
         assertThatThrownBy(() -> service.save(user, file)).isInstanceOf(IllegalStateException.class);
         assertThat(service.icon(user).orElseThrow()).isEqualTo(original);
-        assertThat(new ImageCleanup(jdbc, storage).pending()).isEqualTo(1);
+        assertThat(TestInfrastructure.cleanup(jdbc, storage).pending()).isEqualTo(1);
         doNothing().when(storage).delete(anyString(), anyString());
-        assertThat(new ImageCleanup(jdbc, storage).run()).isZero();
+        assertThat(TestInfrastructure.cleanup(jdbc, storage).run()).isZero();
         verify(storage, never()).delete(original.bucket(), original.key());
     }
 
     @Test void usersWithPostsCannotBeDeletedAndReferencedIconsAreNeverCleaned() {
         service.save(user, file); var icon = service.icon(user).orElseThrow();
         jdbc.update("insert into posts(id,user_id,title) values (?,?, '残す投稿')", UUID.randomUUID(), user);
-        assertThatThrownBy(() -> service.deleteUser(user)).isInstanceOf(org.springframework.dao.DataAccessException.class);
+        assertThatThrownBy(() -> repository.deleteAuthor(user)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("投稿がある");
         assertThat(repository.author(user)).isPresent(); assertThat(service.icon(user)).contains(icon);
-        var cleanup = new ImageCleanup(jdbc, storage); cleanup.enqueue(icon.bucket(), icon.key());
+        var cleanup = TestInfrastructure.cleanup(jdbc, storage); cleanup.enqueue(icon.bucket(), icon.key());
         assertThat(cleanup.run()).isEqualTo(1);
         verify(storage, never()).delete(icon.bucket(), icon.key());
     }
 
     @Test void deletingAUserQueuesItsIconAndInvalidInputDoesNotUpload() {
-        assertThatThrownBy(() -> service.save(user, new MockMultipartFile("image", "bad.png", "image/png", new byte[]{1, 2})))
+        assertThatThrownBy(() -> service.save(user, new ImageUpload(new byte[]{1, 2})))
             .isInstanceOf(IllegalArgumentException.class);
         verify(storage, never()).upload(anyString(), any());
         service.save(user, file); var icon = service.icon(user).orElseThrow();
-        service.deleteUser(user);
+        repository.deleteAuthor(user);
         assertThat(repository.author(user)).isEmpty(); assertThat(service.icon(user)).isEmpty();
         verify(storage).delete(icon.bucket(), icon.key());
     }

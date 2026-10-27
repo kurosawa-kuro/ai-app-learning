@@ -1,5 +1,11 @@
 package com.example.webapptemplate;
 
+import com.example.webapptemplate.authors.AuthorOperations;
+import com.example.webapptemplate.authors.AuthorView;
+import com.example.webapptemplate.posts.PostOperations;
+import com.example.webapptemplate.posts.PostView;
+import com.example.webapptemplate.exports.internal.adapter.web.CsvExportController;
+
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -22,13 +28,14 @@ class CsvExportTests {
     }
 
     @Test void downloadsUtf8BomCsvWithRelationshipsButNoStorageInternals() throws Exception {
-        var repository = mock(PostRepository.class);
+        var repository = mock(PostOperations.class);
+        var authors = mock(AuthorOperations.class);
         var user = UUID.randomUUID(); var post = UUID.randomUUID();
         var date = OffsetDateTime.parse("2026-10-27T00:30:00Z");
-        when(repository.posts(null)).thenReturn(List.of(new PostRepository.Post(post, user, "サンプル", "タイトル",
+        when(repository.posts(null)).thenReturn(List.of(new PostView(post, user, "サンプル", "タイトル",
             "一行目\n二行目", "private-bucket", "private-key", "image/png", date)));
-        when(repository.authors()).thenReturn(List.of(new PostRepository.Author(user, "サンプル", 1, date)));
-        var mvc = MockMvcBuilders.standaloneSetup(new CsvExportController(repository)).build();
+        when(authors.authors()).thenReturn(List.of(new AuthorView(user, "サンプル", 1, date)));
+        var mvc = MockMvcBuilders.standaloneSetup(new CsvExportController(repository, authors)).build();
         var response = mvc.perform(get("/admin/exports/posts.csv"))
             .andExpect(status().isOk()).andExpect(content().contentType("text/csv;charset=UTF-8"))
             .andExpect(header().string("Cache-Control", "no-store")).andReturn().getResponse();
@@ -43,9 +50,10 @@ class CsvExportTests {
     }
 
     @Test void emptyExportHasHeadersAndDatabaseFailureIsNotADownload() throws Exception {
-        var repository = mock(PostRepository.class);
-        when(repository.authors()).thenReturn(List.of());
-        var mvc = MockMvcBuilders.standaloneSetup(new CsvExportController(repository)).build();
+        var repository = mock(PostOperations.class);
+        var authors = mock(AuthorOperations.class);
+        when(authors.authors()).thenReturn(List.of());
+        var mvc = MockMvcBuilders.standaloneSetup(new CsvExportController(repository, authors)).build();
         var empty = mvc.perform(get("/admin/exports/users.csv")).andExpect(status().isOk()).andReturn().getResponse();
         assertThat(empty.getContentAsString(StandardCharsets.UTF_8)).isEqualTo("\uFEFF\"ユーザーID\",\"ユーザー名\",\"投稿数\",\"作成日時（日本時間）\"\r\n");
         when(repository.posts(null)).thenThrow(new DataAccessResourceFailureException("private connection details"));

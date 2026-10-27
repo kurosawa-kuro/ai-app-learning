@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('test', 'run', 'package', 'seed-preview', 'seed', 'seed-reset', 'seed-cleanup')]
+    [ValidateSet('test', 'run', 'package', 'seed-preview', 'seed', 'seed-reset', 'seed-cleanup', 'seed-images')]
     [string]$Action = 'run',
     [switch]$Images
 )
@@ -79,6 +79,7 @@ try {
             'seed' { 'add' }
             'seed-reset' { 'reset' }
             'seed-cleanup' { 'cleanup' }
+            'seed-images' { 'images' }
         }
         & (Join-Path $PSScriptRoot 'mvnw.cmd') -B spring-boot:run "-Dspring-boot.run.arguments=--seed.action=$seedAction --server.port=0"
     } else {

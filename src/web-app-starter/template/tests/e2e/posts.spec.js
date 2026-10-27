@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }, info) => { await saveFeatures(page, info.projec
 test('共通UI・画面幅・ナビゲーション・モバイルとキーボード', async ({ page }, info) => {
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   await page.route('**/*', route => new URL(route.request().url()).hostname === '127.0.0.1' ? route.continue() : route.abort());
-  for (const asset of ['/vendor/pico/pico.min.css', '/ui/photo-diary-theme.css', '/ui/favicon.svg', '/ui/ui.css', '/ui/ui.js', '/features/posts/posts.css', '/features/posts/posts.js']) {
+  for (const asset of ['/vendor/pico/pico.min.css', '/ui/photo-diary-theme.css', '/ui/favicon.svg', '/ui/ui.css', '/ui/ui.js', '/features/authors/user-selection.js', '/features/posts/posts.css', '/features/posts/posts.js']) {
     expect((await page.request.get(asset)).status()).toBe(200);
   }
   const kinds = [['/posts', 1200], ['/posts/new', 800], ['/admin/users', 1200], ['/admin/settings', 800], ['/admin', 1200], ['/examples/skill-janken', 960]];

@@ -70,6 +70,8 @@
 
 Webアプリの採用基盤は[ADR 0001](adr/0001-web-app-stack.md)を参照する。Spring Boot＋Thymeleaf＋Render＋Supabaseへの統一は決定済みで、実装・公開・受入状況とは分けて管理する。
 
+Webテンプレートの機能境界と依存方向は[ADR 0002](adr/0002-web-template-modules.md)と[構造・改修例](../src/web-app-starter/template/docs/architecture.md)を参照する。対象はWebテンプレートであり、全教材への一律適用や学習者の必修条件にはしない。
+
 | ドキュメント | 役割 |
 |---|---|
 | [01_requirements.md](./01_requirements.md) | 対象者・目的・初回成功・支援範囲 |

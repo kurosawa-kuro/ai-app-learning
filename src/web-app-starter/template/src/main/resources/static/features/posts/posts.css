@@ -12,3 +12,6 @@
 .post-thumbnail { display: block; width: min(100%, 12rem); margin-bottom: .75rem; }
 .post-thumbnail img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: .65rem; background: var(--admin-bg-header); }
 .post-list-excerpt { color: var(--ui-text-secondary); }
+.post-pagination { display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0; }
+.post-pagination [role="button"], .post-pagination button { width: auto; margin: 0; min-width: 5rem; }
+.post-pagination [aria-current="page"] { color: var(--ui-text-secondary); font-size: .875rem; }
