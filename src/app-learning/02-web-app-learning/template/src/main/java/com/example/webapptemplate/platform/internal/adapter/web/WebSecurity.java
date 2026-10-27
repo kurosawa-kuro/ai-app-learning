@@ -25,7 +25,10 @@ public class WebSecurity {
         } else if(info.accessMode().equals("basic")) {
             String password=env.getProperty("app.access.password","");
             if(password.length()<20) throw new IllegalStateException("Set an access password of at least 20 characters.");
-            http.authorizeHttpRequests(auth -> auth.requestMatchers("/healthz").permitAll().anyRequest().authenticated()).httpBasic(Customizer.withDefaults());
+            var contexts=new org.springframework.security.web.context.HttpSessionSecurityContextRepository();
+            http.securityContext(context -> context.securityContextRepository(contexts));
+            http.authorizeHttpRequests(auth -> auth.requestMatchers("/healthz").permitAll().anyRequest().authenticated())
+                .httpBasic(basic -> basic.securityContextRepository(contexts));
         } else throw new IllegalStateException("Unsupported access mode.");
         return http.formLogin(AbstractHttpConfigurer::disable).logout(AbstractHttpConfigurer::disable).build();
     }

@@ -31,7 +31,8 @@ public class PageContext {
     }
 
     @ModelAttribute
-    public void selectedUser(@CookieValue(name = AUTHOR_COOKIE, required = false) String id, Model model) {
+    public void selectedUser(@CookieValue(name = AUTHOR_COOKIE, required = false) String id, Model model, HttpServletRequest request) {
+        if (!needsPage(request)) return;
         AuthorView author=null;
         boolean unavailable=false;
         String icon=null;
@@ -44,15 +45,24 @@ public class PageContext {
     }
 
     @ModelAttribute("userIconIds")
-    public java.util.Set<UUID> userIconIds() {
+    public java.util.Set<UUID> userIconIds(HttpServletRequest request) {
+        if (!needsPage(request)) return java.util.Set.of();
         try { return storage.configured() ? icons.usersWithIcons() : java.util.Set.of(); }
         catch(DataAccessException failure) { return java.util.Set.of(); }
+    }
+
+    private static boolean needsPage(HttpServletRequest request) {
+        String path=request.getRequestURI();
+        return !path.matches("/posts/[0-9a-f-]{36}/image|/admin/users/[0-9a-f-]{36}/icon")
+            && !"true".equals(request.getHeader("X-UI-Form"))
+            && !path.startsWith("/api/");
     }
 
     public AuthorView currentAuthor(String id) { return repository.selected(id); }
 
     @ModelAttribute("imagesEnabled")
-    public boolean imagesEnabled() {
+    public boolean imagesEnabled(HttpServletRequest request) {
+        if (!needsPage(request)) return false;
         try { return settings.imagesEnabled() && storage.configured(); }
         catch(DataAccessException failure) { return false; }
     }

@@ -25,4 +25,15 @@ class PublicAccessTests {
         assertThat(client.send(HttpRequest.newBuilder(URI.create(root+"/posts")).header("Authorization","Basic "+Base64.getEncoder().encodeToString("acceptance:wrong".getBytes())).GET().build(),HttpResponse.BodyHandlers.discarding()).statusCode()).isEqualTo(401);
         assertThat(client.send(HttpRequest.newBuilder(URI.create(root+"/admin/settings")).header("Authorization",correct).POST(HttpRequest.BodyPublishers.ofString("imagePosting=true")).build(),HttpResponse.BodyHandlers.discarding()).statusCode()).isIn(401,403);
     }
+    @Test void authenticationIsReusedForAssetsWithoutRepeatingBasicCredentials() throws Exception {
+        var cookies=new java.net.CookieManager();
+        var client=HttpClient.newBuilder().cookieHandler(cookies).build();
+        String root="http://127.0.0.1:"+port;
+        String auth="Basic "+Base64.getEncoder().encodeToString("acceptance:only-a-local-test-password-12345".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        assertThat(client.send(HttpRequest.newBuilder(URI.create(root+"/admin")).header("Authorization",auth).GET().build(),HttpResponse.BodyHandlers.discarding()).statusCode()).isEqualTo(200);
+        assertThat(cookies.getCookieStore().getCookies()).anyMatch(cookie->cookie.getName().equals("JSESSIONID"));
+        assertThat(client.send(HttpRequest.newBuilder(URI.create(root+"/ui/ui.css")).GET().build(),HttpResponse.BodyHandlers.discarding()).statusCode()).isEqualTo(200);
+        assertThat(client.send(HttpRequest.newBuilder(URI.create(root+"/admin/ai")).GET().build(),HttpResponse.BodyHandlers.discarding()).statusCode()).isEqualTo(200);
+        assertThat(client.send(HttpRequest.newBuilder(URI.create(root+"/admin/settings")).POST(HttpRequest.BodyPublishers.noBody()).build(),HttpResponse.BodyHandlers.discarding()).statusCode()).isEqualTo(403);
+    }
 }
