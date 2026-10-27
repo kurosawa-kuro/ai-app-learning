@@ -37,3 +37,8 @@
 .ui-page--feed .ui-toolbar form { display: flex; gap: .75rem; flex-wrap: wrap; align-items: end; }
 .ui-page--feed .ui-toolbar label { flex: 1 1 10rem; }
 @media(max-width: 600px) { .post-card { padding: 1rem; } }
+
+/* Pico's full-screen flex dialog expects an article; this media dialog is its own panel. */
+.post-image-dialog[open]{min-width:0;min-height:0;display:block;position:fixed;inset:0;margin:auto;width:calc(100vw - 2rem);height:fit-content;max-width:1200px;max-height:calc(100dvh - 2rem);padding:1rem;background:var(--admin-bg-card,white);border:1px solid var(--admin-border);border-radius:1rem;overflow:auto}
+.post-image-dialog[open] img{width:auto;height:auto;max-width:100%;max-height:calc(100dvh - 10rem);margin:1rem auto 0;object-fit:contain}
+.post-image-dialog[open] button{width:auto;white-space:nowrap;margin:0 0 0 auto}
