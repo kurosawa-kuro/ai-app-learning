@@ -15,6 +15,6 @@ COPY certs/prod-ca-2021.crt certs/
 COPY --from=build /src/target/web-app-template-0.0.1-SNAPSHOT.jar app.jar
 USER app
 ENV SPRING_PROFILES_ACTIVE=render \
-    JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75"
+    JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75 -XX:TieredStopAtLevel=1"
 EXPOSE 10000
 ENTRYPOINT ["java", "-jar", "app.jar"]

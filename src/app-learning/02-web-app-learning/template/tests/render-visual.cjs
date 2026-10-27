@@ -16,7 +16,7 @@ const {chromium,expect}=require('@playwright/test');const fs=require('node:fs');
  }
  await p.goto('/posts');
  if(width<600) { await p.locator('[data-sidebar-toggle]').click(); await expect(p.locator('#sidebar')).toBeVisible(); }
- await p.locator('[popovertarget="user-popup"]').click();await expect(p.locator('#user-popup')).toBeVisible();
+ await p.locator('.ui-user-trigger').click();await expect(p.locator('#user-popup')).toBeVisible();
  await expect(p.locator('[data-user-options-list] button').first()).toBeVisible();
  if(errors.length)throw Error(errors.join('\n'));await c.close();
 }}finally{await b.close();}})().catch(e=>{console.error(e.message);process.exitCode=1});
