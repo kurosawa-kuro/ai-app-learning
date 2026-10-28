@@ -16,4 +16,4 @@
 
 初期化はアプリごとに新しいSheetsから行い、APP_SPREADSHEET_IDとAPP_KINDをScript Propertiesへ保存する。再実行は列の検査のみ。列が違う・表が消えた場合は停止し、データを再作成しない。IDは行番号に依存しない。
 
-[Range公式仕様](https://developers.google.com/apps-script/reference/spreadsheet/range#setRichTextValues(RichTextValue))を2026-10-28に確認。実Sheetsでの保存受入は未実施。
+[Range公式仕様](https://developers.google.com/apps-script/reference/spreadsheet/range#setRichTextValues(RichTextValue))を2026-10-28に確認。実GAS画面からの保存・再読込は確認済み。Sheets行・型との直接照合は未確認。

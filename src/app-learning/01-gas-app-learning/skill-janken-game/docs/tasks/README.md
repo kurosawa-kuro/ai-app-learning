@@ -1,10 +1,12 @@
 # タスク
 
+> 2026-10-28 状態整理：現在の教材はスキルなし通常版@1。初期化・対戦・保存・再読込・同ID再送を確認済み。Sheets直接照合・初期化再実行後の保持が残る。以下の旧スキル版タスクとは区別する。 現在の確認済み事項・残作業は[5教材の受入記録](../../../../docs/tasks/gas-release-20261028.md)を参照。
+
 このディレクトリは、毎日の作業計画・調査・実装チェックリスト・完了証跡の実行ハブ。プロダクトの挙動・アーキテクチャ・データモデル・運用 runbook の正本ではないが、「今日何をするか」「次に何をするか」「何を完了したか」はここを正とする。
 
 確定した仕様は `docs/specs/`、判断は `docs/adr/`、繰り返す運用は `docs/runbooks/`、再利用する作業手順は `.claude/skills/` に置く。
 
-現在の追加作業：[UI/UX再設計](03_active/uiux-redesign.md)と[DB再設計](03_active/database-redesign.md)。実装済み、検証・実DB移行は[最終検証](03_active/mvp-release-verification.md)へ集約する。
+旧スキル版の追加作業（通常版の必須残件ではない）：[UI/UX再設計](03_active/uiux-redesign.md)と[DB再設計](03_active/database-redesign.md)。実装済み、検証・実DB移行は[最終検証](03_active/mvp-release-verification.md)へ集約する。
 
 ## 日次運用
 

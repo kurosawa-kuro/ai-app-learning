@@ -9,6 +9,6 @@
 
 ## 別途必要な実GAS受入
 
-模擬APIではOAuth、Google権限、実Sheetsの型・書込み、HTML Serviceのiframe、割当制限・通信時間は保証できない。[公開手順](08_release_runbook.md)のチェックを新しいコピー先で実施して記録する。現時点では全項目未確認。
+模擬APIではOAuth、Google権限、実Sheetsの型・書込み、HTML Serviceのiframe、割当制限・通信時間は保証できない。[公開手順](08_release_runbook.md)のチェックを新しいコピー先で実施して記録する。既存の本人限定@1では主要操作を確認済み。Sheets行の直接照合・初期化再実行後の保持は未確認。新しいコピー先の受入は別途必要。
 
 ローカルの速さを実GASの計測値として案内しない。CR版の成功を旧MVP全機能の完成と扱わない。

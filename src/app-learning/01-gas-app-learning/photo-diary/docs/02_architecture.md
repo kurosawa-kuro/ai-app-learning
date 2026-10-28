@@ -1,6 +1,6 @@
 # 02 アーキテクチャ
 
-GAS（V8）＋ Google Sheets、HTML Service、素の JavaScript の 1 ページ型アプリ。2026-10-25に主要業務へDomain / Applicationの分離と依存注入を導入した。現在の責務・ポート・状態回復の正本は [業務ルールと依存関係の設計](specs/application-domain-architecture.md)。日記・画像資産・AI生成を同一アプリ内で分け、既存の公開APIとDB v2を維持する。本番データ移行・デプロイは未実施。
+GAS（V8）＋ Google Sheets、HTML Service、素の JavaScript の 1 ページ型アプリ。2026-10-25に主要業務へDomain / Applicationの分離と依存注入を導入した。現在の責務・ポート・状態回復の正本は [業務ルールと依存関係の設計](specs/application-domain-architecture.md)。日記・画像資産・AI生成を同一アプリ内で分け、既存の公開APIとDB v2を維持する。本番DB v2移行は2026-10-25に完了。現在の公開版は@20で、主要操作の受入記録は[公開手順](08_release_runbook.md)を参照。
 
 ## 実行の流れ
 
@@ -14,7 +14,7 @@ GAS（V8）＋ Google Sheets、HTML Service、素の JavaScript の 1 ページ�
 
 初期一覧は HTML 配信時の CONFIG に含め、画面からの追加往復を抑える。詳細は一覧データを再利用し、必要時に getOne を使う。保存直後は入力から結果を構成し、表示用の表を読み直さない。
 
-2026-10-25のローカルDB v2では、資産・添付・転送要求・保存要求・AI生成を分離した。AssetRepositoryは画像の正本、GenerationRepositoryは生成入力／結果、DatabaseMigrationは旧表を保持する段階移行を担当する。物理表はv2_接頭辞の10表。公開反映は未実施。[DB v2仕様](specs/database-v2.md)を参照。
+2026-10-25のローカルDB v2では、資産・添付・転送要求・保存要求・AI生成を分離した。AssetRepositoryは画像の正本、GenerationRepositoryは生成入力／結果、DatabaseMigrationは旧表を保持する段階移行を担当する。物理表はv2_接頭辞の10表。公開反映済み。[DB v2仕様](specs/database-v2.md)を参照。
 
 ## 責務の境界（パスはプロジェクトルート基準）
 

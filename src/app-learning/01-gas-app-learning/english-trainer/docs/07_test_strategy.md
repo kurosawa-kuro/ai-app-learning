@@ -1,6 +1,8 @@
 # 検証
 
-`src`で`npm run check`を実行する。教材生成整合・Nodeテスト・フォーマットを検査する。`npm run test:browser`は実Chromiumで1440px/390px幅の主要導線を試す（GAS/Geminiはモック）。スクリーンショットとJSONは`src/test-results/`に出力する。
+> 2026-10-28 状態整理：基本版はNode 76件成功、本人限定@3の実OpenAI採点・会話・振り返り・履歴を確認済み。下記2026-10-25の66件・Geminiに関する記述は旧G3の検証履歴。物理スマホ・採点校正・コピー配布の完了を意味しない。 現在の確認済み事項と残作業は[5教材の受入記録](../../../docs/tasks/gas-release-20261028.md)を参照。
+
+`src`で`npm run check`を実行する。教材生成整合・Nodeテスト・フォーマットを検査する。`npm run test:browser`は実Chromiumで1440px/390px幅の主要導線を試す（GAS/OpenAIはモック）。スクリーンショットとJSONは`src/test-results/`に出力する。
 
 Nodeでは出題・5判定・選択肢ID互換、初期化・schema破損、追記制約、二重送信、保存障害、利用枠、429と日跨ぎ、unknown、3シナリオ会話、構造化応答検証、秘密非公開、依存方向・外部宛先制約を検査する。
 

@@ -1,6 +1,6 @@
 # GASエディタの診断・性能チェック
 
-2026-10-25ローカル実装。入口は [setup.js](../../src/server/controllers/setup.js)。GASへのpush/deploy・実環境での計測は未実施。
+2026-10-25ローカル実装。入口は [setup.js](../../src/server/controllers/setup.js)。GASへの反映は完了。ここに記載する診断・性能計測の実環境での完了は別途確認が必要。
 
 ## 最初に実行する関数
 

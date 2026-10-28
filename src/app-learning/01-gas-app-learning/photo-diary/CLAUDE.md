@@ -12,7 +12,7 @@ Claude Code向けの入口。最初に[AGENTS.md](AGENTS.md)を読み、共通�
 | 写真・AI・運用診断 | [連携仕様](docs/specs/photo-gemini-integration.md)・[運用入口](docs/specs/setup-operations.md) |
 | 残作業・過去の判断 | [タスク索引](docs/tasks/README.md)・[文書索引](docs/00_index.md) |
 
-現行コードはDB v2とDomain / Application構成。旧文書の「業務4表」「キャッシュだけで再送防止」「表を消して再初期化」「DDD化しない」は実装判断に使わない。旧版の公開実績と最新修正の未反映を区別する。
+現行コードはDB v2とDomain / Application構成。旧文書の「業務4表」「キャッシュだけで再送防止」「表を消して再初期化」「DDD化しない」は実装判断に使わない。旧版の公開実績と最新@20の受入を区別し、[受入記録](../../docs/tasks/gas-release-20261028.md)で確認済み・残項目を判断する。
 
 ## Claude Codeでの作業
 
