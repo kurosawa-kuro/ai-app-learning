@@ -28,6 +28,11 @@ const fs=require('node:fs');
  await expect.poll(()=>page.locator('img.post-image').evaluateAll(es=>es.every(e=>e.complete&&e.naturalWidth>0))).toBe(true);
  fs.mkdirSync('test-results',{recursive:true});await page.screenshot({path:'test-results/diary-desktop.png',fullPage:true});
  const detail=page.url();await page.setViewportSize({width:390,height:844});await page.reload();await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ for(const img of await page.locator('img.post-image').all()) {
+  await img.scrollIntoViewIfNeeded();
+  expect(await img.evaluate(e=>{const image=e.getBoundingClientRect(), frame=e.parentElement.getBoundingClientRect();return image.top>=frame.top && image.bottom<=frame.bottom && image.left>=frame.left && image.right<=frame.right;})).toBe(true);
+ }
+ await page.evaluate(()=>{document.activeElement.blur();scrollTo(0,0)});
  await page.screenshot({path:'test-results/diary-mobile.png',fullPage:true});
  await page.goto(base+'/diary?tag='+encodeURIComponent('発見'));await expect(page.locator('h2 a[href="'+new URL(detail).pathname+'"]')).toBeVisible();
  if(errors.length)throw Error(errors.join('\n'));

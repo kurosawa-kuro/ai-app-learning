@@ -24,8 +24,8 @@
 .post-list-excerpt { margin: .75rem 0; overflow-wrap: anywhere; }
 .post-read-more { display: inline-block; margin-bottom: 1rem; }
 .post-media { position: relative; margin-top: 1rem; }
-.post-image-button { display: grid; place-items: center; width: 100%; height: clamp(15rem, 40vw, 26rem); padding: .5rem; margin: 0; border: 1px solid var(--admin-border); border-radius: .75rem; background: var(--admin-bg-header); }
-.post-image-button .post-image { width: 100%; height: 100%; max-height: 25rem; object-fit: contain; margin: 0; border-radius: .5rem; }
+.post-image-button { display: grid; grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); place-items: center; width: 100%; height: clamp(15rem, 40vw, 26rem); padding: .5rem; margin: 0; border: 1px solid var(--admin-border); border-radius: .75rem; background: var(--admin-bg-header); }
+.post-image-button .post-image { min-width: 0; min-height: 0; width: 100%; height: 100%; max-height: 25rem; object-fit: contain; margin: 0; border-radius: .5rem; }
 .post-media[data-image-state="error"] img { visibility: hidden; }
 .post-image-status { margin: .5rem 0; font-size: .875rem; }
 .post-image-status:empty { display: none; }
