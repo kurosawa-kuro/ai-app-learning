@@ -9,7 +9,7 @@
 <label>日付<input type="date" name="entryDate" th:value="${#temporals.format(today,'yyyy-MM-dd')}" required></label>
 <label>タイトル<input name="title" maxlength="120" placeholder="今日の小さな発見" required></label>
 <fieldset data-tag-picker data-limit="5"><legend>タグ（複数選択・5個まで）</legend>
-<input type="hidden" name="tags" value=""><div class="tag-options"><label th:each="t:${tags}" class="tag-option"><input type="checkbox" data-tag th:value="${t}"><span th:text="${t}"></span></label></div>
+<input type="hidden" name="tags" value=""><div class="tag-options"><label th:each="t:${tags}" class="tag-option"><input type="checkbox" data-tag th:value="${t.id}"><span th:text="${t.name}"></span></label></div>
 <p class="ui-help" data-tag-count aria-live="polite">0 / 5個を選択</p><p class="ui-help">タグは<a th:href="@{/admin/tags}" target="_blank" rel="noopener">タグ管理（別タブ）</a>で追加できます。追加後は日記を書く前にこの画面を再読み込みしてください。</p></fieldset>
 <label>写真（任意・3枚まで）<input id="diary-photos" name="photos" type="file" accept="image/png,image/jpeg" multiple></label>
 <p class="ui-help">JPEG・PNGを1枚5MBまで。写真は選んだ順に保存します。画像投稿の許可が必要です。</p><div id="diary-previews" class="ui-stack"></div>

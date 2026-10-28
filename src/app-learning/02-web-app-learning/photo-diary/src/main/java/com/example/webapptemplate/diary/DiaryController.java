@@ -14,7 +14,7 @@ import org.springframework.http.*;
 public class DiaryController {
  private final DiaryService service;private final AuthorOperations users;private final ImageStore storage;private final AiText ai;
  public DiaryController(DiaryService service,AuthorOperations users,ImageStore storage,AiText ai){this.service=service;this.users=users;this.storage=storage;this.ai=ai;}
- @GetMapping("/diary") public String list(@RequestParam(defaultValue="")String tag,@RequestParam(defaultValue="1")long page,Model model){model.addAttribute("diaryPage",service.page(tag,page));model.addAttribute("tags",service.tags());model.addAttribute("tag",tag);model.addAttribute("selectedTags",Arrays.asList(tag.split(",")));return "diary/list";}
+ @GetMapping("/diary") public String list(@RequestParam(defaultValue="")String tag,@RequestParam(defaultValue="1")long page,Model model){var result=service.page(tag,page);model.addAttribute("diaryPage",result);model.addAttribute("tags",service.tags());model.addAttribute("tag",result.selectedTagIds().stream().map(UUID::toString).collect(java.util.stream.Collectors.joining(",")));model.addAttribute("selectedTags",result.selectedTagIds());return "diary/list";}
  @GetMapping("/diary/new") public String form(Model model){model.addAttribute("tags",service.tags());model.addAttribute("authors",users.choices());model.addAttribute("today",LocalDate.now());model.addAttribute("requestId",UUID.randomUUID());return "diary/form";}
  @GetMapping("/diary/{id}") public String detail(@PathVariable UUID id,Model model){model.addAttribute("entry",service.entry(id));model.addAttribute("photos",service.photos(id));return "diary/detail";}
  @GetMapping("/admin/tags") public String tags(Model model){model.addAttribute("catalog",service.tagCatalog());return "diary/tags";}
@@ -32,7 +32,7 @@ public class DiaryController {
   synchronized(session){
    var previous=(AiDraftResult)session.getAttribute("diaryDraft");
    if(previous!=null&&previous.requestId().equals(requestId))return ResponseEntity.ok(previous);
-   try {var result=ai.generate(requestId,"DIARY: 写真と素材から短い日本語の日記を作成。写真にない事実を足さず、本文だけ返す。",material+"\nタグ："+tags,uploads(photos));session.setAttribute("diaryDraft",result);return ResponseEntity.ok(result);}
+   try {var result=ai.generate(requestId,"DIARY: 写真と素材から短い日本語の日記を作成。写真にない事実を足さず、本文だけ返す。",material+"\nタグ："+service.tagNames(tags),uploads(photos));session.setAttribute("diaryDraft",result);return ResponseEntity.ok(result);}
    catch(IllegalArgumentException|IllegalStateException failure){return ResponseEntity.badRequest().body(Map.of("error",failure.getMessage()));}
   }
  }

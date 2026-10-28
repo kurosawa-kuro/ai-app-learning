@@ -1,112 +1,32 @@
-﻿# 教育用DBの再設計（V10）
+# ショップのDB設計
 
-2026-10-27。現在のDB仕様の正本。既存の機能追加履歴ではなく、教材の最小完成範囲から構造を決め直す。認証、監査、AI台帳、バックアップシステム、汎用業務エンジンは追加しない。
+2026-10-28再設計。既存の機能を維持し、教育用のデータ関係と制約を明確にする。認証・監査・AI台帳・独自復旧機能は追加しない。
 
-## データの中心
-
-学習者が扱うのは「投稿者が投稿を書く」「画像を1枚付ける」「設定で動作を変える」。まずこの関係を直接読める形にする。画像の実体はStorage、DBにはバケット・キー・形式だけを置く。投稿者は認証アカウントではない。
+## 固有データ
 
 ```mermaid
 erDiagram
-    app_users ||--o{ posts : writes
-    app_users o|--o| app_settings : default_user
-    posts o|--o| post_requests : saved_result
-    app_users {
-        uuid id PK
-        varchar name
-        text icon_bucket
-        text icon_key
-        varchar icon_type
-        timestamptz created_at
-    }
-    posts {
-        uuid id PK
-        uuid user_id FK
-        varchar title
-        varchar body
-        text image_bucket
-        text image_key
-        varchar image_type
-        bigint version
-        timestamptz created_at
-    }
-    app_settings {
-        integer id PK
-        boolean images_enabled
-        boolean ai_enabled
-        uuid default_user_id FK
-        timestamptz updated_at
-    }
-    post_requests {
-        uuid request_id PK
-        varchar fingerprint
-        uuid post_id FK
-        timestamptz created_at
-    }
-    allowed_ai_models {
-        varchar model_id PK
-        integer position UK
-    }
-    image_cleanup {
-        text image_bucket PK
-        text image_key PK
-    }
+ app_users ||--o{ shop_orders : orders
+ shop_orders ||--|{ shop_items : contains
+ shop_products ||--o{ shop_items : source
 ```
 
-## 稼働用の6表
-
-| 表 | 保存するもの | 判断 |
+| 表 | 主キー・主な列 | 保証すること |
 |---|---|---|
-| `app_users` | 投稿者名・作成日時・任意のアイコン1枚 | アイコンは投稿者の属性。別表・別ライフサイクルを持たせない |
-| `posts` | 投稿者FK・タイトル・本文・任意画像・日時・編集版 | 投稿教材固有。ショップの注文や英語の学習結果をこの表へ無理に入れない |
-| `app_settings` | id=1の1行。画像許可・AI許可・既定投稿者・更新日時 | 型のある列。何でも入るキー値表やJSON設定にしない |
-| `allowed_ai_models` | 許可モデルID1行1件、表示順0〜19 | 改行区切り文字列を廃止。重複・形式・最大件数を制約で表す。0件は全モデル禁止 |
-| `post_requests` | 作成要求ID・内容ハッシュ・保存先 | 通信切断後の再送で投稿を増やさないためだけ。本文・画像・AI実行履歴を積まない |
-| `image_cleanup` | 削除に失敗した画像のバケット／キー | 既存画像の参照を確認して再試行。監視画面・常駐処理は設けない |
+| shop_products | id、name、description、price、active | 商品名空白禁止、価格範囲、販売状態 |
+| shop_orders | id、user_id FK、fingerprint、created_at、cancelled_at | 同一要求の重複注文防止、取消は作成以降 |
+| shop_items | (order_id,product_id)複合PK・FK、product_name、unit_price、quantity | 確定時の商品名・価格を保存、数量1〜99 |
 
-Flywayの管理表はこの6表とは別。`user_icons` は `app_users.icon_*` に移して廃止。`operation_events`・`ai_requests` は稼働スキーマから外す。データがある旧表だけ `<元スキーマ>_legacy` に移し、空表は削除する。退避先をアプリから参照しない。
+図の明細1件以上は注文サービスが同一トランザクションで保証する。FKだけで空注文を禁止するものではない。カートはDBへ永続化しない。注文後に商品名や価格が変わっても明細は変更しない。取消は日時を設定し、履歴や明細を削除しない。
 
-## DBで保証すること
+確認画面の商品照会は集合で1回。確定時は商品ID順で一括ロックし価格・販売状態を再検証する。要求IDのロックと内容比較を維持し、同じ要求で異なる内容は拒否する。
 
-- 投稿者のない投稿を許さない。投稿から参照されているユーザーの削除は拒否する。
-- 既定ユーザーの削除時は設定をNULLへ戻す。
-- 投稿画像・アイコンは3項目すべてNULL、または3項目すべて有効。空の場所・形式の欠落を拒否する。
-- 投稿の編集版は0以上。更新時に版を比較し、競合した変更で上書きしない。
-- 送信受付の投稿FKは削除時にNULLになる。受付自体は残し、「削除済み」を返す。同じ要求で投稿を復活させない。参照先のないUUIDを残さない。
-- 許可モデルは重複なし、明示された順序。設定の変更は1トランザクションでまとめ、並行保存を1行の設定ロックで直列化する。
-- RLSとanon/authenticatedへのDB権限解除を維持する。ログイン機能の追加とは別。
+全体履歴は(created_at DESC,id)で先に30件を選び、該当明細だけ集計する。既存(user_id,created_at DESC,id)は参照確認用に残す。合計金額の保存列・在庫・決済表は追加しない。
 
-## 画像投稿の保存順
+## 共通6表と移行
 
-1. 要求IDが保存済みなら受付を返す。異なる内容・削除済み要求は拒否する。
-2. 入力・投稿者・画像許可を検証する。
-3. 試行ごとに別のランダムキーで画像をアップロードする。この間はDBトランザクションを開かない。
-4. 短いDBトランザクションで要求IDをロックし、再確認→投稿INSERT→受付INSERT→コミットする。
-5. 同時送信で先に別の処理が保存していた場合、今回だけの未使用画像を後片付けする。
-6. DB失敗時は参照確認付き後片付けを試みる。通信切断でコミットの返事だけが失われた場合にも、保存済み画像を消さない。
+共通6表（app_users／app_settings／allowed_ai_models／posts／post_requests／image_cleanup）は[templateの設計](../../template/docs/database-design.md)を参照。posts・post_requestsはコピーした投稿見本であり、上記の教材固有データを保存する表ではない。CSV・投稿処理・参照確認から依存があるため、DBだけを削除しない。
 
-StorageとPostgreSQLの完全な分散トランザクションは実装しない。アップロード直後のプロセス強制終了などでは未参照画像が残る可能性がある。これを解消する常駐監視・運用基盤を教材へ追加しない。
+[V12__shop_integrity_and_feed.sql](../src/main/resources/db/migration/V12__shop_integrity_and_feed.sql)を追加する。適用済みファイルは変更しない。新規DBは全履歴、既存DBは追加分で同じ最終構造へ到達する。データが新制約に違反すれば移行を止め、勝手に切捨てない。
 
-## 読取りと索引
-
-- 通常の投稿一覧は検索語なしの単純な条件とORDER BY／LIMIT。空検索のために全投稿の本文へ文字列関数を実行しない。
-- `(created_at DESC,id)` と `(user_id,created_at DESC,id)` を残す。同じ先頭列を持つ旧 `posts_user_created` は廃止。
-- 投稿画像とアイコンの参照確認用に、画像がある行だけの `(bucket,key)` 索引を設ける。
-- 投稿者単体の取得・選択・存在確認では投稿件数を集計しない。使用件数は管理一覧、CSV、削除判定だけで取得する。
-- 部分一致検索は小規模教材向けの走査を許容する。検索エンジン、全文検索拡張、キャッシュ層、件数の重複保存は導入しない。
-
-## 移行と反映
-
-適用済みV1〜V9は変更しない。`V10__educational_core.sql` を新しいコードとセットで適用する。投稿ID・ユーザーID・本文・日時・画像キー・設定値は維持する。既存の孤立した受付は投稿参照をNULLへ正規化する。
-
-V10は旧コードと互換性がない。旧コードが使うDBへ新コードを先に起動して、旧コードも同時稼働させるローリング更新は行わない。ローカルでは旧プロセスを停止してから起動する。Renderへ反映する場合も旧アプリの停止を伴う切替が必要。旧コミットへのコード差戻しだけでは戻せない。DBを初期化する手順は使わない。
-
-`_legacy` 付きスキーマ名は63文字以内。長すぎる既存名や不正データがあれば移行を失敗させ、推測で切り捨てない。新しいインストールもV1〜V10で同じ6表へ到達する。
-
-## 横展開で変更するところ
-
-共通候補はユーザー（認証ではない）・型付き設定・必要な画像処理。`posts` と `post_requests` は投稿教材の実例であり全教材の必須DBではない。じゃんけんなら対戦、ショップなら注文と明細、英語なら学習結果をそれぞれの表で表現する。カート・問題管理等は採用した教材でだけ追加する。全教材に備えた空テーブルは作らない。
-
-## 検証
-
-旧V9の投稿・画像参照・アイコン・設定・旧履歴を入れた専用スキーマからの移行、制約違反の拒否、同時再送、削除後の再送、アップロード中のDBトランザクション不在をテストする。Java回帰と実Storageを使うPlaywrightの結果は作業記録へ残す。SQLを整理しただけで公開先の速度改善を達成したとは扱わない。
+進捗・公開反映・検証結果は[統合実行計画](../../教育用アプリ横展開の残作業ゼロまでの実行計画.md)で管理する。ローカルの設計変更と公開DBの反映は区別する。

@@ -59,4 +59,15 @@ class DiaryTests {
         assertThat(diary.page(name+"変更,散歩",1).entries()).extracting(DiaryService.Entry::id).contains(first,second);
         assertThatThrownBy(()->diary.renameTag(tag.id(),tag.version(),"競合")).isInstanceOf(IllegalArgumentException.class);
     }
+    @Test void stableTagIdsSurviveRenameAndTagOrderDoesNotChangeReplay(){
+        diary.addTag("ID確認"+UUID.randomUUID().toString().substring(0,8));
+        var selected=diary.tags().subList(0,2);
+        var ids=selected.stream().map(t->t.id().toString()).toList();
+        var user=authors.addAuthor("ID選択確認");var id=UUID.randomUUID();var date=LocalDate.now();
+        diary.save(id,user,date,"IDで保存","本文",String.join(",",ids),List.of());
+        var tag=diary.tagCatalog().stream().filter(t->t.id().equals(selected.get(0).id())).findFirst().orElseThrow();
+        diary.renameTag(tag.id(),tag.version(),"変更後"+UUID.randomUUID().toString().substring(0,8));
+        assertThat(diary.page(ids.get(0),1).entries()).extracting(DiaryService.Entry::id).contains(id);
+        assertThat(diary.save(id,user,date,"IDで保存","本文",ids.get(1)+","+ids.get(0),List.of())).isEqualTo(id);
+    }
 }
