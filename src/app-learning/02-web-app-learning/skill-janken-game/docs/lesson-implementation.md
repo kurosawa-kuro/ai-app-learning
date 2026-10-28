@@ -63,6 +63,6 @@ AI固定応答の確認と、実Geminiへの接続結果は区別する。Render
 
 ## 2026-10-28の改修・公開状況
 
-ローカルのAI固定下書き・手直し採用・対戦・履歴・ユーザー切替・PC／スマホ確認済み。実AI接続は前回確認済み。公開は承認済みだが、Renderの25サービス上限により作成待ち。公開済みではない。
+ローカルのAI固定下書き・手直し採用・対戦・履歴・ユーザー切替・PC／スマホ確認済み。実AI接続は前回確認済み。Renderの枠確保後、[公開先](https://learning-skill-janken-game.onrender.com/janken)で受入済み。公開コード `8e2bcd0`。PC／スマホ、CSS、手動DB確認を含む結果は[公開受入記録](../../docs/tasks/remaining-publication-20261028.md)を参照。
 
 最新の状態と検証記録：[5教材の横展開記録](../../docs/rollout-status.md)。

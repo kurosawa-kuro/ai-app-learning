@@ -11,10 +11,10 @@
 | [写真日記](../photo-diary/docs/lesson-implementation.md) | 8091 | photo_diary | 複数タグ・管理・3画像・保存・再読込・拡大・再読込 | 公開先で実生成確認 | [更新公開・受入済み](https://learning-photo-diary.onrender.com/diary) |
 | [キャスト評価](../cast-evaluation/docs/lesson-implementation.md) | 8092 | cast_evaluation | 確認済み（実績・同点順位・編集・再集計） | 不要 | [公開・受入済み](https://learning-cast-evaluation.onrender.com/evaluation) |
 | [英語](../english-trainer/docs/lesson-implementation.md) | 8093 | english_trainer | 固定応答で確認済み（クイズ・会話・振り返り・履歴） | 実Geminiで確認済み | [公開・受入済み](https://learning-english-trainer.onrender.com/learning) |
-| [ショップ](../online-shop/docs/lesson-implementation.md) | 8094 | online_shop | 確認済み（1800円の注文・再送・取消） | 不要 | 公開待ち：Renderの25サービス上限 |
-| [じゃんけん](../skill-janken-game/docs/lesson-implementation.md) | 8095 | skill_janken_game | 固定応答で確認済み（採用・対戦・履歴） | 実Geminiで確認済み | 公開待ち：Renderの25サービス上限 |
+| [ショップ](../online-shop/docs/lesson-implementation.md) | 8094 | online_shop | 確認済み（1800円の注文・再送・取消） | 不要 | [公開・受入済み](https://learning-online-shop.onrender.com/shop) |
+| [じゃんけん](../skill-janken-game/docs/lesson-implementation.md) | 8095 | skill_janken_game | 固定応答で確認済み（採用・対戦・履歴） | 実Geminiで確認済み | [公開・受入済み](https://learning-skill-janken-game.onrender.com/janken) |
 
-2026-10-28に5教材すべての公開が承認された。写真日記・評価・英語は公開受入済み。ショップ・じゃんけんはRenderの25サービス上限で新規作成できず、削除可能な既存サービス2件の指定待ち。他プロジェクトを勝手に削除していない。
+2026-10-28に5教材すべての公開が承認された。写真日記・評価・英語は公開受入済み。ショップ・じゃんけんは一時25サービス上限で停止したが、ユーザーの「どれでもよい」という削除許可を受け、停止済みのstarter-kitとnextjs-ssg-jsonを削除して公開・受入を完了した。全5教材が公開受入済み。
 
 ## 検証中に見つけて修正した点
 
@@ -105,4 +105,16 @@ Java全体389件中384成功・実API用5件スキップ。加えてtemplateのD
 | 評価3名・実績あり | 2.967 / 1.185 / 1.285秒 | 1.924 / 1.150 / 1.259秒 |
 | 英語・履歴3件 | 1.695 / 0.998 / 0.785秒 | 1.271 / 0.965 / 0.760秒 |
 
-公開専用DB：`photo_diary_render`、`cast_evaluation_render`、`english_trainer_render`。ショップ・じゃんけんの公開用サービス／スキーマは未作成。未公開を公開済みと扱わない。
+公開専用DB：`photo_diary_render`、`cast_evaluation_render`、`english_trainer_render`。この時点ではショップ・じゃんけんの公開用サービス／スキーマは未作成だった。その後の公開完了は次節を参照。
+
+## 2026-10-28 残る2教材の公開完了
+
+[公開受入記録](tasks/remaining-publication-20261028.md)。停止済み2サービスの削除で枠を確保し、無料プランで公開。ショップ・じゃんけんの公開コードは `8e2bcd0`（先行3教材は `16f71d8`）。ソースのアプリ実装は変更していない。
+
+- ショップ：専用DB `online_shop_render`。架空商品3件、1,800円注文、数量保持で戻る、同一要求再送、取消・再表示を確認。Geminiキーは設定していない。
+- じゃんけん：専用DB `skill_janken_game_render`。`APP_AI_MODE=live`。実AI生成・手直し・採用、対戦中のAI呼出しなし、得点・履歴再表示、ユーザー切替を確認。
+- 両教材：PlaywrightでPC 1440×1000／スマホ390×844、CSS MIME、横はみ出し、管理メニュー、手動DB確認。スクショを実際に開いて確認した。
+- 稼働中の画面ロード3回：ショップ 1.788／0.921／0.690秒、じゃんけん 1.965／0.911／1.037秒。コールドスタートやAI処理時間の値ではない。
+- 最初のテストはデプロイ完了前のアクセスにより画面要素待機で失敗。Renderのlive確認後に再実行し成功。初回失敗を成功件数へ含めていない。
+
+今回承認された5教材の公開・公開先受入は完了。利用者本人の試用とGAS対応は別工程で、完了していない。
