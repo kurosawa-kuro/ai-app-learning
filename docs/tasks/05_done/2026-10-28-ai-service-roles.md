@@ -21,7 +21,7 @@
 
 - 全体：[README](../../../README.md)、[AGENTS](../../../AGENTS.md)、[CLAUDE](../../../CLAUDE.md)、[索引](../../00_index.md)、[要件](../../01_requirements.md)、[構成](../../02_architecture.md)。
 - 学習ルート：[アプリ学習](../../../src/app-learning/README.md)、[GAS](../../../src/app-learning/01-gas-app-learning/README.md)、[Web](../../../src/app-learning/02-web-app-learning/README.md)、[Java](../../../src/java-career-learning/java-career-learning-strategy.md)、[業務自動化](../../../src/office-automation-starter/README.md)。
-- 導入資料：[記事設計](../../../src/解説/記事/README.md)、[解説](../../../src/解説/README.md)、[動画](../../../src/解説/動画/README.md)、[学習ガイド](../../../src/解説/learning-guide.md)、[準備案内](../../../src/解説/support-guide.md)。
+- 導入資料：[記事設計](../../../src/解説/記事/README.md)、[解説](../../../src/解説/README.md)、[動画](../../../src/解説/動画/README.md)、[学習ガイド](../../../src/解説/AIと学ぶ共通ガイド.md)、[準備案内](../../../src/解説/受講準備・費用・サポートの案内.md)。
 - 横断設計：[索引](../../../src/app-learning/docs/README.md)、[学習設計](../../../src/app-learning/docs/02_learning-design.md)、[基盤・検証](../../../src/app-learning/docs/03_platforms-and-validation.md)。
 
 ## 確認結果
