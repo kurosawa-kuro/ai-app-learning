@@ -20,6 +20,8 @@ Web版のAIはOpenAI Responses APIを使う。既定モデルは `gpt-4.1-mini`�
 
 ## 確認状況
 
+**今回のOpenAI移行は完了。** 全6サービスは `cdefa83dd505c0cf8587d1b487a096c2ac89f0ef` でlive。旧Gemini環境変数を削除した状態で更新済み。最終版でもPC 1440px・スマホ390px、CSS、画像デコード・枠内表示、OpenAIモデル設定を確認した。
+
 - ローカル実API疎通：成功（gpt-4.1-mini）。
 - 全体テスト：template 76件、写真日記80件、英語80件、じゃんけん80件、ショップ78件、評価78件。計472件中466件成功、実API用6件は通常実行ではスキップ。失敗0。ローカル実APIは別途1件成功。
 - 旧V9データを入れて最新V14へ移行するテストで、投稿・アイコン・設定・旧履歴の保持とGPT許可モデルへの変更を確認。
@@ -37,9 +39,15 @@ Web版のAIはOpenAI Responses APIを使う。既定モデルは `gpt-4.1-mini`�
 ## 証跡と再確認
 
 - 各アプリの `target/surefire-reports/`：Javaテスト結果。
+- 全6アプリの `.local/render-acceptance/final-1440.png`／`final-390.png`：最終公開版のPC／スマホ。写真日記の縦長・正方形も枠内表示。
 - 各AIアプリの `.local/render-acceptance/openai-success.png`：公開先の実疎通。
 - 日記 `test-results/diary-desktop.png`／`diary-mobile.png`、英語 `learning-mobile.png`、じゃんけん `janken-mobile.png`：公開先の教材操作。
 - `RENDER_ACCEPTANCE_URL` と `RUN_RENDER_OPENAI=true` を設定し、各アプリの `node tests/render-acceptance.cjs` で明示的に再確認できる。実APIを1回呼び、AI許可スイッチは元の状態に戻す。
 - `tests/diary-acceptance.cjs`／`learning-acceptance.cjs`／`janken-acceptance.cjs` は架空データを追加する受入テスト。キーはログ・スクリーンショット・Gitへ含めない。
+
+## 作業時の失敗と再発防止
+
+- V9移行試験の入力をGPT形式へ一括置換すると、歴史的なV10のGemini形式制約に違反する。旧版の入力はGemini形式のままにし、最新へ移行した後の期待値をGPT形式にする。過去のSQLを書き換えて通さない。
+- Supabase Session poolerのこの環境の上限は15接続。6アプリのDBテストや、新旧インスタンスが重なるデプロイを同時実行すると `EMAXCONNSESSION` になる。実際に並列テストと2回目の同時デプロイで失敗した。DBテストは直列で全件成功。公開更新も1サービスのlive確認後に次へ進む。教材へ新しい監視基盤は追加せず、接続上限の増額で解決したことにもしない。
 
 過去のGemini検証記録は当時の証跡であり、現在の接続手順ではない。この文書と各アプリのREADME／環境変数例を使う。

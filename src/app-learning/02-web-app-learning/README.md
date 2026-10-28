@@ -2,7 +2,7 @@
 
 > 2026-10-28 方針更新：コードについての質問・改造はDevin、WebアプリのコードからのAI呼び出しはOpenAI API。業務自動化の質問・作業はCursor。教材アプリのGemini採用は廃止する。過去のGemini実疎通・公開受入を、OpenAIでの受入済みとは扱わない。 判断の正本は[AIの役割分担（ADR 0003）](../../../docs/adr/0003-ai-service-roles.md)。
 
-> 2026-10-28：Web版AIをOpenAIへ移行中。現行の接続設定と検証状況は[OpenAI移行記録](docs/tasks/openai-migration-20261028.md)を参照。下記のGemini検証は移行前の記録です。
+> 2026-10-28：Web版AIのOpenAI移行・Render反映・実AI受入が完了。現行の接続設定と検証状況は[OpenAI移行記録](docs/tasks/openai-migration-20261028.md)を参照。下記のGemini検証は移行前の記録です。
 
 この全体案内は内部管理用です。利用者向けには[情報出口の分離方針](../docs/publication/README.md)に従い、選択した教材の公開用原稿を渡します。既存アプリのコード・仕様の正本は移動しません。
 
