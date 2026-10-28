@@ -43,3 +43,8 @@ function trashOrphanUpload(uploadId) { return respond_(() => UploadMaintenance.t
 function cancelCreate(requestId) { return respond_(() => DiaryService.cancel(requestId)) }
 function listGenerationHistoryForCleanup() { return respond_(() => GenerationMaintenance.candidates()) }
 function purgeGenerationHistory(id) { return respond_(() => GenerationMaintenance.purge(id)) }
+
+function getTags() { return respond_(() => ApplicationComposition.tags().list()) }
+function changeTag(input) { return respond_(() => ApplicationComposition.tags().change(input)) }
+
+function upgradeDiaryEntryDate() { return upgradeDiaryEntryDate_() }

@@ -16,6 +16,8 @@
 
     return {
       getAll: (tagId, cursor = null) => call("getAll", tagId, cursor),
+      getTags: () => call("getTags"),
+      changeTag: (input) => call("changeTag", input),
       getOne: (id) => call("getOne", id),
       create: (input, requestId) => call("create", input, requestId),
       cancelCreate: (requestId) => call("cancelCreate", requestId),

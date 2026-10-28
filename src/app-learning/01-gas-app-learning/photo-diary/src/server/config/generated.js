@@ -7,10 +7,10 @@ const APP_CONFIG = {
     "mark": "日"
   },
   "limits": {
-    "title": 100,
+    "title": 120,
     "body": 5000,
     "excerpt": 80,
-    "tags": 10
+    "tags": 5
   },
   "ai": {
     "model": "gemini-3.5-flash-lite",

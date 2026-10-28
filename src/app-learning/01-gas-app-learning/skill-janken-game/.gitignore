@@ -87,3 +87,6 @@ uploads/
 .clasp.json
 .clasprc.json
 .clasprc.*.json
+
+# Current plain GAS build
+dist-basic/

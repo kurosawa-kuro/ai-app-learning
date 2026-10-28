@@ -1,0 +1,89 @@
+<script>
+  const Ui = {
+    busy: false,
+    rpc(operation, input = {}) {
+      return new Promise((resolve, reject) =>
+        google.script.run
+          .withSuccessHandler((result) =>
+            result.ok ? resolve(result.data) : reject(new Error(result.error)),
+          )
+          .withFailureHandler(() =>
+            reject(
+              new Error(
+                "通信できませんでした。入力を残しています。同じ内容で再試行してください。",
+              ),
+            ),
+          )
+          .rpc(operation, input),
+      );
+    },
+    id() {
+      const bytes = crypto.getRandomValues(new Uint8Array(16));
+      bytes[6] = (bytes[6] & 15) | 64;
+      bytes[8] = (bytes[8] & 63) | 128;
+      const hex = Array.from(bytes, (b) =>
+        b.toString(16).padStart(2, "0"),
+      ).join("");
+      return [
+        hex.slice(0, 8),
+        hex.slice(8, 12),
+        hex.slice(12, 16),
+        hex.slice(16, 20),
+        hex.slice(20),
+      ].join("-");
+    },
+    node(tag, text, className) {
+      const el = document.createElement(tag);
+      if (text != null) el.textContent = text;
+      if (className) el.className = className;
+      return el;
+    },
+    options(select, rows, label = "選択してください") {
+      const old = select.value;
+      select.replaceChildren(
+        new Option(label, ""),
+        ...rows.map((row) => new Option(row.name, row.id)),
+      );
+      if (rows.some((row) => row.id === old)) select.value = old;
+    },
+    async run(button, work, message) {
+      if (this.busy) return;
+      this.busy = true;
+      const controls = [
+        ...document.querySelectorAll("button,input,select"),
+      ].map((el) => [el, el.disabled]);
+      controls.forEach(([el]) => (el.disabled = true));
+      button?.setAttribute("aria-busy", "true");
+      const status = document.querySelector("#status");
+      status.className = "notice";
+      status.textContent = "処理しています…";
+      try {
+        await work();
+        status.textContent = message || "表示を更新しました。";
+      } catch (e) {
+        status.className = "notice error";
+        status.textContent = e.message;
+        status.focus();
+      } finally {
+        controls.forEach(([el, state]) => (el.disabled = state));
+        button?.removeAttribute("aria-busy");
+        this.busy = false;
+      }
+    },
+    pending(key, payload) {
+      this.requests ||= {};
+      const serialized = JSON.stringify(payload),
+        current = this.requests[key];
+      if (!current || current.serialized !== serialized)
+        this.requests[key] = { serialized, id: this.id() };
+      return this.requests[key].id;
+    },
+    clear(key) {
+      if (this.requests) delete this.requests[key];
+    },
+    localDate() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    },
+  };
+</script>

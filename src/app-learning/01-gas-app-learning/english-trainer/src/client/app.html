@@ -139,10 +139,6 @@
             ...[
               ["回答", result.total],
               ["判定済み", result.graded],
-              [
-                "覚えたクイズ",
-                result.quiz.stableCount + " / " + result.quiz.itemCount,
-              ],
             ].map(([label, n]) => {
               const d = node("div", label);
               d.append(node("strong", String(n)));
@@ -479,7 +475,7 @@
               : "未判定：AI設定を確認して再判定できます。",
           ),
         );
-        if (r.response_mode === "free_text") {
+        if (r.response_mode === "free_text" && !r.result) {
           const b = node("button", "この回答を再判定");
           let pending = null;
           b.onclick = () =>

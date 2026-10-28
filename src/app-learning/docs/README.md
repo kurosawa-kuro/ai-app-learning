@@ -41,6 +41,7 @@ Web共通テンプレートは既にある。次に整える共通の不足は[�
 
 | 文書 | 役割 |
 |---|---|
+| [通常ChromeでのPlaywright接続・検証手順](runbooks/gas-playwright-chrome.md) | ログイン済みChromeでの実GAS操作、承認の分担、スクリーンショット確認 |
 | [Webテンプレートの共通仕様](../02-web-app-learning/template/docs/shared-foundation-requirements.md) | 5教材から逆算した共通の不足、AI基盤、投稿依存の整理と完成条件 |
 | [配布範囲と横展開の方針](feature-allocation.md) | 両版の完成範囲、提供者の負担の上限、任意の応用、現行実装との差分 |
 | [01 ポートフォリオ](01_portfolio.md) | 現行状況、正本への入口、5教材の責任領域、横断レビュー |

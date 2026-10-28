@@ -53,6 +53,7 @@
       $("save").textContent = saving ? "保存中…" : "保存する"
       $("draft").disabled = saving || drafting || blocked
       App.photoUpload.setDisabled(saving || drafting)
+      $("f-date").disabled = saving || drafting
       $("f-title").disabled = saving || drafting
       $("f-body").disabled = saving || drafting
       $("new-generation").disabled = saving || drafting
@@ -130,7 +131,7 @@
       setBusy()
       hideError()
       try {
-        const input = { title, body, imageIds: state.imageIds.concat(App.photoUpload.ids()), tagIds: state.tagIds.slice(), sourceGenerationId: state.sourceGenerationId }
+        const input = { title, body, entryDate: $("f-date").value, imageIds: state.imageIds.concat(App.photoUpload.ids()), tagIds: state.tagIds.slice(), sourceGenerationId: state.sourceGenerationId }
         let post
         if (state.sent && JSON.stringify(state.sent) !== JSON.stringify(input)) {
           const previous = await App.api.cancelCreate(state.requestId)
@@ -200,6 +201,7 @@
         $("form").addEventListener("keydown", (e) => {
           if (e.key === "Enter" && e.target.tagName === "INPUT" && !e.isComposing && e.keyCode !== 229) e.preventDefault()
         })
+        $("f-date").addEventListener("input", () => {state.dirty=true})
         $("f-title").addEventListener("input", () => { state.dirty = true })
         $("f-body").addEventListener("input", () => { state.dirty = true })
         $("back").addEventListener("click", () => { if (this.confirmLeave()) App.router.back(store.listRoute()) })
@@ -209,6 +211,7 @@
         state = blank()
         App.photoUpload.reset()
         state.requestId = App.api.newRequestId()
+        $("f-date").value = new Date().toLocaleDateString("sv-SE")
         $("f-title").value = ""
         $("f-body").value = ""
         $("ai-consent").checked = false

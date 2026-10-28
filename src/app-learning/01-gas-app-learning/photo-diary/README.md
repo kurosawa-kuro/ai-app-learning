@@ -1,17 +1,19 @@
 # photo-diary
 
-Google Apps Script・Google Sheets・Drive・Geminiで動く、本人専用の写真日記アプリです。写真とキーワードからAI下書きを作り、手直しして保存できます。一覧・絞り込み・詳細表示、最大3枚の写真、未添付画像と生成履歴の手動整理に対応しています。保存済み日記の編集・削除、独自ログインは対象外です。
+Google Apps Script・Google Sheets・Drive・Geminiで動く、本人専用の写真日記アプリです。写真とキーワードからAI下書きを作り、手直しして保存できます。一覧・複数タグOR絞り込み・詳細表示、タグ管理・日付入力、最大3枚の写真、未添付画像と生成履歴の手動整理に対応しています。保存済み日記の編集・削除、独自ログインは対象外です。
 
 ## 現在地と検証範囲
 
-2026-10-25時点。DBは`v2_`接頭辞の10表、主要業務はDomain / Application / アダプターに分離しています。
+2026-10-28時点。DBは`v2_`接頭辞の10表、主要業務はDomain / Application / アダプターに分離しています。
 
 | 対象 | 確認できていること |
 |---|---|
 | 既存公開環境 | [移行記録](docs/tasks/03_active/本番DBv2移行_2026-10-25.md)ではDB v2移行・画像検証・公開版@18への更新が完了。現在の公開状態は別途照合する |
-| 最新のローカル修正 | 保存先・起動JSON・書込確定・文字列保存の修正に加え、画像一覧の一括読取と手動編集時のキャッシュ失効競合を修正。これらのpush・deployは未実施 |
-| 直近のローカル検証 | `npm run check`で159件成功とAI要求構築4ケース成功。実ChromiumでPC幅・スマホ幅の操作・50件ずつの追加表示・画像表示を確認。GAS・Drive・Gemini通信は模擬 |
-| 残る受入 | 最新版の実GASでの保存・再送・同時実行、実端末の操作、追加flushの性能 |
+| 最新のローカル修正 | 保存先・起動JSON・書込確定・文字列保存の修正に加え、画像一覧の一括読取と手動編集時のキャッシュ失効競合を修正。78ファイルpush済み。日付列追加と公開版更新は未実施 |
+| 直近のローカル検証 | `npm run check`で162件成功とAI要求構築4ケース成功。実ChromiumでPC幅・スマホ幅の操作・50件ずつの追加表示・画像表示を確認。GAS・Drive・Gemini通信は模擬 |
+| 残る受入 | 日付列追加・公開版更新、実GAS／Drive／Geminiでの保存・再表示・タグ操作 |
+
+日付・タグ・入力上限の仕様は[基本機能の対応](docs/specs/gas-baseline.md)。配置と残作業は[5教材の実行記録](../../docs/tasks/gas-release-20261028.md)。
 
 テスト件数と版番号は上記日時の記録です。ローカル成功を実環境の動作保証として扱わず、公開時に[Runbook](docs/08_release_runbook.md)で確認します。
 
@@ -44,7 +46,8 @@ npm run test:browser
 
 1. ローカル検証後、`npx clasp show-file-status`でmanifest・server JS・client HTMLのみが対象であることを確認し、pushする。
 2. **今回の修正を初めて反映するときは、公開版を更新する前に保存先を登録する。** 対象SheetsからApps Scriptエディタを開き、`bindDatabaseSpreadsheet`を実行する。`DIARY_SPREADSHEET_ID`とキャッシュ世代だけを登録し、業務表は変更しない。
-3. `inspectApplicationSetup`で状態を確認し、既存デプロイを更新して公開URLで受入確認する。
+3. 既存Sheetsをコピー保存し、`upgradeDiaryEntryDate`で日記の末尾に日付列を追加する。旧行・旧5列を変更しない。列追加後は既存デプロイを速やかに更新する。
+4. `inspectApplicationSetup`と公開URLで保存・画像・AI・タグを受入確認する。
 
 保存先未登録は`setup_required`、既存登録先との不一致は`setup_conflict`で停止します。認証、スタンドアロンGASでの登録、新規初期化、旧版移行、復旧は[Runbook](docs/08_release_runbook.md)を参照してください。既存v2環境の保存先登録のためにDBを初期化し直す必要はありません。
 

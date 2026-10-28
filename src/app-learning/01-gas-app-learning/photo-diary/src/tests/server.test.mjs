@@ -21,7 +21,7 @@ const ng = (res, code) => {
 test("初回：v2の10表を作り、タグとサンプル日記を入れる", () => {
   const gas = ready()
   assert.deepEqual([...gas.sheets.keys()].sort(), Object.keys(gas.run("TABLES")).map((n) => "v2_"+n).sort())
-  assert.deepEqual(gas.sheets.get("v2_posts").rows[0], ["id", "title", "body", "created_at", "source_generation_id"])
+  assert.deepEqual(gas.sheets.get("v2_posts").rows[0], ["id", "title", "body", "created_at", "source_generation_id", "entry_date"])
   assert.equal(gas.sheets.get("v2_posts").frozen, 1)
   const data = ok(gas.call("getAll"))
   assert.deepEqual(data.posts.map((p) => p.title), ["休日のお出かけ", "カフェに行った"]) // 新しい順
@@ -114,7 +114,7 @@ test("Create：検証に落ちたら 1 行も書かない", () => {
   assert.match(ng(gas.call("create", { title: "t", body: "b", imageIds: ["evil"] }, "invalid-request"), "invalid"), /写真/)
   assert.match(ng(gas.call("create", { title: "t", body: "b", tagIds: ["999"] }, "invalid-request"), "invalid"), /キーワード/)
   assert.match(ng(gas.call("create", { title: "t", body: "b", tagIds: "10" }, "invalid-request"), "invalid"), /キーワード/)
-  assert.match(ng(gas.call("create", { title: "x".repeat(101), body: "b" }, "invalid-request"), "invalid"), /100文字/)
+  assert.match(ng(gas.call("create", { title: "x".repeat(121), body: "b" }, "invalid-request"), "invalid"), /120文字/)
   assert.deepEqual([...gas.sheets.values()].map((s) => s.getLastRow()), before)
 })
 

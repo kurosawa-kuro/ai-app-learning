@@ -1,0 +1,77 @@
+<script>
+  App.views.tags = (() => {
+    const { $, el } = App.dom
+    let busy = false
+    async function load() {
+      const rows = await App.api.getTags()
+      App.store.tags = rows
+      const box = $("tag-management-list")
+      box.textContent = ""
+      rows.forEach((tag) => {
+        const form = el("form"),
+          label = el("label", null, `タグ名（使用 ${tag.used} 件）`),
+          input = el("input"),
+          save = el("button", null, "名前を変更"),
+          remove = el("button", "secondary", "未使用タグを削除")
+        input.value = tag.name
+        input.maxLength = 30
+        input.required = true
+        input.setAttribute("aria-label", tag.name + "の名前")
+        label.appendChild(input)
+        remove.type = "button"
+        remove.disabled = tag.used > 0
+        const actions = el("div", "app-tag-actions")
+        actions.append(save, remove)
+        form.append(label, actions)
+        form.onsubmit = (e) => {
+          e.preventDefault()
+          change({ action: "rename", id: tag.id, name: input.value })
+        }
+        remove.onclick = () => {
+          if (confirm(`「${tag.name}」を削除しますか？`))
+            change({ action: "delete", id: tag.id })
+        }
+        box.appendChild(form)
+      })
+    }
+    async function change(input) {
+      if (busy) return
+      busy = true
+      const controls = [...$("view-tags").querySelectorAll("input,button")].map(
+        (e) => [e, e.disabled]
+      )
+      controls.forEach(([e]) => (e.disabled = true))
+      $("tag-status").textContent = "保存しています…"
+      try {
+        await App.api.changeTag(input)
+        App.store.list.stale = true
+        App.store.detailCache.clear()
+        await load()
+        if (input.action === "create") $("tag-new-name").value = ""
+        $("tag-status").textContent = "タグを更新しました。"
+      } catch (e) {
+        $("tag-status").textContent = e.message
+      } finally {
+        busy = false
+        controls.forEach(([e, d]) => (e.disabled = d))
+      }
+    }
+    return {
+      init() {
+        $("tag-add-form").onsubmit = (e) => {
+          e.preventDefault()
+          change({ action: "create", name: $("tag-new-name").value })
+        }
+      },
+      async show() {
+        App.ui.setView("tags")
+        try {
+          await load()
+          $("tag-status").textContent = ""
+        } catch (e) {
+          $("tag-status").textContent = e.message
+        }
+      },
+    }
+  })()
+</script>

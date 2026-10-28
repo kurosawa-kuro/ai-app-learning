@@ -1,7 +1,11 @@
 /**
- * タグ（tags シート）の読み出し。タグの管理画面は作らないので、書き込みは初期データ（db/seeder.js）だけ。
+ * タグ（tags シート）の読み出し。変更はロック内の管理操作からだけ行う。
  */
 const TagRepository = {
+  usage() { const counts = new Map(); SheetStore.readFresh("post_tags").forEach(row => counts.set(row.tag_id, (counts.get(row.tag_id)||0)+1)); return this.fresh().map(t => ({...t, used: counts.get(t.id)||0})) },
+  insert(tag) { SheetStore.append("tags", [tag]); return tag },
+  rename(id, name) { SheetStore.update("tags", id, {name}); return {id,name} },
+  remove(id) { SheetStore.removeWhere("tags", "id", id) },
   fresh() { return this.fromRows(SheetStore.readFresh("tags")) },
   /** タグの一覧（id の順）。 */
   list() {

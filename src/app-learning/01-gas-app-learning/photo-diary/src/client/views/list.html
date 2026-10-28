@@ -46,8 +46,9 @@
 
     function filterTo(tagId) {
       const current = store.list.loading ? store.list.requestedTag : store.list.tag ? store.list.tag.id : null
-      if (App.ui.current() === "list" && current === tagId) return
-      App.router.go({ view: "list", tag: tagId }, "push")
+      const ids = current ? String(current).split(",") : []
+      const next = tagId == null ? [] : ids.includes(tagId) ? ids.filter(id => id !== tagId) : ids.concat(tagId)
+      App.router.go({ view: "list", tag: next.length ? next.sort().join(",") : null }, "push")
     }
 
     function setStatus(text, withRetry) {
@@ -66,7 +67,7 @@
       const list = store.list
       const current = list.loading ? list.requestedTag : list.tag ? list.tag.id : null
       box.appendChild(App.ui.tagChip({ name: "すべて" }, () => filterTo(null), current == null))
-      store.tags.forEach((t) => box.appendChild(App.ui.tagChip(t, () => filterTo(t.id), current === t.id)))
+      store.tags.forEach((t) => box.appendChild(App.ui.tagChip(t, () => filterTo(t.id), String(current || "").split(",").includes(t.id))))
     }
 
     function card(post) {
@@ -87,7 +88,7 @@
       const content = el("div", "admin-news-card__content")
       content.appendChild(el("h3", "item-title", post.title))
       content.appendChild(el("p", null, post.excerpt))
-      content.appendChild(el("small", null, App.format.date(post.created_at)))
+      content.appendChild(el("small", null, post.entry_date || App.format.date(post.created_at)))
       if (post.tags.length) {
         const chips = el("div", "app-chips")
         post.tags.forEach((t) => chips.appendChild(App.ui.tagChip(t, (e) => {

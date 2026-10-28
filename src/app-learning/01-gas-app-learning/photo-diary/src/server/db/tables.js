@@ -1,8 +1,8 @@
 /** v2論理表。物理シートはv2_接頭辞で旧表と分離する。 */
 const TABLES = {
   posts: {
-    columns: ["id", "title", "body", "created_at", "source_generation_id"],
-    text: ["id", "title", "body", "source_generation_id"],
+    columns: ["id", "title", "body", "created_at", "source_generation_id", "entry_date"],
+    text: ["id", "title", "body", "source_generation_id", "entry_date"],
     key: "id",
   },
   assets: {

@@ -11,7 +11,7 @@
   <body>
     <header>
       <div>
-        <span class="eyebrow">DAILY ENGLISH PRACTICE</span>
+        <span class="eyebrow">英語を1問、AIと試そう</span>
         <h1>AI英語訓練</h1>
         <p>思い出す。書いてみる。会話で使う。</p>
       </div>
@@ -33,13 +33,13 @@
         <div id="stats" class="stats"></div>
         <div class="cards">
           <article>
-            <h3>選んで思い出す</h3>
-            <p>意味や意図を確かめるクイズ。</p>
+            <h3>英文を書いて確かめる</h3>
+            <p>短いクイズに答え、AIの採点を確かめます。</p>
             <button data-jump="train">練習を始める</button>
           </article>
           <article>
             <h3>英語で話題を広げる</h3>
-            <p>先生・学習者・自由会話の3つから選択。</p>
+            <p>短いテキスト会話をして、最後に振り返ります。</p>
             <button data-jump="talk">会話を始める</button>
           </article>
         </div>
@@ -47,13 +47,13 @@
       <section id="train" hidden>
         <h2>練習</h2>
         <label
-          >練習方法<select id="mode">
-            <option value="choice">意味・意図を選ぶ</option>
-            <option value="controlled_recall">思い出して答える</option>
-            <option value="slot_replacement">一部を入れ替える</option>
-            <option value="contrast_drill">表現を使い分ける</option>
-            <option value="recognition">英文の意味を書く</option>
-            <option value="free_production">自由に英文を作る</option>
+          >クイズ<select id="mode">
+            <option value="choice" hidden>意味・意図を選ぶ</option>
+            <option value="controlled_recall" hidden>思い出して答える</option>
+            <option value="slot_replacement" hidden>一部を入れ替える</option>
+            <option value="contrast_drill" hidden>表現を使い分ける</option>
+            <option value="recognition" hidden>英文の意味を書く</option>
+            <option value="free_production" selected>英文で答える</option>
           </select></label
         ><button id="next">次の問題</button>
         <p id="content-warnings"></p>
@@ -82,10 +82,10 @@
       <section id="talk" hidden>
         <h2>AIと会話</h2>
         <label
-          >シナリオ<select id="scenario">
-            <option value="teacher">先生と練習</option>
-            <option value="learner">仲間と練習</option>
-            <option value="free_talk">自由会話</option>
+          >会話の種類<select id="scenario">
+            <option value="teacher" hidden>先生と練習</option>
+            <option value="learner" hidden>仲間と練習</option>
+            <option value="free_talk" selected>自由会話</option>
           </select></label
         >
         <p class="privacy">
@@ -112,17 +112,21 @@
       <section id="records" hidden>
         <h2>学習記録</h2>
         <button id="refresh-records">更新</button
-        ><button id="reset-review">覚えたものを再チェック</button>
+        ><button id="reset-review" hidden>覚えたものを再チェック</button>
         <div id="records-list"></div>
-        <h3>練習方法ごとの記録</h3>
-        <p id="capabilities"></p>
+        <div hidden>
+          <h3>練習方法ごとの記録</h3>
+          <p id="capabilities"></p>
+        </div>
         <h3>会話履歴</h3>
         <div id="sessions"></div>
-        <h3>会話から見つかった表現</h3>
-        <p>
-          承認は候補の記録です。教材に加える場合はet_expressionsシートへ例文・選択肢とともに登録してください。
-        </p>
-        <div id="candidates"></div>
+        <div hidden>
+          <h3>会話から見つかった表現</h3>
+          <p>
+            承認は候補の記録です。教材に加える場合はet_expressionsシートへ例文・選択肢とともに登録してください。
+          </p>
+          <div id="candidates"></div>
+        </div>
       </section>
       <section id="settings" hidden>
         <h2>設定</h2>

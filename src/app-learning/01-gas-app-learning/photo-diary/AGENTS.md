@@ -4,6 +4,8 @@
 
 ## 範囲と正本
 
+- Webと揃える日付・複数タグ・管理・入力上限は[基本機能仕様](docs/specs/gas-baseline.md)。旧6タグ以上の記録を削除せず、日付列追加は明示的なupgradeDiaryEntryDateで行う。
+
 - 本人専用の写真日記。GAS・Sheets・Drive・Geminiを使用する。保存済み日記の編集・削除、独自ログインは対象外。`#perf`は一時的な計測機能として残る。
 - 現行DBは`v2_`接頭辞の10表。[DB v2仕様](docs/specs/database-v2.md)と[データモデル](docs/05_data_model.md)、列定義は`src/server/db/tables.js`を参照する。
 - 業務の責務は[Domain / Application設計](docs/specs/application-domain-architecture.md)に従う。旧4表・6表、CacheServiceだけの重複防止、旧表の自動削除は過去実装。

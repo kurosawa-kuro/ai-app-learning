@@ -1,5 +1,7 @@
 # ドキュメント索引
 
+現行の基本範囲は[教育用の基本配布範囲](specs/educational-baseline.md)を優先する。実施状況は[5教材の実行記録](../../../docs/tasks/gas-release-20261028.md)。
+
 2026-10-25：G3ローカル実装済み。実GAS/Sheets/Geminiでの受入・公開は未実施。
 
 ## 現行仕様

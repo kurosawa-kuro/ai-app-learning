@@ -6,7 +6,7 @@
 
     function render(post) {
       $("detail-status").textContent = ""
-      $("detail-date").textContent = App.format.date(post.created_at, true)
+      $("detail-date").textContent = post.entry_date || App.format.date(post.created_at, true)
       $("detail-title").textContent = post.title
       const gallery = $("detail-images")
       gallery.textContent = ""

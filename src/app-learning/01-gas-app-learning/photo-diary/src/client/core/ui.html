@@ -1,7 +1,7 @@
 <script>
   // 画面の共通部品：表示する画面の切り替え・サイドバー・通知・キーワードのチップ。
   App.ui = (() => {
-    const VIEWS = ["list", "form", "detail", "perf"] // index.html の view-* と対応
+    const VIEWS = ["list", "form", "detail", "perf", "tags"] // index.html の view-* と対応
     const POP_COLORS = 4 // admin-theme.html の --admin-pop-1〜4
     let current = null
     let toastTimer = null
@@ -24,6 +24,7 @@
 
       /** サイドバーの「今いる場所」の印。 */
       setNavCurrent(routeView) {
+        App.dom.$("nav-tags").setAttribute("aria-current", routeView === "tags" ? "page" : "false")
         App.dom.$("nav-list").setAttribute("aria-current", routeView === "list" ? "page" : "false")
         App.dom.$("nav-new").setAttribute("aria-current", routeView === "new" ? "page" : "false")
       },

@@ -58,12 +58,15 @@ try {
     );
     await page.getByRole("button", { name: "練習", exact: true }).click();
     await page.locator("#next").click();
-    await page.locator("#options input").first().check();
+    await page.locator("#answer").fill("Hello, nice to meet you.");
+    await page.locator("#grade-consent").check();
     await page.locator("#submit").click();
     await page.waitForFunction(() =>
-      document.querySelector("#feedback").textContent.includes("回答例"),
+      document
+        .querySelector("#feedback")
+        .textContent.includes("意味が伝わります"),
     );
-    await page.locator("#mode").selectOption("controlled_recall");
+    await page.locator("#mode").selectOption("free_production");
     await page.locator("#next").click();
     await page.locator("#answer").fill("A different phrase.");
     await page.locator("#grade-consent").check();
@@ -92,7 +95,8 @@ try {
     await page.waitForFunction(
       () => document.querySelectorAll("#records-list .record").length === 2,
     );
-    assert.equal(await page.locator("#candidates article").count(), 1);
+    assert.equal(await page.locator("#candidates").isVisible(), false);
+    assert.equal(await page.locator("#reset-review").isVisible(), false);
     assert.equal(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,

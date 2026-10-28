@@ -13,4 +13,14 @@
   h1, h2, h3 { letter-spacing: 0.01em; }
 
   [hidden] { display: none !important; }
+  .app-mobile-bar { display: none; }
+  #view-tags { max-width: 800px; margin-inline: auto; }
+  #tag-management-list form { padding-block: 1rem; border-top: 1px solid var(--admin-border); }
+  .app-tag-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .app-tag-actions button { margin-bottom: 0; }
+  @media (max-width: 1024px) {
+    .app-mobile-bar { display: flex; position: sticky; top: 0; z-index: 20; padding: 0.5rem 1rem; background: var(--admin-bg-elevated); border-bottom: 1px solid var(--admin-border); }
+    .app-mobile-bar .admin-mobile-toggle { position: static; margin: 0; }
+    .admin-main { padding-top: 1.5rem; }
+  }
 </style>

@@ -15,6 +15,8 @@
     detail.init()
     form.init()
     perf.init()
+    App.views.tags.init()
+    $("nav-tags").addEventListener("click", e => {e.preventDefault();if(form.confirmLeave()) App.router.go({view:"tags"}, "push")})
 
     $("nav-list").addEventListener("click", (e) => {
       e.preventDefault()
@@ -39,6 +41,7 @@
       App.ui.setNavCurrent(route.view)
       if (route.view === "list") list.show(route)
       else if (route.view === "new") form.show()
+      else if (route.view === "tags") App.views.tags.show()
       else if (route.view === "perf") perf.show()
       else detail.show(route.id)
     })

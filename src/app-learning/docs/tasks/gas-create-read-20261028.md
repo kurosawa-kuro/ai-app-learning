@@ -11,6 +11,6 @@
 
 スクリーンショットは各教材test-results配下のevaluation.png／shop.png。4枚を目視し、Pico既定色が残るCSSの詳細度、余白、フォームのまとまりを修正して再検証した。整形チェックも成功。
 
-残り：2本の実GAS配置・実Sheets保存・本人限定公開の受入。公開先やScript IDを流用せず、新しい専用Sheetsで確認する。手順は各教材docs/08_release_runbook.md。
+続報：専用Sheets・GASへの配置と本人限定@1作成まで実施。実Sheets保存・公開画面の受入は残る。[最新の5教材実行記録](gas-release-20261028.md)へ引き継いだ。公開先やScript IDを流用せず、新しい専用Sheetsで確認する。手順は各教材docs/08_release_runbook.md。
 
 今回対象外：編集・削除・取消・配点変更UI、AI、監査・復旧・外部業務連携。旧構想を正本の後半に残し、先頭の現行CR範囲を優先すると明示した。他3教材とWebコードは変更していない。

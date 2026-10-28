@@ -151,7 +151,7 @@ test("一覧：起動すると日記が新しい順に並び、キーワード�
   assert.equal(ui.$("list-count").textContent, "2 件")
   assert.equal(ui.$("tag-filter").querySelectorAll(".app-chip").length, 9) // すべて＋8
   assert.ok(ui.cards()[1].querySelector("img").src.startsWith("data:image/svg+xml"))
-  assert.match(ui.cards()[1].querySelector("small").textContent, /^\d{4}\/\d{2}\/\d{2}（.）\s\d{2}:\d{2}$/)
+  assert.match(ui.cards()[1].querySelector("small").textContent, /^\d{4}-\d{2}-\d{2}$/)
 
   ui.chip("tag-filter", "スイーツ").click(); await wait(60)
   assert.deepEqual(ui.titles(), ["カフェに行った"])
@@ -159,6 +159,7 @@ test("一覧：起動すると日記が新しい順に並び、キーワード�
   assert.equal(ui.chip("tag-filter", "スイーツ").getAttribute("aria-pressed"), "true")
   assert.equal(ui.ctl.history.at(-1).hash, "tag-12")
 
+  ui.chip("tag-filter", "スイーツ").click(); await wait(60)
   ui.chip("tag-filter", "読書").click(); await wait(60)
   assert.match(ui.$("list-status").textContent, /このキーワードの日記はまだありません/)
 
@@ -174,7 +175,7 @@ test("詳細：カードを開くと全画像・本文・全タグが出て、�
   assert.deepEqual(ui.ctl.calls, [], "一覧から詳細を開くのに往復している（対応 B）")
   assert.ok(ui.visible("view-detail"))
   assert.equal(ui.$("detail-title").textContent, "カフェに行った")
-  assert.match(ui.$("detail-date").textContent, /^\d{4}年\d{1,2}月\d{1,2}日（.）/)
+  assert.match(ui.$("detail-date").textContent, /^\d{4}-\d{2}-\d{2}$/)
   assert.equal(ui.$("detail-images").querySelectorAll("img").length, 2)
   assert.equal(ui.$("detail-body").textContent, "今日はカフェでケーキを食べた。\n窓ぎわの席が空いていて、ゆっくりできた。")
   assert.equal(ui.$("detail-tags").querySelectorAll(".app-chip").length, 3)

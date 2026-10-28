@@ -3,6 +3,7 @@
   <head>
     <base target="_top">
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <!-- 見た目：Pico CSS ＋ admin-pico（vendor）＋ その補正と日本語向けの調整（overrides）＋ app の部品（components） -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.1.1/css/pico.min.css">
     <?!= include("client/vendor/admin-pico/admin-theme") ?>
@@ -12,7 +13,7 @@
     <?!= include("client/styles/components") ?>
   </head>
   <body class="admin-body" data-sidebar-open="false">
-    <button class="admin-mobile-toggle secondary" type="button" data-sidebar-toggle>メニュー</button>
+    <div class="app-mobile-bar"><button class="admin-mobile-toggle secondary" type="button" data-sidebar-toggle>メニュー</button></div>
     <div class="admin-sidebar-backdrop" data-sidebar-backdrop></div>
 
     <div class="admin-shell">
@@ -36,8 +37,9 @@
               </ul>
             </details>
             <details open>
-              <summary>保存先</summary>
+              <summary>管理・保存先</summary>
               <ul>
+                <li><a class="admin-nav-item" id="nav-tags" href="#tags">タグ管理</a></li>
                 <li><a class="admin-nav-item" id="nav-sheet" target="_blank" rel="noopener">スプレッドシートを開く</a></li>
               </ul>
             </details>
@@ -74,7 +76,7 @@
                 </div>
               </header>
               <div class="admin-card__body">
-                <div id="tag-filter" class="app-chips" aria-label="キーワードで絞り込み"></div>
+                <p class="app-muted">タグは複数選べます。いずれかを含む日記を表示します。</p><div id="tag-filter" class="app-chips" aria-label="キーワードで絞り込み"></div>
               </div>
             </article>
 
@@ -143,6 +145,7 @@
                     <button id="clear-generation" class="secondary" type="button">AI採用元の関連を解除</button>
                   </div>
 
+                  <label for="f-date">日記の日付<span class="app-req">必須</span><input id="f-date" type="date" min="2000-01-01" max="2100-12-31" required></label>
                   <label for="f-title">タイトル<span class="app-req">必須</span>
                     <input id="f-title" name="title" type="text" autocomplete="off" enterkeyhint="next">
                   </label>
@@ -161,6 +164,7 @@
         </div>
 
         <!-- 計測（#perf）。docs/GAS性能_調査と対応方針.md 6 章。計測が済んだら消す -->
+        <div id="view-tags" hidden><header class="admin-header"><div><h1>タグ管理</h1><p>名前を変えても、日記とのつながりは残ります。</p></div></header><article><form id="tag-add-form"><label>新しいタグ名<input id="tag-new-name" maxlength="30" required></label><button>タグを追加</button></form><p id="tag-status" role="status"></p><div id="tag-management-list"></div></article></div>
         <div id="view-perf" hidden>
           <header class="admin-header">
             <div>
@@ -239,6 +243,7 @@
     <?!= include("client/views/detail") ?>
     <?!= include("client/views/form") ?>
     <?!= include("client/views/perf") ?>
+    <?!= include("client/views/tags") ?>
     <!-- 起動と配線 -->
     <?!= include("client/app") ?>
   </body>

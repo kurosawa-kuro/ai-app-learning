@@ -6,7 +6,11 @@ function createDiaryValidationApplication_(ports) {
       const limits = ports.settings.limits()
       const source = data || {}
       const { title, body } = DiaryPolicy.text(source, limits)
-      return { title, body, photoIds: this.photoIds(source.imageIds), tagIds: this.tagIds(source.tagIds, tagsById) }
+      if (source.entryDate != null) {
+        const parts = /^(20\d{2}|2100)-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.exec(source.entryDate)
+        if (!parts || Number(parts[3]) > new Date(Date.UTC(Number(parts[1]),Number(parts[2]),0)).getUTCDate()) throw new AppError("invalid", "日記の日付を正しく選択してください。")
+      }
+      return { title, body, entryDate: source.entryDate || "", photoIds: this.photoIds(source.imageIds), tagIds: this.tagIds(source.tagIds, tagsById) }
     },
 
     /** 写真の ID：提供元にあるものだけ。重複は 1 つにし、選んだ順を表示順にする。 */

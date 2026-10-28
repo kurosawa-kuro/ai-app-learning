@@ -1,0 +1,37 @@
+<script>
+  const $ = (s) => document.querySelector(s),
+    hands = { rock: "グー", scissors: "チョキ", paper: "パー" },
+    results = { win: "あなたの勝ち！", draw: "あいこ", lose: "今回は負け" };
+  function describe(r) {
+    return `${hands[r.player_hand]} 対 ${hands[r.cpu_hand]}：${results[r.result]}（+${r.points}点）`;
+  }
+  async function refresh() {
+    const data = await Ui.rpc("overview");
+    $("#total").textContent = `${data.total}点・${data.rounds.length}回`;
+    $("#history").replaceChildren(
+      ...data.rounds.map((r) => {
+        const a = Ui.node("article");
+        a.append(Ui.node("p", describe(r)), Ui.node("small", r.created_at));
+        return a;
+      }),
+    );
+    if (!data.rounds.length)
+      $("#history").append(Ui.node("p", "最初の対戦をしてみよう。"));
+  }
+  $("#play-form").onsubmit = (e) => {
+    e.preventDefault();
+    const payload = { hand: $("#hand").value },
+      requestId = Ui.pending("round", payload);
+    Ui.run(
+      e.submitter,
+      async () => {
+        const r = await Ui.rpc("play", { ...payload, requestId });
+        Ui.clear("round");
+        $("#result").textContent = describe(r);
+        await refresh();
+      },
+      "対戦を記録しました。別の手でも試せます。",
+    );
+  };
+  Ui.run(null, refresh, "準備できました。");
+</script>

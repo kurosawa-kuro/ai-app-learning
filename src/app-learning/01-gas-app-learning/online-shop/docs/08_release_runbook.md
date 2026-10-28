@@ -1,6 +1,8 @@
 # GASへの配置と実環境受入
 
-現在はローカル検証まで。実GASへの配置・公開・受入はまだ行っていない。
+2026-10-28：1800円・2明細の注文、再送で重複なし、再読込、ユーザー切替とPC／モバイル幅の表示を通常ChromeからPlaywrightで確認した。Sheets照合等は残る。 [配置先・残作業](../../../docs/tasks/gas-release-20261028.md)。
+
+通常Chromeでの接続・承認・操作確認は[Playwright実環境検証手順](../../../docs/runbooks/gas-playwright-chrome.md)を参照。
 
 ## 最初の1コピーを用意する
 

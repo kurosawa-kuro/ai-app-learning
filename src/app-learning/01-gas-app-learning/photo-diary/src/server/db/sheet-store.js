@@ -199,3 +199,13 @@ const SheetStore = {
     )
   },
 }
+
+function upgradeDiaryEntryDate_() {
+ return withLock_(() => {
+  const sheet=SheetStore.sheet("posts");if(!sheet)throw new AppError("schema_missing","日記シートがありません。")
+  const current=sheet.getDataRange().getValues()[0].map(String),expected=TABLES.posts.columns;
+  if(JSON.stringify(current)===JSON.stringify(expected))return {changed:false};
+  if(JSON.stringify(current)!==JSON.stringify(expected.slice(0,-1)))throw new AppError("schema_mismatch","列が異なるため変更せず停止しました。")
+  sheet.getRange(1,expected.length,1,1).setValues([["entry_date"]]);SheetStore.flush();TableCache.clear();return {changed:true};
+ });
+}

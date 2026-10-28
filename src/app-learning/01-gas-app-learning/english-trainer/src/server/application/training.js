@@ -301,7 +301,9 @@ function createTrainingApplication_(p) {
       const capabilities = {};
       for (const e of repo.all("evidence")) {
         if (!latestIds.has(e.assessment_id)) continue;
-        const group = (capabilities[e.capability] ||= {
+        const group = (capabilities[e.capability] = capabilities[
+          e.capability
+        ] || {
           attempts: 0,
           successes: 0,
         });

@@ -36,6 +36,7 @@ const DiaryRepository = {
         title: p.title,
         body: p.body,
         sourceGenerationId: p.source_generation_id,
+        entryDate: p.entry_date || "",
         createdAt: p.created_at instanceof Date ? p.created_at : null,
         photos: (photosByPost.get(p.id) || [])
           .map((img) => ({ fileId: img.asset_id, sortOrder: Number(img.sort_order) }))
@@ -63,10 +64,10 @@ const DiaryRepository = {
    * 子（写真・タグの関連）を先に、親（posts）を最後に書く。途中で失敗しても親の無い子は表に出ない。
    * photos：[{ id?, fileId }]（並び順がそのまま表示順）
    */
-  insert({ id, title, body, createdAt, photos, tagIds, sourceGenerationId = "" }) {
+  insert({ id, title, body, createdAt, photos, tagIds, sourceGenerationId = "", entryDate = "" }) {
     SheetStore.append("post_assets", photos.map((photo, i) => ({ id: photo.id || Utilities.getUuid(), post_id: id, asset_id: photo.fileId, sort_order: i + 1 })))
     SheetStore.append("post_tags", tagIds.map((tagId) => ({ post_id: id, tag_id: tagId })))
-    SheetStore.append("posts", [{ id, title, body, created_at: createdAt, source_generation_id: sourceGenerationId }])
+    SheetStore.append("posts", [{ id, title, body, created_at: createdAt, source_generation_id: sourceGenerationId, entry_date: entryDate }])
   },
 }
 

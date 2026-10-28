@@ -7,13 +7,14 @@
     "node": ">=22"
   },
   "scripts": {
-    "test": "node --test tests/*.test.mjs",
-    "test:browser": "node tests/browser/scaffold.mjs",
-    "build": "node scripts/build.mjs",
-    "preview": "node scripts/preview.mjs",
-    "format": "prettier --write src scripts tests package.json .prettierrc.json",
-    "format:check": "prettier --check src scripts tests package.json .prettierrc.json",
-    "check": "npm run format:check && npm test && npm run build && npm run test:browser"
+    "test": "node --test tests/basic.test.cjs",
+    "test:browser": "playwright test -c playwright.basic.config.cjs",
+    "build": "node scripts/build-basic.cjs",
+    "preview": "node scripts/basic-preview.cjs 8195",
+    "format": "prettier --write src/basic scripts/*basic.cjs scripts/basic-preview.cjs tests/basic* playwright.basic.config.cjs package.json",
+    "format:check": "prettier --check src/basic scripts/*basic.cjs scripts/basic-preview.cjs tests/basic* playwright.basic.config.cjs package.json",
+    "check": "npm run build && npm test && npm run format:check && npm run test:browser",
+    "test:legacy": "node --test tests/*.test.mjs"
   },
   "devDependencies": {
     "@google/clasp": "3.4.1",

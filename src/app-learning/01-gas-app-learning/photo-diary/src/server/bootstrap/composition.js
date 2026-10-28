@@ -1,5 +1,6 @@
 /** 依存を組み立てる入口。ファイル読込時に初期化しない。 */
 const ApplicationComposition = {
+  tags() { return createTagManagementApplication_({database:Seeder,tags:TagRepository,lock:withLock_,ids:{next:()=>Utilities.getUuid()}}) },
   diary() {
     return createDiaryApplication_({
       database: Seeder,

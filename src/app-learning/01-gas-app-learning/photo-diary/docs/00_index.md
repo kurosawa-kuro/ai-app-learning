@@ -1,5 +1,7 @@
 # プロジェクトドキュメント索引
 
+現行の基本範囲は[GAS基本機能とWebとの差](specs/gas-baseline.md)を優先する。実施状況は[5教材の実行記録](../../../docs/tasks/gas-release-20261028.md)。
+
 このディレクトリは、プロジェクトの要件・設計・ワークフロー・テスト・リリース運用の正本。`AGENTS.md` は Codex / 他エージェント向けの repo ガイド、`CLAUDE.md` は Claude Code の司令塔、`docs/tasks/` は毎日の作業計画・実装タスク・調査ログの実行ハブ、`.claude/skills/` は Claude Code で繰り返し使う作業手順。
 
 ## 今回の整合基準と読み方

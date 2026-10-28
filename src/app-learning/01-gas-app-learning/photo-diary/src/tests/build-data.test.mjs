@@ -35,6 +35,6 @@ test("壊れたデータは理由つきで止まる", () => {
   assert.throws(broken({ dataText: base.dataText.replace('tags: ["11"]', 'tags: ["99"]') }), /tags\.csv に無いタグ 99/)
   assert.throws(broken({ dataText: base.dataText.replace("file: sample-c", "file: sample-z") }), /目録に無い写真 sample-z/)
   assert.throws(broken({ dataText: base.dataText.replace("hue: 28", "hue: 400") }), /hue は 0〜360/)
-  assert.throws(broken({ configText: base.configText.replace("title: 100", "title: 0") }), /limits\.title/)
+  assert.throws(broken({ configText: base.configText.replace("title: 120", "title: 0") }), /limits\.title/)
   assert.throws(broken({ configText: base.configText.replace("  - books", "  - posts") }), /使用中のシート posts/)
 })
