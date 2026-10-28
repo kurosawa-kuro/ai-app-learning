@@ -1,0 +1,73 @@
+---
+description: Cursor Hobby 枠で事務処理を自動化するスターターキットのプロジェクトルール（Windows 専用 / ランタイム非インストール）
+alwaysApply: true
+---
+
+# このリポジトリの位置づけ
+
+非 IT エンジニア（Windows ユーザー）が **Cursor の Hobby 枠（無料プラン）だけ** を使って **事務処理を自動化** するための、プロンプトメモ + サンプルデータ + ガイドドキュメント一式。
+
+# 必ず守るルール
+
+## 1. ランタイム非インストール原則（最重要）
+
+Python / Node.js / Docker などのプログラミングランタイムを **インストールしない**。以下は禁止:
+
+- `apt install python3` / `apt install nodejs` 等の Linux パッケージ導入手順を含む解
+- `pip install ...` / `npm install ...` 等のランタイム前提の導入指示
+- 仮想環境（`venv` / `uv` / `conda`）の作成指示
+
+代わりに **Windows 標準機能で完結する解** を優先する:
+
+- **PowerShell**（Windows 標準のスクリプト言語 / ターミナル。`Rename-Item` `Move-Item` `Copy-Item` `Get-ChildItem` 等）
+- **Excel の数式・Power Query・ピボットテーブル**
+- **エクスプローラの手動操作**
+- **Edge / Acrobat の標準コピー機能**（PDF テキスト抽出は全選択コピーで対応）
+- **Windows 11 標準の OCR**（PowerToys Text Extractor）
+
+もしくは **Cursor 内で完結する処理**:
+
+- Cursor が読めるファイル（テキスト / CSV / Markdown）は `@file` で添付して AI 側で処理
+- PDF の中身は Edge で開いて全選択コピー → Chat に貼り付け
+
+どうしてもランタイムが必要なケースでは、まず代替案を提示し、ユーザーが明示的に承諾した場合のみインストール手順を案内する。
+
+## 2. 対象 OS は Windows 10/11 のみ
+
+macOS / Linux 向けの手順を案内しない。コマンド例は PowerShell / Windows cmd / Cursor 内操作に絞る。
+
+## 3. 元ファイル不変更
+
+`src/office-task/data/` 配下のサンプルファイルや、利用者が指定した業務ファイルは **絶対に変更・移動・削除しない**。コピーして新しい名前を付けて同ディレクトリに保存する。
+
+## 4. プロンプトメモは自己完結
+
+`src/office-task/README.md` のプロンプトメモは、共通項目を DRY 化せず、各セクション単体でコピペできる状態を維持する。
+
+## 5. 言語
+
+回答・コメント・コミットメッセージは **日本語**。読者は日本語話者の非エンジニア。
+
+## 5.1 日本語フォントの徹底（PDF / 画像 / ドキュメント生成時）
+
+PDF・画像・スライド等を生成するコードを書く場合、**必ず日本語フォントを明示指定** する。中国語字形のフォントを使わない。
+
+- **使ってよい**: `IPAGothic` / `IPAPGothic` / `IPAMincho` / `Noto Sans CJK JP` / `Yu Gothic` / `Meiryo`
+- **使ってはいけない**: `WenQuanYi Zen Hei` / `Noto Sans CJK SC|TC|HK|KR` / `Source Han Sans SC|TC|HK|KR` / 言語サフィックスなしの汎用 CJK
+- `reportlab` / `matplotlib` / `Pillow` 等を使う際は **フォントパスをコード内で明示** し、デフォルトの自動選択に任せない
+- フォントが無い環境では中国語フォントへの暗黙フォールバックを避け、エラーで止めるか利用者に確認する
+
+理由: Unicode 同一コードポイントでも「直 / 骨 / 国 / 別 / 海」など日本語と中国語で字形が異なる漢字が多く、日本語向け文書に中国語字形が混入すると違和感や誤解を招く。
+
+## 6. Cursor Hobby 枠の運用
+
+- 1 リクエストに長文や多並列を詰め込まない
+- Composer は Hobby 枠の制限内に収まる範囲でのみ使う（基本は Chat / Inline Edit で済ませる）
+- `@file` / `@folder` を使って AI に読ませる範囲を明示する
+
+# 参考ファイル
+
+- `AGENTS.md` — AI コーディングアシスタント向けの完全な作業ガイド
+- `docs/01_仕様と設計.md` — 仕様の権威ドキュメント
+- `docs/教育資料/04_Cursor操作.md` — 操作リファレンス & 統合トラブルシューティング
+- `src/office-task/README.md` — 事務処理プロンプトメモ

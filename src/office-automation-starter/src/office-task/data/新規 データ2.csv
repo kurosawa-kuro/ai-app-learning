@@ -1,0 +1,11 @@
+project_id,client,industry,position,must_skills,want_skills,monthly_rate_min,monthly_rate_max,start_date,duration_months,work_location,remote_type,openings,deadline,status
+P101,大手メガバンクA,金融,Java バックエンド,Java|Spring Boot|Oracle,Kubernetes|AWS,700000,850000,2026-06-01,12,東京都千代田区,週1リモート可,2,2026-05-20,募集中
+P102,EC スタートアップB,EC,フロントエンドリード,React|TypeScript|Next.js,GraphQL|Tailwind,750000,900000,2026-06-15,6,東京都渋谷区,フルリモート可,1,2026-05-25,募集中
+P103,大手保険会社C,保険,Salesforce 開発,Salesforce Apex|Lightning,Flow|CPQ,650000,800000,2026-07-01,9,大阪府大阪市,週2リモート可,2,2026-05-28,募集中
+P104,SaaS ベンダーD,SaaS,SRE,Kubernetes|Terraform|GCP,Go|Datadog,850000,1000000,2026-06-15,12,東京都港区,フルリモート可,1,2026-05-22,募集中（高優先）
+P105,小売チェーンE,小売,データエンジニア,Snowflake|dbt|SQL,Airflow|Python,800000,950000,2026-07-01,12,東京都中央区,週3リモート可,1,2026-06-05,募集中
+P106,スタートアップF,SaaS,フルスタック,TypeScript|Next.js|Node.js,AWS|Prisma,600000,720000,2026-05-20,6,東京都目黒区,フルリモート可,1,2026-05-12,募集中（緊急）
+P107,フィンテック G,金融,iOS エンジニア,Swift|SwiftUI,Combine|Firebase,750000,880000,2026-06-01,12,東京都港区,フルリモート可,1,2026-05-26,募集中
+P108,大手 SIer H,SI,Python データ分析,Python|pandas|SQL,BI ツール経験,550000,680000,2026-06-15,6,東京都新宿区,週2リモート可,2,2026-05-30,募集中
+P109,広告配信会社I,広告,Go バックエンド,Go|gRPC|Kubernetes,Postgres|Kafka,780000,920000,2026-06-15,12,東京都渋谷区,週1リモート可,1,2026-05-24,募集中
+P110,医療系スタートアップJ,医療,Vue.js フロントエンド,Vue.js|TypeScript,Nuxt|デザインシステム,550000,680000,2026-05-25,9,神奈川県横浜市,フルリモート可,1,2026-05-15,募集中

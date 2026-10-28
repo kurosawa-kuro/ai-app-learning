@@ -1,0 +1,11 @@
+engineer_id,name,age,primary_skill,secondary_skills,years_total,years_primary,preferred_role,monthly_rate,available_from,remote_pref,location,english_level,last_project,status
+E001,山田太郎,32,Java,Spring Boot|AWS|PostgreSQL,9,7,バックエンド,750000,2026-06-01,週3リモート可,東京都新宿区,中級,大手金融向けマイクロサービス基盤,稼働中（2026-05末まで）
+E002,佐藤花子,28,React,TypeScript|Next.js|GraphQL,5,4,フロントエンド,680000,2026-05-20,フルリモート希望,北海道札幌市,初級,EC サイト リニューアル,稼働中（2026-05末まで）
+E003,鈴木一郎,40,Python,Django|AWS|Terraform|Docker,15,10,テックリード,950000,2026-07-01,出社可（東京）,東京都港区,上級,SaaS プラットフォーム刷新,稼働中（2026-06末まで）
+E004,高橋美咲,26,React Native,TypeScript|Firebase|iOS|Android,4,3,モバイル,620000,2026-05-15,フルリモート希望,福岡県福岡市,初級,小売チェーン向け iOS/Android アプリ,稼働終了（待機中）
+E005,伊藤健,35,Go,gRPC|Kubernetes|GCP|Postgres,12,5,SRE/バックエンド,880000,2026-06-15,週2リモート可,東京都渋谷区,中級,広告配信プラットフォーム SRE,稼働中（2026-06中旬まで）
+E006,渡辺彩,30,Salesforce Apex,Lightning|Flow|Salesforce CPQ,7,6,Salesforce 開発,720000,2026-06-01,フルリモート可,大阪府大阪市,初級,大手保険会社 Salesforce 営業支援,稼働中（2026-05末まで）
+E007,中村優,29,Java,Spring|Oracle|Kotlin,6,5,バックエンド,700000,2026-06-01,出社必須（東京）,東京都千代田区,初級,銀行勘定系ミドルウェア,稼働中（2026-05末まで）
+E008,小林翔,24,Vue.js,TypeScript|Nuxt|REST,2,2,フロントエンド,540000,2026-05-10,フルリモート希望,神奈川県横浜市,中級,スタートアップ SaaS 管理画面,稼働終了（待機中）
+E009,加藤真由美,38,データエンジニア,Snowflake|dbt|Airflow|Python|SQL,14,8,データ基盤,920000,2026-07-15,週1リモート可,東京都中央区,中級,小売 DX データ基盤構築,稼働中（2026-07上旬まで）
+E010,松本拓海,33,iOS/Swift,SwiftUI|Combine|Firebase|XCTest,10,8,iOS リード,820000,2026-06-01,フルリモート希望,北海道函館市,初級,フィンテックアプリ iOS 開発,稼働中（2026-05末まで）
