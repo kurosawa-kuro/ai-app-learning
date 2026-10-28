@@ -1,4 +1,4 @@
-// Explicit live acceptance; one paid-provider probe only when RUN_RENDER_GEMINI=true.
+// Explicit live acceptance; one paid-provider probe only when RUN_RENDER_OPENAI=true.
 const {chromium,expect,request}=require('@playwright/test');
 const fs=require('node:fs');
 (async()=>{
@@ -26,7 +26,7 @@ const fs=require('node:fs');
   const csrf=await context.request.post('/admin/ai/models',{form:{allowedModelsInput:''}});
   if(csrf.status()!==403)throw Error(`CSRF protection failed: ${csrf.status()}`);
   console.log('Public pages without login, all CSS, Pico form styling and CSRF passed.');
-  if(process.env.RUN_RENDER_GEMINI==='true') {
+  if(process.env.RUN_RENDER_OPENAI==='true') {
    await page.goto('/admin/settings');const toggle=page.locator('[name="aiIntegration"]');const original=await toggle.isChecked();
    try {
     if(!original){await toggle.check();await page.getByRole('button',{name:'設定を保存',exact:true}).click();await page.waitForURL('**/admin/settings');}
@@ -34,7 +34,7 @@ const fs=require('node:fs');
     await page.getByRole('button',{name:'接続を確認',exact:true}).click();
     await expect(page.locator('#ai-check-result h2')).toHaveText('接続できました',{timeout:60000});
     console.log(await page.locator('#ai-check-result').innerText());
-    fs.mkdirSync('.local/render-acceptance',{recursive:true});await page.screenshot({path:'.local/render-acceptance/gemini-success.png',fullPage:true});
+    fs.mkdirSync('.local/render-acceptance',{recursive:true});await page.screenshot({path:'.local/render-acceptance/openai-success.png',fullPage:true});
    } finally {
     await page.goto('/admin/settings');await page.locator('[name="aiIntegration"]').setChecked(original);await page.getByRole('button',{name:'設定を保存',exact:true}).click();
     await page.waitForURL('**/admin/settings');console.log(`AI permission restored: ${original}`);

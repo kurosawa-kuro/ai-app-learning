@@ -13,7 +13,7 @@ public record AllowedAiModels(List<String> values) {
         for(String line:input.split("\\R")) {
             String model=line.strip();
             if(model.isEmpty()) continue;
-            if(!model.matches("gemini-[a-z0-9.-]{1,80}"))
+            if(!model.matches("gpt-[a-z0-9.-]{1,80}"))
                 throw new IllegalArgumentException("モデルIDを1行に1つ入力してください。URL・空白・ワイルドカードは使えません。");
             models.add(model);
         }

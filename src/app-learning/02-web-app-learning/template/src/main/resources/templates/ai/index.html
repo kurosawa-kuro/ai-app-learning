@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layout :: page(~{::title}, 'form', ~{::#heading}, ~{::#actions}, ~{::#content})}">
-<head><title>Gemini接続確認 | 投稿ノート</title></head>
+<head><title>OpenAI接続確認 | 投稿ノート</title></head>
 <body>
-<div id="heading"><h1>Gemini接続確認</h1><p>AIを使う前に、接続できるかを確かめます。</p></div>
+<div id="heading"><h1>OpenAI接続確認</h1><p>AIを使う前に、接続できるかを確かめます。</p></div>
 <div id="actions"><a th:href="@{/admin/settings}">機能管理へ戻る</a></div>
 <div id="content" class="admin-stack">
   <article class="admin-card">
@@ -24,18 +24,18 @@
     <header><h2>接続の準備</h2></header>
     <div class="admin-card__body admin-stack">
       <dl>
-        <dt>接続設定</dt><dd th:text="${geminiConfigured ? '設定済み' : '未設定・設定不備'}"></dd>
+        <dt>接続設定</dt><dd th:text="${openaiConfigured ? '設定済み' : '未設定・設定不備'}"></dd>
         <dt>AI連携</dt><dd th:text="${aiAllowed ? '許可' : '禁止'}"></dd>
-        <dt>使用モデル</dt><dd th:text="${geminiModel}"></dd>
+        <dt>使用モデル</dt><dd th:text="${openaiModel}"></dd>
         <dt>モデル制限</dt><dd th:text="${modelAllowed ? '利用を許可' : '利用を禁止'}"></dd>
       </dl>
-      <p th:unless="${geminiConfigured}" class="admin-note">提供者がAPIキー・モデルの接続設定を確認し、アプリを再起動してください。</p>
+      <p th:unless="${openaiConfigured}" class="admin-note">提供者がAPIキー・モデルの接続設定を確認し、アプリを再起動してください。</p>
       <p th:unless="${aiAllowed}" class="admin-note">機能管理で「AI連携を許可する」を選び、設定を保存してください。</p>
       <p th:unless="${modelAllowed}" class="admin-note">使用モデルが許可リストにありません。必要なモデルだけを上の一覧に登録するか、提供者が使用モデルを変更してください。</p>
-      <p>「接続を確認」を押すと、確認用の短文をGeminiへ1回送ります。投稿・写真・ユーザー情報は送りません。APIの利用枠を消費し、契約によって料金が発生します。</p>
+      <p>「接続を確認」を押すと、確認用の短文をOpenAIへ1回送ります。投稿・写真・ユーザー情報は送りません。APIの利用枠を消費し、契約によって料金が発生します。</p>
       <form th:action="@{/admin/ai/check}" method="post" data-ui-form data-busy-text="接続を確認中…">
         <input type="hidden" name="requestToken" th:value="${requestToken}">
-        <button type="submit" th:disabled="${!geminiConfigured || !aiAllowed || !modelAllowed}">接続を確認</button>
+        <button type="submit" th:disabled="${!openaiConfigured || !aiAllowed || !modelAllowed}">接続を確認</button>
       </form>
       <p class="ui-muted">画面を開くだけでは通信しません。結果不明でも自動再送はしません。</p>
     </div>

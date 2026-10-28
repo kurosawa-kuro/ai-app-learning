@@ -15,7 +15,7 @@ public class JdbcSettingsStore implements SettingsStore {
     public JdbcSettingsStore(JdbcTemplate jdbc, @Value("${app.images.enabled}") boolean initialImagesEnabled) {
         this.jdbc = jdbc;
         // Environment variables seed new installations; never overwrite a saved preference.
-        jdbc.update("with initial as (insert into app_settings (id, images_enabled) values (1, ?) on conflict (id) do nothing returning id) insert into allowed_ai_models(model_id,position) select 'gemini-3.5-flash-lite',0 from initial",
+        jdbc.update("with initial as (insert into app_settings (id, images_enabled) values (1, ?) on conflict (id) do nothing returning id) insert into allowed_ai_models(model_id,position) select 'gpt-4.1-mini',0 from initial",
                 initialImagesEnabled);
     }
 

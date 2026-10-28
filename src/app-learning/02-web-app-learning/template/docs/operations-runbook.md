@@ -15,4 +15,4 @@
 
 AIは管理画面で許可とモデルを指定し、明示操作で送る。下書きはブラウザーの直近1件だけ保持する。必要な結果は投稿本文へ反映して保存する。通信失敗時の自動再送はない。
 
-秘密値は `.env`。順番はアプリ・DB・画像・Gemini・Render。認証設定は不要。公開時は[Render手順](render-deployment.md)を使う。
+秘密値は `.env`。順番はアプリ・DB・画像・OpenAI・Render。認証設定は不要。公開時は[Render手順](render-deployment.md)を使う。

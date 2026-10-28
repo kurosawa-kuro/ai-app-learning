@@ -38,8 +38,8 @@
             <div><dt>今まで使ったAI金額</dt><dd>12,640<span>円</span></dd></div>
           </dl>
         </section>
-        <p id="ai-status" class="admin-note admin-note--neutral">設定を保存するだけではAIへ通信しません。接続確認画面で明示的に実行すると、Geminiへ確認用の短文を送ります。</p>
-        <a th:href="@{/admin/ai}">Gemini接続確認を開く</a>
+        <p id="ai-status" class="admin-note admin-note--neutral">設定を保存するだけではAIへ通信しません。接続確認画面で明示的に実行すると、OpenAIへ確認用の短文を送ります。</p>
+        <a th:href="@{/admin/ai}">OpenAI接続確認を開く</a>
       </div>
     </article>
     <div th:replace="~{ui/form :: actions('/admin/settings', '変更を取り消す', '設定を保存')}"></div>

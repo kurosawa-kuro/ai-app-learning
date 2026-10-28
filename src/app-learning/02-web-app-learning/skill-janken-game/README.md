@@ -1,5 +1,7 @@
 # skill-janken-game — Web版
 
+AI接続はOpenAIへ移行。設定・移行・公開確認は[OpenAI移行記録](../docs/tasks/openai-migration-20261028.md)を参照。過去のGemini検証記録は旧版の証跡です。
+
 コピー元：`../template`、基準コミット：`1e56304db211ec16d3dee971c093778ff81584b8`。
 2026-10-27、固有編集前に412ファイルのSHA256一致を確認。
 [コピー照合記録](../docs/tasks/copy-baseline-20261027.json)。除外：`.env`（秘密値）、`.local`（実データ・作業記録）、`node_modules`・`target`・`playwright-report`・`test-results`（再生成可能）。
@@ -26,7 +28,7 @@ AIはセリフを事前に作り、本人が確認・手直し・採用するた
 ## ローカル起動（共通の秘密値を参照する場合）
 
 このディレクトリで `./run-local.ps1 -SecretsFile ../template/.env -Action run` を実行します。
-DB・Storage・Geminiの秘密値だけをプロセスへ読み込みます。スキーマ・バケット・ポートはこのアプリ固有の設定を使います。`.env` をコピーする必要はありません。
+DB・Storage・OpenAIの秘密値だけをプロセスへ読み込みます。スキーマ・バケット・ポートはこのアプリ固有の設定を使います。`.env` をコピーする必要はありません。
 AIは既定で固定応答（`APP_AI_MODE=demo`）。実接続の確認時だけ環境変数を `live` にします。固定応答と実接続の検証結果は分けて記録します。
 
 
@@ -42,7 +44,7 @@ AIは既定で固定応答（`APP_AI_MODE=demo`）。実接続の確認時だけ
 - 画像の添付・差替え・解除・拡大。ユーザーアイコン。
 - 投稿者の作成・名前編集・切替・デフォルト指定。ログイン機能はありません。
 - 管理・設定で画像投稿／AIのON・OFF、AIモデル制限、CSV出力。
-- Gemini疎通、本文と任意の画像から下書き生成、確認して反映／破棄。
+- OpenAI疎通、本文と任意の画像から下書き生成、確認して反映／破棄。
 - スキルじゃんけんのUI例。
 
 ## 起動
@@ -51,10 +53,10 @@ Java 17以降が必要です。Mavenは同梱Wrapperを使います。Playwright
 
 1. `.env.example` を参考に `.env` へSupabase PostgreSQLのSession pooler接続値を設定します。
 2. 画像を使う場合はSUPABASE_URL・SUPABASE_SECRET_KEY・SUPABASE_STORAGE_BUCKETを設定します。
-3. AIを使う場合はGEMINI_API_KEYを設定します。接続情報だけでAIは実行されず、画面の許可・モデル制限・明示操作が必要です。
+3. AIを使う場合はOPENAI_API_KEYを設定します。接続情報だけでAIは実行されず、画面の許可・モデル制限・明示操作が必要です。
 4. Git Bashで `./run-local.sh`、PowerShellで `.\run-local.ps1`。http://localhost:8080/posts を開きます。
 
-`.env` の順番は「アプリ → DB → 画像 → Gemini → Render」。コメント内も含め、秘密値をGit・チャット・検証ログへ出しません。認証用の環境変数は不要です。
+`.env` の順番は「アプリ → DB → 画像 → OpenAI → Render」。コメント内も含め、秘密値をGit・チャット・検証ログへ出しません。認証用の環境変数は不要です。
 
 ## デモデータと検証
 

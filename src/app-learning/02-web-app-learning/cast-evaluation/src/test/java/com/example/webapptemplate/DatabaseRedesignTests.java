@@ -36,7 +36,7 @@ class DatabaseRedesignTests {
                 assertThat(db.queryForObject("select icon_key from app_users where id=?",String.class,user)).isEqualTo("icon.png");
                 assertThat(db.queryForObject("select default_user_id from app_settings",UUID.class)).isEqualTo(user);
                 assertThat(db.queryForObject("select images_enabled and ai_enabled from app_settings",Boolean.class)).isTrue();
-                assertThat(db.queryForList("select model_id from allowed_ai_models order by position",String.class)).containsExactly("gemini-test-b","gemini-test-a");
+                assertThat(db.queryForList("select model_id from allowed_ai_models order by position",String.class)).containsExactly("gpt-4.1-mini");
                 assertThat(db.queryForObject("select count(*) from "+schema+"_legacy.operation_events",Integer.class)).isEqualTo(1);
                 assertThat(db.queryForObject("select result_text from "+schema+"_legacy.ai_requests",String.class)).isEqualTo("残す下書き");
                 assertThat(db.queryForList("select table_name from information_schema.tables where table_schema=? and table_name<>'flyway_schema_history' order by table_name",String.class,schema))

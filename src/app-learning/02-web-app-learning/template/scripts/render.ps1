@@ -9,7 +9,7 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $settings = Read-DotEnv -Path (Join-Path $root '.env')
 # Existing process environment wins over the local file, as in run-local.ps1.
-foreach ($name in @('RENDER_API_KEY', 'DB_HOST', 'SPRING_DATASOURCE_USERNAME', 'SPRING_DATASOURCE_PASSWORD', 'RENDER_DB_SCHEMA', 'GEMINI_API_KEY', 'GEMINI_MODEL', 'GEMINI_TIMEOUT', 'SUPABASE_URL', 'SUPABASE_SECRET_KEY', 'SUPABASE_STORAGE_BUCKET')) {
+foreach ($name in @('RENDER_API_KEY', 'DB_HOST', 'SPRING_DATASOURCE_USERNAME', 'SPRING_DATASOURCE_PASSWORD', 'RENDER_DB_SCHEMA', 'OPENAI_API_KEY', 'OPENAI_MODEL', 'OPENAI_TIMEOUT', 'SUPABASE_URL', 'SUPABASE_SECRET_KEY', 'SUPABASE_STORAGE_BUCKET')) {
     $existing = [Environment]::GetEnvironmentVariable($name, 'Process')
     if ($null -ne $existing) { $settings[$name] = $existing }
 }
@@ -102,7 +102,7 @@ switch ($Action) {
             APP_ENVIRONMENT = 'production'
             APP_DB_SCHEMA = $settings['RENDER_DB_SCHEMA']
         }
-        foreach ($name in @('GEMINI_API_KEY','GEMINI_MODEL','GEMINI_TIMEOUT','SUPABASE_URL','SUPABASE_SECRET_KEY','SUPABASE_STORAGE_BUCKET')) {
+        foreach ($name in @('OPENAI_API_KEY','OPENAI_MODEL','OPENAI_TIMEOUT','SUPABASE_URL','SUPABASE_SECRET_KEY','SUPABASE_STORAGE_BUCKET')) {
             if (-not [string]::IsNullOrWhiteSpace($settings[$name])) { $deployment[$name] = $settings[$name] }
         }
         foreach ($name in $deployment.Keys) {

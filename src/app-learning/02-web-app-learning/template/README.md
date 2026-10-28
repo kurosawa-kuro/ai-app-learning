@@ -1,5 +1,7 @@
 # 教育用Webアプリスターター
 
+AI接続はOpenAIへ移行。設定・移行・公開確認は[OpenAI移行記録](../docs/tasks/openai-migration-20261028.md)を参照。過去のGemini検証記録は旧版の証跡です。
+
 一つの題材で、AIへ依頼し、動かし、結果を確認するためのSpring Bootアプリです。実務向け運用基盤の全部入りにはしません。
 
 現在の範囲は[教育用の最小構成](docs/educational-baseline.md)。[過剰実装の失敗と再発防止](docs/education-scope-incident.md)を記録しています。
@@ -10,7 +12,7 @@
 - 画像の添付・差替え・解除・拡大。ユーザーアイコン。
 - 投稿者の作成・名前編集・切替・デフォルト指定。ログイン機能はありません。
 - 管理・設定で画像投稿／AIのON・OFF、AIモデル制限、CSV出力。
-- Gemini疎通、本文と任意の画像から下書き生成、確認して反映／破棄。
+- OpenAI疎通、本文と任意の画像から下書き生成、確認して反映／破棄。
 - スキルじゃんけんのUI例。
 
 ## 起動
@@ -19,10 +21,10 @@ Java 17以降が必要です。Mavenは同梱Wrapperを使います。Playwright
 
 1. `.env.example` を参考に `.env` へSupabase PostgreSQLのSession pooler接続値を設定します。
 2. 画像を使う場合はSUPABASE_URL・SUPABASE_SECRET_KEY・SUPABASE_STORAGE_BUCKETを設定します。
-3. AIを使う場合はGEMINI_API_KEYを設定します。接続情報だけでAIは実行されず、画面の許可・モデル制限・明示操作が必要です。
+3. AIを使う場合はOPENAI_API_KEYを設定します。接続情報だけでAIは実行されず、画面の許可・モデル制限・明示操作が必要です。
 4. Git Bashで `./run-local.sh`、PowerShellで `.\run-local.ps1`。http://localhost:8080/posts を開きます。
 
-`.env` の順番は「アプリ → DB → 画像 → Gemini → Render」。コメント内も含め、秘密値をGit・チャット・検証ログへ出しません。認証用の環境変数は不要です。
+`.env` の順番は「アプリ → DB → 画像 → OpenAI → Render」。コメント内も含め、秘密値をGit・チャット・検証ログへ出しません。認証用の環境変数は不要です。
 
 ## デモデータと検証
 

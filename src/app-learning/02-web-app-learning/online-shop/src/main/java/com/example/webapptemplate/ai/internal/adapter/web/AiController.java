@@ -13,7 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class AiController {
-    private static final String TOKEN="gemini-check-token";
+    private static final String TOKEN="openai-check-token";
     private final AiConnectivity connectivity;
     private final SettingsOperations policy;
     public AiController(AiConnectivity connectivity, SettingsOperations policy) {
@@ -25,8 +25,8 @@ public class AiController {
             if(session.getAttribute(TOKEN)==null) session.setAttribute(TOKEN,UUID.randomUUID().toString());
             model.addAttribute("requestToken",session.getAttribute(TOKEN));
         }
-        model.addAttribute("geminiConfigured",connectivity.configured());
-        model.addAttribute("geminiModel",connectivity.model());
+        model.addAttribute("openaiConfigured",connectivity.configured());
+        model.addAttribute("openaiModel",connectivity.model());
         model.addAttribute("aiAllowed",policy.aiEnabled());
         model.addAttribute("modelAllowed",policy.allowsAiModel(connectivity.model()));
         if(!model.containsAttribute("allowedModelsInput"))

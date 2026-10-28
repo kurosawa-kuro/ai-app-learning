@@ -50,7 +50,7 @@
       <p class="ui-help" th:unless="${imagesEnabled}">画像投稿は現在OFFです。タイトルと本文を投稿できます。</p>
       <section class="ui-stack" data-ai-draft aria-labelledby="ai-draft-heading">
         <h2 id="ai-draft-heading">AIで本文の下書きを作る</h2>
-        <p class="ui-help">本文と、今回選択した画像をGeminiへ送ります。保存済みの画像は送りません。生成だけでは投稿を保存しません。</p>
+        <p class="ui-help">本文と、今回選択した画像をOpenAIへ送ります。保存済みの画像は送りません。生成だけでは投稿を保存しません。</p>
         <button type="button" class="secondary" data-ai-generate>AIで下書きを作る</button>
         <button type="button" class="secondary" data-ai-check hidden>同じ要求の結果を確認</button>
         <p role="status" aria-live="polite" data-ai-status></p>

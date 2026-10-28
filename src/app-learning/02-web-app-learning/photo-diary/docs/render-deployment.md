@@ -4,9 +4,9 @@
 
 ## 設定
 
-RenderのRoot Directoryは `src/app-learning/02-web-app-learning/template`、Dockerfileは `./Dockerfile`。ローカルDockerは不要。DB接続、Storage、必要時のGeminiキーを環境変数へ設定する。秘密値をGitへ置かない。
+RenderのRoot Directoryは `src/app-learning/02-web-app-learning/template`、Dockerfileは `./Dockerfile`。ローカルDockerは不要。DB接続、Storage、必要時のOpenAIキーを環境変数へ設定する。秘密値をGitへ置かない。
 
-`.env` のRENDER_API_KEYを使い、`./scripts/render.sh env` でDB・Storage・Geminiの設定を反映する。APP_ACCESS_USER／APP_ACCESS_PASSWORD／APP_ACCESS_MODEは使わない。既存サービスに残っている場合は削除する。
+`.env` のRENDER_API_KEYを使い、`./scripts/render.sh env` でDB・Storage・OpenAIの設定を反映する。APP_ACCESS_USER／APP_ACCESS_PASSWORD／APP_ACCESS_MODEは使わない。既存サービスに残っている場合は削除する。
 
 コードをテストしてGitへpushすると、現在のサービスでは自動デプロイされる。手動の状態確認は `./scripts/render.sh status`、明示デプロイは `./scripts/render.sh deploy`。
 

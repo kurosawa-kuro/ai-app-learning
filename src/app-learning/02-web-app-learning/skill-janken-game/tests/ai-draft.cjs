@@ -19,7 +19,7 @@ const assert=require('node:assert/strict');
   const other=await browser.newContext({baseURL:`http://127.0.0.1:${process.argv[2]}`});assert.equal((await other.request.get(`/ai/drafts/${data.requestId}`)).status(),404);await other.close();
   await page.route('**/ai/drafts',route=>route.abort());await page.locator('[data-ai-generate]').click();
   await expect(page.locator('[data-ai-check]')).toBeVisible();await expect(page.locator('[name="body"]')).toHaveValue('今日の素材');
-  await page.setViewportSize({width:390,height:844});await page.waitForFunction(()=>document.querySelector('.admin-sidebar').getBoundingClientRect().right <= 0);await page.locator('[data-ai-draft]').scrollIntoViewIfNeeded();await page.screenshot({path:'target/gemini-ui/draft-mobile.png',fullPage:true});
+  await page.setViewportSize({width:390,height:844});await page.waitForFunction(()=>document.querySelector('.admin-sidebar').getBoundingClientRect().right <= 0);await page.locator('[data-ai-draft]').scrollIntoViewIfNeeded();await page.screenshot({path:'target/openai-ui/draft-mobile.png',fullPage:true});
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   console.log('Draft UI: image, CSRF, generation, apply, discard, owner isolation, network loss, mobile passed');
  } finally {await browser.close();}

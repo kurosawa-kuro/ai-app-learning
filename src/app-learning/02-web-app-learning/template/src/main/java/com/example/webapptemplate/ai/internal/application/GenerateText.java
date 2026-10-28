@@ -4,8 +4,8 @@ import com.example.webapptemplate.platform.*;
 import com.example.webapptemplate.settings.FeaturePolicy;
 import java.util.*;
 public final class GenerateText implements AiText {
- private final GeminiGateway gateway; private final FeaturePolicy policy; private final ImageCodec codec;
- public GenerateText(GeminiGateway gateway,FeaturePolicy policy,ImageCodec codec){this.gateway=gateway;this.policy=policy;this.codec=codec;}
+ private final OpenAIGateway gateway; private final FeaturePolicy policy; private final ImageCodec codec;
+ public GenerateText(OpenAIGateway gateway,FeaturePolicy policy,ImageCodec codec){this.gateway=gateway;this.policy=policy;this.codec=codec;}
  public AiDraftResult generate(UUID id,String instruction,String input,List<ImageUpload> images){
   if(id==null || instruction==null || instruction.isBlank() || instruction.length()>3000 || input==null || input.isBlank() || input.length()>5000 || images==null || images.size()>3)
    throw new IllegalArgumentException("入力は1〜5000文字、画像は3枚までです。");
