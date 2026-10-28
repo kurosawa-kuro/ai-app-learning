@@ -29,7 +29,7 @@ public class EvaluationController {
     case "rule" -> service.rule(p.get("category"),new BigDecimal(p.getOrDefault("unit","")),new BigDecimal(p.getOrDefault("points","")),p.containsKey("enabled"),number(p,"version"));
     default -> throw new IllegalArgumentException("操作を確認してください。");
    }
-   flash.addFlashAttribute("message","保存しました。");return "redirect:/evaluation?month="+YearMonth.parse(month);
+   flash.addFlashAttribute("message","保存しました。");return "redirect:/evaluation?month="+YearMonth.parse(month)+"#lesson-"+(operation.equals("member")?"members":operation.equals("rule")?"rules":"record");
   } catch(IllegalArgumentException|java.time.DateTimeException e){model.addAttribute("error",e instanceof NumberFormatException?"数値を確認してください。":e.getMessage());}
     catch(org.springframework.dao.DataAccessException e){model.addAttribute("error","保存できませんでした。入力を残しています。再試行してください。");}
   model.addAttribute("failedOperation",operation);model.addAttribute("input",p);return show(month,null,model);
