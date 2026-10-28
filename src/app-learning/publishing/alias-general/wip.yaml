@@ -1,0 +1,9 @@
+version: 1
+site_id: alias-general
+mode: introduction-only
+access: public
+temporary_identity: true
+content: content/wip.json
+theme: paper
+project: desk-r8v2
+url: https://desk-r8v2.pages.dev/

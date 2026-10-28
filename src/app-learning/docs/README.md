@@ -1,5 +1,7 @@
 # アプリ学習の横断設計
 
+内部管理資料です。外向きの3出口の設計・名義・運用は[publication](publication/README.md)、公開原稿・素材の許可設定は[publishing](../publishing/README.md)で管理します。本書を含む全体資料をそのまま公開・配布しません。
+
 [アプリ学習の入口](../README.md) · [01 GAS](../01-gas-app-learning/README.md) · [02 Web](../02-web-app-learning/README.md) · [Webスタックの採用判断](../../../docs/adr/0001-web-app-stack.md)
 
 初回の成功は、本人に意味のある一つの課題でAIへの依頼・試行・結果確認を経験すること。操作・言語化の支援を認め、全5教材・全技術・独力での改修を終了条件にしない。提供者は課題と支援枠を合意し、依頼文・確認例・戻し方・残件の扱いを渡して終了する。

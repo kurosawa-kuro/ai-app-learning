@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="ja" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><base target="_top">
+<?!= include_('pico'); ?><?!= include_('style'); ?>
+<title>キャスト評価</title></head><body><main>
+<header><p class="eyebrow">GASで、保存して読み返す</p><h1>キャスト評価</h1><p>実績を1件記録して、月の結果にどうつながるか見てみましょう。</p></header>
+<p id="status" class="notice" role="status" tabindex="-1">読み込んでいます…</p>
+<nav aria-label="ページ内メニュー"><a href="#summary">月次結果</a><a href="#record">実績入力</a><a href="#members">メンバー</a><a href="#rules">配点</a></nav>
+<section id="summary"><h2>月次結果</h2><form id="month-form"><label>集計する月<input id="month" type="month" min="2000-01" max="2100-12" required></label><button>結果を見る</button></form><div id="scores" class="result-grid"></div><details><summary>この月の入力済み実績</summary><div id="records" class="stack"></div></details></section>
+<section id="record" class="form-panel"><h2>実績を記録する</h2><p class="help">1人・1営業日につき1件。今回は登録と確認を体験します。</p><form id="record-form"><div class="fields"><label>メンバー（必須）<select id="member" name="memberId" required></select></label><label>営業日（必須）<input id="date" name="businessDate" type="date" min="2000-01-01" max="2100-12-31" required></label>
+<label>ドリンク（杯）<input name="drinks" type="number" min="0" max="1000000" step="1" value="0" required></label><label>ボトル（本）<input name="bottles" type="number" min="0" max="1000000" step="1" value="0" required></label><label>指名（件）<input name="nominations" type="number" min="0" max="1000000" step="1" value="0" required></label><label>同伴（件）<input name="accompaniments" type="number" min="0" max="1000000" step="1" value="0" required></label><label>売上（円）<input name="sales" type="number" min="0" max="1000000000" step="1" value="0" required></label></div><button>実績を保存する</button></form></section>
+<section id="members" class="form-panel"><h2>メンバー</h2><form id="member-form"><label>追加する名前（必須・60文字まで）<input id="name" maxlength="60" required autocomplete="off"></label><button>メンバーを追加する</button></form><ul id="member-list"></ul></section>
+<section id="rules"><h2>現在の配点</h2><p class="help">月内の数量を合計してから計算します。売上の配点は初期状態では無効です。変更はSheetsの evaluation_rules で行います。</p><div id="rule-list" class="result-grid"></div></section>
+<footer><p class="help">架空データを使う学習用アプリです。ログイン機能はなく、選んだ人のデータを操作します。</p></footer>
+</main><?!= include_('bridge'); ?><?!= include_('app'); ?></body></html>

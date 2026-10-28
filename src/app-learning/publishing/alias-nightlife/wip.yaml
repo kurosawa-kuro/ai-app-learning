@@ -1,0 +1,9 @@
+version: 1
+site_id: alias-nightlife
+mode: introduction-only
+access: public
+temporary_identity: true
+content: content/wip.json
+theme: evening
+project: atelier-m7q4
+url: https://atelier-m7q4.pages.dev/

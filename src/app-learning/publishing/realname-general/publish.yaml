@@ -1,0 +1,13 @@
+# 内部の出口設定。未設定を他出口や本名で補完しない。
+version: 1
+site_id: realname-general
+identity_mode: realname
+audience: general
+publication_enabled: false
+access_mode: public
+identity_profile:
+  id: realname-general
+  public_name: null
+  brand_name: null
+  contact_email: null
+selected_ids: [rg-home]

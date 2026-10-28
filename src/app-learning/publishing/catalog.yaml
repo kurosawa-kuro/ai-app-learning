@@ -1,0 +1,57 @@
+# 内部専用。全台帳を公開しない。原稿は未レビューのため公開不可。
+version: 1
+materials:
+  - id: first-step
+    source: common/content/first-step.md
+    output: first-step.md
+    allowed_sites: [realname-general, alias-nightlife, alias-general]
+    dependencies: []
+    review_status: draft
+  - id: diary-basics
+    source: common/content/photo-diary-basics.md
+    output: photo-diary-basics.md
+    allowed_sites: [realname-general, alias-nightlife, alias-general]
+    dependencies: [first-step]
+    review_status: draft
+  - id: rg-home
+    source: realname-general/content/index.md
+    output: index.md
+    allowed_sites: [realname-general]
+    dependencies: [rg-diary, first-step]
+    review_status: draft
+  - id: rg-diary
+    source: realname-general/content/photo-diary.md
+    output: photo-diary.md
+    allowed_sites: [realname-general]
+    dependencies: [diary-basics]
+    review_status: draft
+  - id: an-home
+    source: alias-nightlife/content/index.md
+    output: index.md
+    allowed_sites: [alias-nightlife]
+    dependencies: [an-diary, an-evaluation, first-step]
+    review_status: draft
+  - id: an-diary
+    source: alias-nightlife/content/photo-diary.md
+    output: photo-diary.md
+    allowed_sites: [alias-nightlife]
+    dependencies: [diary-basics]
+    review_status: draft
+  - id: an-evaluation
+    source: alias-nightlife/content/cast-evaluation.md
+    output: cast-evaluation.md
+    allowed_sites: [alias-nightlife]
+    dependencies: [first-step]
+    review_status: draft
+  - id: ag-home
+    source: alias-general/content/index.md
+    output: index.md
+    allowed_sites: [alias-general]
+    dependencies: [ag-diary, first-step]
+    review_status: draft
+  - id: ag-diary
+    source: alias-general/content/photo-diary.md
+    output: photo-diary.md
+    allowed_sites: [alias-general]
+    dependencies: [diary-basics]
+    review_status: draft

@@ -1,0 +1,20 @@
+<script>
+const $ = selector => document.querySelector(selector);
+const labels = {DRINK:'ドリンク',BOTTLE:'ボトル',NOMINATION:'指名',ACCOMPANIMENT:'同伴',SALES:'売上'};
+$('#month').value=Ui.localDate().slice(0,7); $('#date').value=Ui.localDate();
+async function refresh() {
+  const data=await Ui.rpc('overview',{month:$('#month').value});
+  Ui.options($('#member'),data.members.filter(m=>m.active==='true'));
+  $('#member-list').replaceChildren(...data.members.map(m=>Ui.node('li',m.name)));
+  $('#scores').replaceChildren(...data.results.map(row=>{const card=Ui.node('article');card.append(Ui.node('h3',`${row.rank}位　${row.name}`),Ui.node('p',`${row.pointsLabel} pt`,'total'),Ui.node('p',`売上 ${Number(row.sales).toLocaleString('ja-JP')} 円`));return card;}));
+  if(!data.results.length) $('#scores').append(Ui.node('p','メンバーを追加すると月次結果が表示されます。'));
+  $('#records').replaceChildren(...data.records.map(row=>{const card=Ui.node('article');card.append(Ui.node('h3',`${row.business_date}　${data.members.find(m=>m.id===row.member_id)?.name || '不明'}`),Ui.node('p',`ドリンク ${row.drinks} 杯・ボトル ${row.bottles} 本・指名 ${row.nominations} 件・同伴 ${row.accompaniments} 件`),Ui.node('p',`売上 ${Number(row.sales).toLocaleString('ja-JP')} 円`));return card;}));
+  if(!data.records.length) $('#records').append(Ui.node('p','この月の実績はまだありません。下のフォームから記録できます。'));
+  $('#rule-list').replaceChildren(...data.rules.map(row=>{const card=Ui.node('article');card.append(Ui.node('h3',labels[row.category]),Ui.node('p',`${row.unit.toLocaleString('ja-JP')} ${row.category==='SALES'?'円':'単位'}ごとに ${row.points} pt${row.enabled?'':'（無効）'}`));return card;}));
+}
+$('#month-form').onsubmit=e=>{e.preventDefault();Ui.run(e.submitter,refresh);};
+$('#member-form').onsubmit=e=>{e.preventDefault();const payload={name:$('#name').value};const requestId=Ui.pending('member',payload);Ui.run(e.submitter,async()=>{const row=await Ui.rpc('createMember',{...payload,requestId});Ui.clear('member');$('#name').value='';await refresh();$('#member').value=row.id;},'メンバーを追加しました。実績入力で選択しています。');};
+$('#record-form').onsubmit=e=>{e.preventDefault();const payload=Object.fromEntries(new FormData(e.target)), requestId=Ui.pending('record',payload);Ui.run(e.submitter,async()=>{await Ui.rpc('createRecord',{...payload,requestId});Ui.clear('record');$('#month').value=payload.businessDate.slice(0,7);await refresh();},'実績を保存しました。月次結果へ反映しました。');};
+document.querySelectorAll('nav a').forEach(a=>a.onclick=e=>{e.preventDefault();document.querySelector(a.getAttribute('href')).scrollIntoView();});
+Ui.run(null,refresh,'準備できました。実績を1件記録してみましょう。');
+</script>

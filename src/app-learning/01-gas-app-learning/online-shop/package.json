@@ -1,0 +1,13 @@
+{
+  "name": "online-shop-gas",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "test": "node --test tests/application.test.cjs",
+    "dev": "node scripts/dev-server.cjs 8194",
+    "test:browser": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1"
+  }
+}

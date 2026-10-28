@@ -4,6 +4,8 @@
 
 アプリ学習に関する横断設計は、昇格した[src/app-learning/docs](../src/app-learning/docs/README.md)を正本とする。受講順は01 GAS → 02 Web、提供者のコード・解説の制作順は02 Web → 01 GAS。Webで動作確認を先に行いやすいことを理由とし、受講者の順番とは分けて管理する。
 
+本名公開・題材を分ける3出口の確定要件と運用は[publication](../src/app-learning/docs/publication/README.md)、外向き原稿と許可設定は[publishing](../src/app-learning/publishing/README.md)を正本とする。ルート・アプリ学習の全体READMEは内部総覧であり、利用者向けの公開原稿とは分ける。
+
 ## 権威順位
 
 | 判断する内容 | 基準にする資料 |
