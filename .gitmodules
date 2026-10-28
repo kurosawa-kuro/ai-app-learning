@@ -1,0 +1,3 @@
+[submodule "src/office-automation-starter"]
+	path = src/office-automation-starter
+	url = git@github.com:kurosawa-kuro/cursor-office-automation-starter.git
