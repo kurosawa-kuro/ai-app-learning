@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 /** Google sign-in through Supabase Auth with the server-side PKCE flow. */
 @Controller
@@ -31,15 +30,16 @@ public class AuthController {
         "denied", "このGoogleアカウントには利用権限がありません。管理者に追加を依頼してください。",
         "failed", "ログインできませんでした。もう一度お試しください。",
         "unavailable", "ログインの確認ができませんでした。時間をおいて再試行してください。",
-        "logout", "ログアウトしました。");
+        "logout", "このブラウザーからログアウトしました。");
     private static final SecureRandom RANDOM = new SecureRandom();
     private final SupabaseAuthGateway gateway;
     private final JwtDecoder decoder;
     private final JdbcAdminList admins;
     private final AuthProperties properties;
+    private final SessionCookies cookies;
 
-    public AuthController(SupabaseAuthGateway gateway, JwtDecoder decoder, JdbcAdminList admins, AuthProperties properties) {
-        this.gateway = gateway; this.decoder = decoder; this.admins = admins; this.properties = properties;
+    public AuthController(SupabaseAuthGateway gateway, JwtDecoder decoder, JdbcAdminList admins, AuthProperties properties, SessionCookies cookies) {
+        this.gateway = gateway; this.decoder = decoder; this.admins = admins; this.properties = properties; this.cookies = cookies;
     }
 
     @GetMapping("/login")
@@ -54,14 +54,14 @@ public class AuthController {
         byte[] random = new byte[32];
         RANDOM.nextBytes(random);
         String verifier = Base64.getUrlEncoder().withoutPadding().encodeToString(random);
-        SessionCookies.storeVerifier(request, response, verifier);
-        return "redirect:" + gateway.googleAuthorizeUrl(callback(), challenge(verifier));
+        cookies.storeVerifier(request, response, verifier);
+        return "redirect:" + gateway.googleAuthorizeUrl(properties.getCallbackUrl(), challenge(verifier));
     }
 
     @GetMapping("/auth/callback")
     public String callback(@RequestParam(required = false) String code, HttpServletRequest request, HttpServletResponse response) {
         String verifier = SessionCookies.read(request, SessionCookies.PKCE);
-        SessionCookies.clearVerifier(request, response);
+        cookies.clearVerifier(request, response);
         if (code == null || code.isBlank() || verifier == null) return "redirect:/login?error=failed";
         try {
             var session = gateway.exchange(code, verifier);
@@ -69,11 +69,11 @@ public class AuthController {
             var user = SupabaseSessionFilter.user(decoder.decode(session.accessToken()));
             if (user != null) admins.forget(user.email());
             if (user == null || !admins.allows(user.email())) {
-                gateway.logout(session.accessToken());
-                SessionCookies.clear(request, response);
+                cookies.clear(request, response);
+                try { gateway.logout(session.accessToken()); } catch (RestClientException unavailable) { /* local denial still applies */ }
                 return "redirect:/login?error=denied";
             }
-            SessionCookies.store(request, response, session);
+            cookies.store(request, response, session);
             return "redirect:" + properties.getHome();
         } catch (RestClientException | JwtException | DataAccessException unavailable) {
             return "redirect:/login?error=unavailable";
@@ -83,16 +83,25 @@ public class AuthController {
     @PostMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
         String access = SessionCookies.read(request, SessionCookies.ACCESS);
-        if (access != null) {
-            try { gateway.logout(access); } catch (RestClientException unavailable) { /* cookies are cleared anyway */ }
-        }
-        SessionCookies.clear(request, response);
+        try {
+            if (access != null) {
+                try { decoder.decode(access); }
+                catch (JwtException expired) { access = null; }
+            }
+            if (access == null) {
+                String refresh = SessionCookies.read(request, SessionCookies.REFRESH);
+                var session = refresh == null ? null : gateway.refresh(refresh);
+                if (session != null) {
+                    decoder.decode(session.accessToken());
+                    access = session.accessToken();
+                }
+            }
+            if (access != null) gateway.logout(access);
+        } catch (RestClientException | JwtException unavailable) { /* local sign-out still completes */ }
+        cookies.clear(request, response);
         return "redirect:/login?logout";
     }
 
-    private static String callback() {
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path("/auth/callback").build().toUriString();
-    }
 
     private static String challenge(String verifier) {
         try {

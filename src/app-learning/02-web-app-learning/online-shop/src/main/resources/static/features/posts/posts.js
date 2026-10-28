@@ -68,6 +68,13 @@
     let saved = false;
     try {
       const response = await fetch(form.action, { method: 'POST', body: data, headers: { 'X-UI-Form': 'true', 'X-CSRF-TOKEN': csrf.value } });
+      if (response.status === 401) {
+        showError('ログインの期限が切れました。本文と画像は残っています。別タブでログインし、戻ってからもう一度保存してください。');
+        const login = document.createElement('a');
+        login.href = '/login'; login.target = '_blank'; login.rel = 'noopener';
+        login.textContent = '別タブでログイン'; summary.append(login);
+        return;
+      }
       if (response.status === 403) {
         try {
           const renewed = await fetch('/csrf', { cache: 'no-store' });

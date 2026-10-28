@@ -18,6 +18,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.jwt.JwtClaimValidator;
+import com.example.webapptemplate.auth.internal.adapter.web.SessionCookies;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -35,10 +38,16 @@ class AuthConfiguration {
         factory.setConnectTimeout(5000);
         factory.setReadTimeout((int) properties.getTimeout().toMillis());
         var decoder = NimbusJwtDecoder.withJwkSetUri(properties.issuer() + "/.well-known/jwks.json")
-            .jwsAlgorithm(SignatureAlgorithm.ES256).restOperations(new RestTemplate(factory)).build();
-        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(properties.issuer()));
+            .jwsAlgorithm(SignatureAlgorithm.ES256).jwsAlgorithm(SignatureAlgorithm.RS256).restOperations(new RestTemplate(factory)).build();
+        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
+            JwtValidators.createDefaultWithIssuer(properties.issuer()),
+            new JwtClaimValidator<java.util.List<String>>("aud", value -> value != null && value.contains("authenticated")),
+            new JwtClaimValidator<String>("role", "authenticated"::equals),
+            new JwtClaimValidator<java.time.Instant>("exp", value -> value != null)));
         return decoder;
     }
+
+    @Bean SessionCookies sessionCookies(AuthProperties properties) { return new SessionCookies(properties); }
 
     @Bean SupabaseAuthGateway supabaseAuthGateway(AuthProperties properties) {
         return new SupabaseAuthGateway(properties);
@@ -48,12 +57,14 @@ class AuthConfiguration {
         return new JdbcAdminList(jdbc);
     }
 
-    @Bean SecurityFilterChain signedInSecurity(HttpSecurity http, JwtDecoder decoder, SupabaseAuthGateway gateway, JdbcAdminList admins) throws Exception {
+    @Bean SecurityFilterChain signedInSecurity(HttpSecurity http, JwtDecoder decoder, SupabaseAuthGateway gateway, JdbcAdminList admins, SessionCookies cookies) throws Exception {
         return http.csrf(config -> config.csrfTokenRepository(BrowserCsrf.repository()))
             // The cookie restores the sign-in on every request. Session management would treat each one
             // as a new login and rotate the CSRF token, breaking forms already on the page.
             .sessionManagement(AbstractHttpConfigurer::disable)
-            .addFilterBefore(new SupabaseSessionFilter(decoder, gateway, admins), UsernamePasswordAuthenticationFilter.class)
+            .securityContext(config -> config.securityContextRepository(new org.springframework.security.web.context.NullSecurityContextRepository()))
+            .requestCache(AbstractHttpConfigurer::disable)
+            .addFilterBefore(new SupabaseSessionFilter(decoder, gateway, admins, cookies), UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(AuthPaths.PUBLIC.toArray(String[]::new)).permitAll()
                 .anyRequest().hasAuthority("ROLE_ADMIN"))

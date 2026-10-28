@@ -47,7 +47,7 @@ public class SupabaseAuthGateway {
     /** Revokes the refresh tokens. Issued access tokens stay valid until they expire. */
     public void logout(String accessToken) {
         try {
-            client.post().uri("/logout").header("Authorization", "Bearer " + accessToken).retrieve().toBodilessEntity();
+            client.post().uri("/logout?scope=local").header("Authorization", "Bearer " + accessToken).retrieve().toBodilessEntity();
         } catch (RestClientResponseException ignored) {
             // Already signed out or expired: the cookies are cleared either way.
         }
@@ -61,7 +61,7 @@ public class SupabaseAuthGateway {
                 || !(response.get("refresh_token") instanceof String refresh)) return null;
             return new Session(access, refresh);
         } catch (RestClientResponseException rejected) {
-            if (rejected.getStatusCode().is4xxClientError()) return null;
+            if (rejected.getStatusCode().value() == 400 || rejected.getStatusCode().value() == 401 || rejected.getStatusCode().value() == 403) return null;
             throw rejected;
         }
     }

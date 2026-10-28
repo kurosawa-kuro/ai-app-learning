@@ -37,21 +37,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /** Google sign-in through a local stand-in for Supabase Auth: JWKS, PKCE exchange, refresh and logout. */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = {"app.auth.enabled=true", "app.auth.publishable-key=test-publishable-key", "app.auth.home=/admin"})
+    properties = {"app.auth.enabled=true", "app.auth.publishable-key=test-publishable-key", "app.auth.callback-url=http://localhost:8080/auth/callback"})
 class AuthTests {
     private static final String ADMIN = "auth-test-admin@example.com";
     private static final String STRANGER = "auth-test-stranger@example.com";
     private static final ECKey KEY;
+    private static final com.nimbusds.jose.jwk.RSAKey RSA_KEY;
+    private static final java.util.Map<String, String> CODES = new java.util.concurrent.ConcurrentHashMap<>();
+    private static volatile String logoutQuery;
     private static final HttpServer AUTH;
     static {
         try {
+            RSA_KEY = new com.nimbusds.jose.jwk.gen.RSAKeyGenerator(2048).keyID("rsa-test").generate();
             KEY = new ECKeyGenerator(Curve.P_256).keyID("test-key").generate();
             AUTH = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         } catch (Exception failure) { throw new ExceptionInInitializerError(failure); }
         AUTH.createContext("/auth/v1/.well-known/jwks.json", exchange ->
-            send(exchange, 200, "{\"keys\":[" + KEY.toPublicJWK().toJSONString() + "]}"));
+            send(exchange, 200, "{\"keys\":[" + KEY.toPublicJWK().toJSONString() + "," + RSA_KEY.toPublicJWK().toJSONString() + "]}"));
         AUTH.createContext("/auth/v1/token", AuthTests::token);
-        AUTH.createContext("/auth/v1/logout", exchange -> send(exchange, 204, ""));
+        AUTH.createContext("/auth/v1/logout", exchange -> { logoutQuery = exchange.getRequestURI().getQuery(); send(exchange, 204, ""); });
         AUTH.start();
     }
     @DynamicPropertySource static void auth(DynamicPropertyRegistry registry) {
@@ -60,6 +64,8 @@ class AuthTests {
 
     @LocalServerPort int port;
     @Autowired JdbcTemplate jdbc;
+    @Autowired org.springframework.security.oauth2.jwt.JwtDecoder decoder;
+    @Autowired com.example.webapptemplate.auth.internal.AuthProperties properties;
 
     @AfterEach void removeAdmins() {
         jdbc.update("DELETE FROM app_admins WHERE email IN (?, ?)", ADMIN, STRANGER);
@@ -86,9 +92,11 @@ class AuthTests {
         var start = client.send(get("/auth/google"), HttpResponse.BodyHandlers.discarding());
         String location = start.headers().firstValue("location").orElse("");
         assertThat(location).startsWith(authUrl() + "/auth/v1/authorize?provider=google")
-            .contains("code_challenge=").contains("code_challenge_method=s256").contains("redirect_to=http://localhost:" + port + "/auth/callback");
+            .contains("code_challenge=").contains("code_challenge_method=s256").contains("redirect_to=http://localhost:8080/auth/callback");
+        registerCode(start, ADMIN);
         var callback = client.send(get("/auth/callback?code=code-" + ADMIN), HttpResponse.BodyHandlers.discarding());
-        assertThat(callback.headers().firstValue("location").orElse("")).endsWith("/admin");
+        assertThat(callback.headers().firstValue("location").orElse("")).endsWith(properties.getHome());
+        assertThat(properties.getHome()).matches("/[a-zA-Z0-9/_-]*");
         assertThat(cookie(cookies, "app_access")).isNotBlank();
         var page = client.send(get("/posts"), HttpResponse.BodyHandlers.ofString());
         assertThat(page.statusCode()).isEqualTo(200);
@@ -98,7 +106,7 @@ class AuthTests {
     @Test void signedInAccountsOutsideTheAdminListAreRefused() throws Exception {
         var cookies = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
         var client = HttpClient.newBuilder().cookieHandler(cookies).build();
-        client.send(get("/auth/google"), HttpResponse.BodyHandlers.discarding());
+        registerCode(client.send(get("/auth/google"), HttpResponse.BodyHandlers.discarding()), STRANGER);
         var callback = client.send(get("/auth/callback?code=code-" + STRANGER), HttpResponse.BodyHandlers.discarding());
         assertThat(callback.headers().firstValue("location").orElse("")).endsWith("/login?error=denied");
         assertThat(cookie(cookies, "app_access")).isEmpty();
@@ -139,8 +147,81 @@ class AuthTests {
             .noneMatch(value -> value.startsWith("XSRF-TOKEN="));
         var logout = client.send(post("/logout", csrf.group(1)), HttpResponse.BodyHandlers.discarding());
         assertThat(logout.headers().firstValue("location").orElse("")).endsWith("/login?logout");
+        assertThat(logoutQuery).isEqualTo("scope=local");
         assertThat(cleared(logout, "app_access")).isTrue();
         assertThat(cleared(logout, "app_refresh")).isTrue();
+    }
+
+    @Test void rejectsWrongAudienceRoleAndMissingExpiry() {
+        for (String token : new String[]{jwt(ADMIN, Instant.now().plusSeconds(3600), "other-app", "authenticated"),
+                jwt(ADMIN, Instant.now().plusSeconds(3600), "authenticated", "service_role"), jwt(ADMIN, null)}) {
+            org.assertj.core.api.Assertions.assertThatThrownBy(() -> decoder.decode(token))
+                .isInstanceOf(org.springframework.security.oauth2.jwt.JwtException.class);
+        }
+    }
+
+    @Test void wrongPkceVerifierCannotExchangeCode() throws Exception {
+        jdbc.update("INSERT INTO app_admins(email, note) VALUES (?, 'test')", ADMIN);
+        var cookies = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
+        var client = HttpClient.newBuilder().cookieHandler(cookies).build();
+        registerCode(client.send(get("/auth/google"), HttpResponse.BodyHandlers.discarding()), ADMIN);
+        cookies.getCookieStore().removeAll();
+        put(cookies, "app_pkce", "a-different-browser-verifier");
+        var callback = client.send(get("/auth/callback?code=code-" + ADMIN), HttpResponse.BodyHandlers.discarding());
+        assertThat(callback.headers().firstValue("location").orElse("")).endsWith("/login?error=failed");
+        assertThat(cookie(cookies, "app_access")).isEmpty();
+    }
+
+    @Test void temporaryRateLimitDoesNotDestroyRefreshCookie() throws Exception {
+        var cookies = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
+        put(cookies, "app_refresh", "refresh-busy");
+        var response = HttpClient.newBuilder().cookieHandler(cookies).build()
+            .send(get("/posts"), HttpResponse.BodyHandlers.discarding());
+        assertThat(response.headers().firstValue("location").orElse("")).endsWith("/login");
+        assertThat(cleared(response, "app_refresh")).isFalse();
+    }
+
+    @Test void expiredFormReturns401WithoutRedirectOrWriting() throws Exception {
+        var cookies = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
+        jdbc.update("INSERT INTO app_admins(email, note) VALUES (?, 'test')", ADMIN);
+        put(cookies, "app_access", jwt(ADMIN, Instant.now().plusSeconds(3600)));
+        var client = HttpClient.newBuilder().cookieHandler(cookies).build();
+        var csrf = Pattern.compile("\"token\":\"([^\"]+)\"").matcher(client.send(get("/csrf"), HttpResponse.BodyHandlers.ofString()).body());
+        assertThat(csrf.find()).isTrue();
+        cookies.getCookieStore().getCookies().stream().filter(c -> c.getName().equals("app_access"))
+            .toList().forEach(c -> cookies.getCookieStore().remove(URI.create("http://localhost:" + port), c));
+        var response = client.send(post("/posts", csrf.group(1)), HttpResponse.BodyHandlers.ofString());
+        assertThat(response.statusCode()).isEqualTo(401);
+        assertThat(response.headers().firstValue("location")).isEmpty();
+        assertThat(response.body()).contains("入力内容を控えて");
+    }
+
+    private static void registerCode(HttpResponse<?> response, String email) {
+        String query = URI.create(response.headers().firstValue("location").orElseThrow()).getRawQuery();
+        for (String pair : query.split("&")) if (pair.startsWith("code_challenge="))
+            CODES.put("code-" + email, java.net.URLDecoder.decode(pair.substring(15), StandardCharsets.UTF_8));
+    }
+    private static String challenge(String verifier) {
+        try { return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(
+            java.security.MessageDigest.getInstance("SHA-256").digest(verifier.getBytes(StandardCharsets.US_ASCII))); }
+        catch (Exception failure) { throw new IllegalStateException(failure); }
+    }
+
+    @Test void acceptsRsaSigningKeysAsWellAsEcKeys() throws Exception {
+        var claims = SignedJWT.parse(jwt(ADMIN, Instant.now().plusSeconds(3600))).getJWTClaimsSet();
+        var token = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(RSA_KEY.getKeyID()).build(), claims);
+        token.sign(new com.nimbusds.jose.crypto.RSASSASigner(RSA_KEY));
+        assertThat(decoder.decode(token.serialize()).getSubject()).isEqualTo(claims.getSubject());
+    }
+
+    @Test void callbackUrlDoesNotTrustForwardedHost() throws Exception {
+        var response = HttpClient.newHttpClient().send(HttpRequest.newBuilder(
+            URI.create("http://localhost:" + port + "/auth/google"))
+            .header("X-Forwarded-Host", "attacker.example").header("X-Forwarded-Proto", "https").GET().build(),
+            HttpResponse.BodyHandlers.discarding());
+        assertThat(response.headers().firstValue("location").orElseThrow())
+            .contains("redirect_to=http://localhost:8080/auth/callback").doesNotContain("attacker.example");
+        assertThat(response.headers().allValues("set-cookie")).anyMatch(c -> c.contains("HttpOnly") && c.contains("SameSite=Lax"));
     }
 
     private HttpRequest get(String path) { return HttpRequest.newBuilder(URI.create("http://localhost:" + port + path)).GET().build(); }
@@ -165,11 +246,14 @@ class AuthTests {
     private static String authUrl() { return "http://127.0.0.1:" + AUTH.getAddress().getPort(); }
 
     private static String jwt(String email, Instant expires) {
+        return jwt(email, expires, "authenticated", "authenticated");
+    }
+    private static String jwt(String email, Instant expires, String audience, String role) {
         try {
             var claims = new JWTClaimsSet.Builder().issuer(authUrl() + "/auth/v1").subject(UUID.nameUUIDFromBytes(email.getBytes()).toString())
-                .audience("authenticated").claim("role", "authenticated").claim("email", email).claim("is_anonymous", false)
+                .audience(audience).claim("role", role).claim("email", email).claim("is_anonymous", false)
                 .claim("user_metadata", Map.of("full_name", "テスト管理者"))
-                .issueTime(Date.from(expires.minusSeconds(3600))).expirationTime(Date.from(expires)).build();
+                .issueTime(Date.from(Instant.now().minusSeconds(3600))).expirationTime(expires == null ? null : Date.from(expires)).build();
             var signed = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.ES256).keyID(KEY.getKeyID()).build(), claims);
             signed.sign(new ECDSASigner(KEY));
             return signed.serialize();
@@ -183,8 +267,13 @@ class AuthTests {
         String email = null;
         var code = Pattern.compile("\"auth_code\":\"code-([^\"]+)\"").matcher(body);
         var refresh = Pattern.compile("\"refresh_token\":\"refresh-([^\"]+)\"").matcher(body);
-        if ("grant_type=pkce".equals(query) && body.contains("\"code_verifier\":\"") && code.find()) email = code.group(1);
+        if ("grant_type=pkce".equals(query) && code.find()) {
+            var verifier = Pattern.compile("\"code_verifier\":\"([^\"]+)\"").matcher(body);
+            String expected = CODES.remove("code-" + code.group(1));
+            if (verifier.find() && expected != null && expected.equals(challenge(verifier.group(1)))) email = code.group(1);
+        }
         if ("grant_type=refresh_token".equals(query) && refresh.find() && !refresh.group(1).equals("revoked")) email = refresh.group(1);
+        if (body.contains("refresh-busy")) { send(exchange, 429, "{}"); return; }
         if (email == null) { send(exchange, 400, "{\"error\":\"invalid_grant\"}"); return; }
         send(exchange, 200, "{\"access_token\":\"" + jwt(email, Instant.now().plusSeconds(3600))
             + "\",\"token_type\":\"bearer\",\"expires_in\":3600,\"refresh_token\":\"refresh-" + email + "\"}");

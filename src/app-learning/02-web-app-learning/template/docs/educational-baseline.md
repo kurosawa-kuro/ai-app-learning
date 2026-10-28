@@ -31,9 +31,9 @@ AI下書きは1ブラウザーセッションの直近1件だけを保存する�
 
 既存投稿・画像・設定は維持する。適用済みFlywayは書き換えない。V10で[DBを6表へ再設計](database-design.md)。旧 `operation_events`・`ai_requests` はデータがある場合だけ別の `_legacy` スキーマへ退避する。投稿・画像参照・設定は維持し、アイコンをユーザーへ統合、許可モデルを行単位へ正規化する。
 
-認証はない。画面を開ける人は投稿・ユーザー・設定を操作できる。教材では架空データを使う。認証が必要な別用途へ展開する場合は、その用途の要件として設計する。
+認証なしはAPP_AUTH_ENABLED=falseの場合。Googleログインのコードは実装済みで、trueではSupabase Authとapp_adminsにより管理者だけに全操作を許可する。管理者間のデータは共有し、投稿者選択は本人認証ではない。実Google・Render受入は未実施。[設定と確認](../../docs/Googleログインの設定と確認.md)を参照。
 
-2026-10-28決定：Supabase Authによる本格版へ移行する予定（[ADR 0004](../../../../../docs/adr/0004-auth-gas-simple-web-supabase.md)）。実装・受入までは上記が現状。Basic認証・APP_ACCESS_USER／APP_ACCESS_PASSWORDは「外したもの」のまま戻さない。
+2026-10-28決定：Supabase Authによる本格版へ移行する予定（[ADR 0004](../../../../../docs/adr/0004-auth-gas-simple-web-supabase.md)）。コードは実装済み、実環境受入・有効化は別途必要。Basic認証・APP_ACCESS_USER／APP_ACCESS_PASSWORDは「外したもの」のまま戻さない。
 
 ## 検証記録
 

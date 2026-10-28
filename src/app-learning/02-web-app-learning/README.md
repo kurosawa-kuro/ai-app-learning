@@ -2,7 +2,7 @@
 
 > 2026-10-28 方針更新：コードについての質問・改造はDevin、WebアプリのコードからのAI呼び出しはOpenAI API。業務自動化の質問・作業はCursor。教材アプリのGemini採用は廃止する。過去のGemini実疎通・公開受入を、OpenAIでの受入済みとは扱わない。 判断の正本は[AIの役割分担（ADR 0003）](../../../docs/adr/0003-ai-service-roles.md)。
 
-> 2026-10-28 方針更新：認証はGAS版を学習用の簡易版（本人限定公開と架空利用者の選択）のまま維持し、Web版はSupabase Authによる本格版へ移行する。Web版は現在も認証なしで、実装は未着手。判断の正本は[認証の分担（ADR 0004）](../../../docs/adr/0004-auth-gas-simple-web-supabase.md)。
+> 2026-10-28 方針更新：認証はGAS版を学習用の簡易版（本人限定公開と架空利用者の選択）のまま維持し、Web版はSupabase Authによる本格版へ移行する。Googleログインは6アプリへコード実装済み。既定は無効、実Google・Render受入は未実施。[設定と確認](docs/Googleログインの設定と確認.md)を参照。判断の正本は[認証の分担（ADR 0004）](../../../docs/adr/0004-auth-gas-simple-web-supabase.md)。
 
 > 2026-10-28：Web版AIのOpenAI移行・Render反映・実AI受入が完了。現行の接続設定と検証状況は[OpenAI移行記録](docs/tasks/openai-migration-20261028.md)を参照。下記のGemini検証は移行前の記録です。
 

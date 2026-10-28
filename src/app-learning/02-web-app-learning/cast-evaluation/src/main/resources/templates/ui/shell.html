@@ -71,6 +71,7 @@
 </dialog>
 <script th:src="@{/admin-pico/js/admin.js}"></script>
 <script th:src="@{/ui/ui.js}"></script>
+<script th:if="${signedInUser != null}" th:src="@{/ui/auth-forms.js}"></script>
 <dialog id="image-viewer" aria-label="投稿画像の拡大" class="post-image-dialog"><button type="button" data-close-image autofocus>閉じる</button><img alt=""><p role="status"></p></dialog>
 <script th:if="${navigation.sidebar}" th:src="@{/features/authors/user-selection.js}"></script>
 <script th:each="asset : ${appScripts}" th:src="@{${asset}}"></script>

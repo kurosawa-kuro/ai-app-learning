@@ -30,9 +30,10 @@ public class SupabaseSessionFilter extends OncePerRequestFilter {
     private final JwtDecoder decoder;
     private final SupabaseAuthGateway gateway;
     private final JdbcAdminList admins;
+    private final SessionCookies cookies;
 
-    public SupabaseSessionFilter(JwtDecoder decoder, SupabaseAuthGateway gateway, JdbcAdminList admins) {
-        this.decoder = decoder; this.gateway = gateway; this.admins = admins;
+    public SupabaseSessionFilter(JwtDecoder decoder, SupabaseAuthGateway gateway, JdbcAdminList admins, SessionCookies cookies) {
+        this.decoder = decoder; this.gateway = gateway; this.admins = admins; this.cookies = cookies;
     }
 
     @Override
@@ -62,9 +63,10 @@ public class SupabaseSessionFilter extends OncePerRequestFilter {
         if (refresh == null) return null;
         try {
             var session = gateway.refresh(refresh);
-            if (session == null) { SessionCookies.clear(request, response); return null; }
-            SessionCookies.store(request, response, session);
-            return admit(decoder.decode(session.accessToken()), request, response);
+            if (session == null) { cookies.clear(request, response); return null; }
+            var user = admit(decoder.decode(session.accessToken()), request, response);
+            if (user != null) cookies.store(request, response, session);
+            return user;
         } catch (RestClientException | JwtException unavailable) {
             // Supabase unreachable: keep the cookies so the next request can retry.
             return null;
@@ -78,7 +80,7 @@ public class SupabaseSessionFilter extends OncePerRequestFilter {
         } catch (DataAccessException unavailable) {
             return null;
         }
-        SessionCookies.clear(request, response);
+        cookies.clear(request, response);
         return null;
     }
 

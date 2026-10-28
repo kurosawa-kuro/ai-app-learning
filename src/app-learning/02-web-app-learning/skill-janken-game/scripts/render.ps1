@@ -9,7 +9,7 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $settings = Read-DotEnv -Path (Join-Path $root '.env')
 # Existing process environment wins over the local file, as in run-local.ps1.
-foreach ($name in @('RENDER_API_KEY', 'DB_HOST', 'SPRING_DATASOURCE_USERNAME', 'SPRING_DATASOURCE_PASSWORD', 'RENDER_DB_SCHEMA', 'OPENAI_API_KEY', 'OPENAI_MODEL', 'OPENAI_TIMEOUT', 'APP_AI_MODE', 'SUPABASE_URL', 'SUPABASE_SECRET_KEY', 'SUPABASE_STORAGE_BUCKET')) {
+foreach ($name in @('RENDER_API_KEY', 'DB_HOST', 'SPRING_DATASOURCE_USERNAME', 'SPRING_DATASOURCE_PASSWORD', 'RENDER_DB_SCHEMA', 'OPENAI_API_KEY', 'OPENAI_MODEL', 'OPENAI_TIMEOUT', 'APP_AI_MODE', 'SUPABASE_URL', 'SUPABASE_SECRET_KEY', 'SUPABASE_STORAGE_BUCKET','APP_AUTH_ENABLED','SUPABASE_AUTH_URL','SUPABASE_AUTH_PUBLISHABLE_KEY','APP_AUTH_HOME','APP_AUTH_CALLBACK_URL')) {
     $existing = [Environment]::GetEnvironmentVariable($name, 'Process')
     if ($null -ne $existing) { $settings[$name] = $existing }
 }
@@ -102,8 +102,20 @@ switch ($Action) {
             APP_ENVIRONMENT = 'production'
             APP_DB_SCHEMA = $settings['RENDER_DB_SCHEMA']
         }
-        foreach ($name in @('OPENAI_API_KEY','OPENAI_MODEL','OPENAI_TIMEOUT','APP_AI_MODE','SUPABASE_URL','SUPABASE_SECRET_KEY','SUPABASE_STORAGE_BUCKET')) {
+        foreach ($name in @('OPENAI_API_KEY','OPENAI_MODEL','OPENAI_TIMEOUT','APP_AI_MODE','SUPABASE_URL','SUPABASE_SECRET_KEY','SUPABASE_STORAGE_BUCKET','APP_AUTH_ENABLED','SUPABASE_AUTH_URL','SUPABASE_AUTH_PUBLISHABLE_KEY','APP_AUTH_HOME','APP_AUTH_CALLBACK_URL')) {
             if (-not [string]::IsNullOrWhiteSpace($settings[$name])) { $deployment[$name] = $settings[$name] }
+        }
+        if ($settings.ContainsKey('APP_AUTH_ENABLED')) {
+            if ($settings['APP_AUTH_ENABLED'] -notin @('true','false')) { throw 'APP_AUTH_ENABLED must be true or false.' }
+            if ($settings['APP_AUTH_ENABLED'] -eq 'true') {
+                foreach ($name in @('SUPABASE_AUTH_URL','SUPABASE_AUTH_PUBLISHABLE_KEY','APP_AUTH_CALLBACK_URL')) {
+                    if ([string]::IsNullOrWhiteSpace($settings[$name])) { throw "Set $name before enabling Auth." }
+                }
+                if ($settings['APP_AUTH_CALLBACK_URL'] -notmatch '^https://[a-zA-Z0-9.-]+/auth/callback$') {
+                    throw 'Render Auth requires an exact HTTPS APP_AUTH_CALLBACK_URL.'
+                }
+            }
+            $deployment['APP_AUTH_ENABLED'] = $settings['APP_AUTH_ENABLED']
         }
         foreach ($name in $deployment.Keys) {
             Invoke-Render Put "/services/$serviceId/env-vars/$name" @{ value = $deployment[$name] } | Out-Null

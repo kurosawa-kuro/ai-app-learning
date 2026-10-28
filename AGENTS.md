@@ -118,4 +118,4 @@ GAS / Retoolを使う場合は[プラットフォームの入口](docs/runbooks/
 
 ## 教育用Webテンプレートの範囲
 
-`src/app-learning/02-web-app-learning/template` の変更では、同配下の `AGENTS.md` と `docs/educational-baseline.md` を必ず確認する。教育用の横展開を本番運用の全部入りと解釈しない。独自復旧・監査DB・AI永続台帳は廃止済みで、過去の課題表を根拠に再追加しない。認証は現在なし。Supabase Authによる本格版への移行だけを[ADR 0004](docs/adr/0004-auth-gas-simple-web-supabase.md)で予定しており、Basic認証・独自ログインは戻さない。GAS版は学習用の簡易版のまま。
+`src/app-learning/02-web-app-learning/template` の変更では、同配下の `AGENTS.md` と `docs/educational-baseline.md` を必ず確認する。教育用の横展開を本番運用の全部入りと解釈しない。独自復旧・監査DB・AI永続台帳は廃止済みで、過去の課題表を根拠に再追加しない。Googleログインはコード実装済みだが既定は無効、実Google・Render受入は未実施。方式と有効化は[src/app-learning/02-web-app-learning/docs/Googleログインの設定と確認.md](src/app-learning/02-web-app-learning/docs/Googleログインの設定と確認.md)に従う。Supabase Authによる本格版への移行を[ADR 0004](docs/adr/0004-auth-gas-simple-web-supabase.md)で予定しており、Basic認証・独自ログインは戻さない。GAS版は学習用の簡易版のまま。
