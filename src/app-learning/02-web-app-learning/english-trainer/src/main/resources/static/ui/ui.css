@@ -190,3 +190,7 @@ body:has(dialog[open]) { overflow: hidden; }
 [data-learning-status]:empty,[data-learning-feedback]:empty {display:none}
 
 input[type=checkbox]:not([role=switch]),input[type=radio]{appearance:auto;accent-color:#c42678;background-image:none}
+
+/* Keep inactive workspaces out of layout; preserve their draft fields in the DOM. */
+[data-workspace-panel][hidden] { display: none !important; }
+[data-workspace-nav] [aria-current="page"] { font-weight: 700; text-decoration: underline; text-underline-offset: .3em; }

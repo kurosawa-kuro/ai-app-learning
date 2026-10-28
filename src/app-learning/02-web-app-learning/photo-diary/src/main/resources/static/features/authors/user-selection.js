@@ -39,6 +39,7 @@
     }
     async function selectUser(user) {
       if (switching) return;
+      if (!document.dispatchEvent(new CustomEvent('app:before-user-select', { cancelable: true, detail: { id: user.id } }))) return;
       switching = true; error.hidden = true;
       list.querySelectorAll('button').forEach(button => { button.disabled = true; });
       userPopup.setAttribute('aria-busy', 'true');

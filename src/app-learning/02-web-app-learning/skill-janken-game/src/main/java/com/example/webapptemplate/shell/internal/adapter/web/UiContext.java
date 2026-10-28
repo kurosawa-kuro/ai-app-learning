@@ -36,7 +36,7 @@ public class UiContext {
     public List<String> scripts(HttpServletRequest request) {
         if(request.getRequestURI().equals("/admin")) return List.of("/ui/database-check.js");
         String path=request.getRequestURI();
-        if(path.startsWith("/janken"))return List.of("/examples/janken-rules.js","/lesson/janken.js");
+        if(path.startsWith("/janken"))return List.of("/ui/workspaces.js","/examples/janken-rules.js","/lesson/janken.js");
         if(path.startsWith("/examples/skill-janken")) return List.of("/examples/janken-rules.js", "/examples/skill-janken.js");
         if(path.equals("/posts/new") || path.matches("/posts/[0-9a-f-]{36}/edit") || (path.equals("/posts") && request.getMethod().equals("POST")))
             return List.of("/ui/image-preview.js", "/ui/form-protection.js", "/features/posts/posts.js", "/features/ai/drafts.js");
