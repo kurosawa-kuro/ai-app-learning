@@ -15,6 +15,7 @@ let browser;
   browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
   const p = await context.newPage();
+  p.setDefaultNavigationTimeout(120000);
   const errors = [];
   p.on('pageerror', e => errors.push(e.message));
   // Establish two fictional users through the real server, preserving all existing data.

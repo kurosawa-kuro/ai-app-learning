@@ -22,6 +22,7 @@ let browser;
     await p.waitForLoadState();
   }
   await p.goto(base + routes[kind]);
+  if (kind !== 'evaluation') await expect(p.getByText('デモ：AIは固定応答です。外部AIへ送信しません。', { exact: true })).toHaveCount(0);
   if (kind === 'janken') {
     await expect(p.locator('#player option:checked')).toHaveText(name);
     await tab(p, 'line');
