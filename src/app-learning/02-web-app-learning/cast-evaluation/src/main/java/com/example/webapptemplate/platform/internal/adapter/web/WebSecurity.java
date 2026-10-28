@@ -1,4 +1,6 @@
 package com.example.webapptemplate.platform.internal.adapter.web;
+import com.example.webapptemplate.platform.BrowserCsrf;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,14 +9,12 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-/** Educational app: no login. CSRF protection still applies to browser writes. */
+/** Educational app without login. CSRF protection still applies to browser writes. Replaced when app.auth.enabled=true. */
 @Configuration
+@ConditionalOnProperty(name = "app.auth.enabled", havingValue = "false", matchIfMissing = true)
 public class WebSecurity {
  @Bean SecurityFilterChain security(HttpSecurity http) throws Exception {
-  var csrf=new org.springframework.security.web.csrf.CookieCsrfTokenRepository();
-  csrf.setHeaderName("X-CSRF-TOKEN");
-  csrf.setCookieCustomizer(cookie -> cookie.sameSite("Lax"));
-  return http.csrf(config -> config.csrfTokenRepository(csrf)).authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+  return http.csrf(config -> config.csrfTokenRepository(BrowserCsrf.repository())).authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
    .httpBasic(AbstractHttpConfigurer::disable).formLogin(AbstractHttpConfigurer::disable)
    .logout(AbstractHttpConfigurer::disable).build();
  }

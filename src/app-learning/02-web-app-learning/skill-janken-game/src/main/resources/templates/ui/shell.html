@@ -31,6 +31,11 @@
       <button type="button" class="secondary" data-sidebar-close>閉じる</button>
       <div class="ui-app-navigation"><small class="ui-nav-caption">アプリ</small><nav class="admin-nav" aria-label="メインメニュー" th:insert="~{ui/navigation :: links(${navigation.links})}"></nav></div>
       <div th:replace="~{ui/navigation :: management}"></div>
+      <section class="ui-sidebar-context" th:if="${signedInUser != null}" aria-labelledby="signed-in-label">
+        <small id="signed-in-label">ログイン中のアカウント</small>
+        <strong th:text="${signedInUser.displayName}" th:title="${signedInUser.email}"></strong>
+        <form method="post" th:action="@{/logout}"><button type="submit" class="secondary">ログアウト</button></form>
+      </section>
       <section class="ui-sidebar-context" th:if="${sidebarContext != null}" aria-labelledby="sidebar-context-label">
         <small id="sidebar-context-label" th:text="${sidebarContext.label}"></small>
         <button type="button" class="ui-user-trigger" popovertarget="user-popup" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="sidebar-context-label sidebar-current-user">

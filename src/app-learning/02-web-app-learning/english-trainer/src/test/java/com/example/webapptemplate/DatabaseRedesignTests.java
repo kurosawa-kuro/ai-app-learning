@@ -40,7 +40,7 @@ class DatabaseRedesignTests {
                 assertThat(db.queryForObject("select count(*) from "+schema+"_legacy.operation_events",Integer.class)).isEqualTo(1);
                 assertThat(db.queryForObject("select result_text from "+schema+"_legacy.ai_requests",String.class)).isEqualTo("残す下書き");
                 assertThat(db.queryForList("select table_name from information_schema.tables where table_schema=? and table_name<>'flyway_schema_history' order by table_name",String.class,schema))
-                    .containsExactly("allowed_ai_models","app_settings","app_users","image_cleanup","learning_entries","learning_questions","post_requests","posts");
+                    .containsExactly("allowed_ai_models","app_admins","app_settings","app_users","image_cleanup","learning_entries","learning_questions","post_requests","posts");
                 assertThatThrownBy(()->db.update("update app_users set icon_type=null where id=?",user)).isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
                 assertThatThrownBy(()->db.update("insert into post_requests(request_id,fingerprint,post_id) values(?,?,?)",UUID.randomUUID(),"c".repeat(64),UUID.randomUUID())).isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
                 assertThatThrownBy(()->db.update("delete from app_users where id=?",user)).isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);

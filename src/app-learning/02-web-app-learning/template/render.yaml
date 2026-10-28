@@ -31,3 +31,12 @@ services:
       # To enable images, also add SUPABASE_URL and SUPABASE_SECRET_KEY in the Dashboard.
       - key: APP_IMAGES_ENABLED
         value: "false"
+      # Google sign-in through Supabase Auth. Enter the Auth project URL and publishable key, then enable.
+      - key: APP_AUTH_ENABLED
+        sync: false
+      - key: SUPABASE_AUTH_URL
+        sync: false
+      - key: SUPABASE_AUTH_PUBLISHABLE_KEY
+        sync: false
+      - key: APP_AUTH_CALLBACK_URL
+        sync: false

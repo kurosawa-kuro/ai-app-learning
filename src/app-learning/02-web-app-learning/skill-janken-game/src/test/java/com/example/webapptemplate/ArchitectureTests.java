@@ -13,7 +13,7 @@ class ArchitectureTests {
     @Test void featureModulesHaveNoCyclesOrInternalAccess() {
         var modules = ApplicationModules.of(WebAppTemplateApplication.class);
         assertThat(modules.stream().map(module -> module.getIdentifier().toString()))
-            .containsExactlyInAnyOrder("authors", "posts", "settings", "platform", "shell", "games", "exports", "bootstrap", "ai", "janken");
+            .containsExactlyInAnyOrder("authors", "posts", "settings", "platform", "shell", "games", "exports", "bootstrap", "ai", "auth", "janken");
         modules.verify();
     }
 
@@ -39,7 +39,7 @@ class ArchitectureTests {
     @Test void featureDependencyDirectionsAreExplicit() {
         var imported = new ClassFileImporter().withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
             .importPackages("com.example.webapptemplate");
-        var allowed = Map.of(
+        var allowed = new java.util.HashMap<String, Set<String>>(Map.of(
             "platform", Set.<String>of(),
             "authors", Set.of("platform"),
             "settings", Set.of("platform"),
@@ -48,7 +48,8 @@ class ArchitectureTests {
             "games", Set.<String>of(),
             "shell", Set.of("authors", "settings", "platform"),
             "bootstrap", Set.of("settings", "platform"),
-            "ai", Set.of("platform", "settings"),"janken",Set.of("platform","authors","ai"));
+            "ai", Set.of("platform", "settings"),"janken",Set.of("platform","authors","ai")));
+        allowed.put("auth", Set.of("platform"));
         allowed.forEach((module, dependencies) -> {
             for (var other : allowed.keySet()) {
                 if (other.equals(module) || dependencies.contains(other)) continue;

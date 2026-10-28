@@ -17,7 +17,7 @@ $settings = Read-DotEnv -Path (Join-Path $PSScriptRoot '.env')
 # Optional shared credentials are read into this process, never copied to app files.
 if ($SecretsFile) {
     $shared=Read-DotEnv -Path $SecretsFile
-    foreach($name in @('DB_HOST','DB_PORT','DB_NAME','SPRING_DATASOURCE_USERNAME','SPRING_DATASOURCE_PASSWORD','SUPABASE_URL','SUPABASE_SECRET_KEY','OPENAI_API_KEY')) {
+    foreach($name in @('DB_HOST','DB_PORT','DB_NAME','SPRING_DATASOURCE_USERNAME','SPRING_DATASOURCE_PASSWORD','SUPABASE_URL','SUPABASE_SECRET_KEY','OPENAI_API_KEY','SUPABASE_AUTH_URL','SUPABASE_AUTH_PUBLISHABLE_KEY')) {
         if(-not $settings.ContainsKey($name) -and $shared.ContainsKey($name)) { $settings[$name]=$shared[$name] }
     }
     $shared.Clear()
@@ -26,7 +26,8 @@ if ($SecretsFile) {
 $allowed = @('DB_HOST', 'DB_PORT', 'DB_NAME', 'SPRING_DATASOURCE_URL',
     'SPRING_DATASOURCE_USERNAME', 'SPRING_DATASOURCE_PASSWORD', 'SUPABASE_URL',
     'SUPABASE_SECRET_KEY', 'SUPABASE_STORAGE_BUCKET', 'APP_IMAGES_ENABLED',
-    'APP_DB_SCHEMA', 'SERVER_PORT', 'APP_ENVIRONMENT', 'AI_OPENAI_API_KEY', 'OPENAI_API_KEY', 'OPENAI_MODEL', 'OPENAI_TIMEOUT', 'APP_AI_MODE')
+    'APP_DB_SCHEMA', 'SERVER_PORT', 'APP_ENVIRONMENT', 'AI_OPENAI_API_KEY', 'OPENAI_API_KEY', 'OPENAI_MODEL', 'OPENAI_TIMEOUT', 'APP_AI_MODE',
+    'APP_AUTH_ENABLED', 'SUPABASE_AUTH_URL', 'SUPABASE_AUTH_PUBLISHABLE_KEY', 'APP_AUTH_HOME', 'APP_AUTH_CALLBACK_URL')
 # Read by scripts/render.ps1 only; never passed to the app.
 $deployOnly = @('RENDER_API_KEY', 'RENDER_DB_SCHEMA')
 foreach ($name in @($settings.Keys)) {
