@@ -34,7 +34,7 @@ samplePosts:
       - { id: "103", file: sample-c }
     tags: ["11"]
 
-# AI 下書きの固定の文章（Gemini はまだ呼ばない。設計書 3 章 P02）
+# AI 下書きの固定の文章（OpenAI はまだ呼ばない。設計書 3 章 P02）
 draft:
   title: ゆったり過ごした一日
   body: |-

@@ -12,7 +12,7 @@ const observation = {
 };
 function gas(status, body) {
   const g = createGas();
-  g.props.set("GEMINI_API_KEY", "secret-test-key-123456789");
+  g.props.set("OPENAI_API_KEY", "secret-test-key-123456789");
   g.context.requests = [];
   g.context.UrlFetchApp = {
     fetch: (url, options) => {
@@ -28,13 +28,14 @@ function gas(status, body) {
 }
 test("構造化採点の要求・キーのヘッダ送信・usage", () => {
   const g = gas(200, {
-    candidates: [
+    status: "completed",
+    output: [
       {
-        finishReason: "STOP",
-        content: { parts: [{ text: JSON.stringify(observation) }] },
+        type: "message",
+        content: [{ type: "output_text", text: JSON.stringify(observation) }],
       },
     ],
-    usageMetadata: { totalTokenCount: 5 },
+    usage: { total_tokens: 5 },
   });
   const out = g.run(
     'EnglishAiProvider.call("grade",{input:{answer:"hello",problem:{}},model:APP_CONFIG.ai.model,maxOutputTokens:4096})',
@@ -45,10 +46,13 @@ test("構造化採点の要求・キーのヘッダ送信・usage", () => {
   assert.equal(r.url.includes("secret"), false);
   assert.equal(r.options.followRedirects, false);
   assert.equal(
-    r.options.headers["x-goog-api-key"],
-    "secret-test-key-123456789",
+    r.options.headers.Authorization,
+    "Bearer secret-test-key-123456789",
   );
-  assert.ok(JSON.parse(r.options.payload).generationConfig.responseJsonSchema);
+  const payload = JSON.parse(r.options.payload);
+  assert.equal(payload.store, false);
+  assert.equal(payload.text.format.strict, true);
+  assert.equal(payload.text.format.schema.additionalProperties, false);
 });
 for (const [status, code] of [
   [401, "authentication_error"],
@@ -59,7 +63,7 @@ for (const [status, code] of [
   test("HTTP " + status + "は安全なコードで返り再送しない", () => {
     const g = gas(status, "secret-test-key-123456789");
     const r = g.run(
-      'GeminiClient.generateText({model:APP_CONFIG.ai.model,text:"test"})',
+      'OpenAIClient.generateText({model:APP_CONFIG.ai.model,text:"test"})',
     );
     assert.equal(r.code, code);
     assert.equal(g.context.requests.length, 1);

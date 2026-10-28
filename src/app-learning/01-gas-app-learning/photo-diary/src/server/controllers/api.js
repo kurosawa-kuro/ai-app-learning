@@ -48,3 +48,6 @@ function getTags() { return respond_(() => ApplicationComposition.tags().list())
 function changeTag(input) { return respond_(() => ApplicationComposition.tags().change(input)) }
 
 function upgradeDiaryEntryDate() { return upgradeDiaryEntryDate_() }
+
+function getAiSettings() { return respond_(() => ({keyConfigured:IntegrationSettings.openaiKeyConfigured(),model:Settings.ai().model})) }
+function saveAiKey(value) { return respond_(() => {IntegrationSettings.saveOpenAIKey(value); return {keyConfigured:IntegrationSettings.openaiKeyConfigured(),model:Settings.ai().model} }) }

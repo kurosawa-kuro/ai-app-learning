@@ -8,13 +8,13 @@
 
 配布モデルAを実装上の前提とする。本人実行・本人アクセスのWebアプリ。1コピーで1利用者、1キー、1日次利用枠。複数利用者の共有運用は対象外。
 
-`rpc → Application → 注入ポート → Repository / Gemini`。Domainは純粋関数。bootstrapで組み立て、Sheets書込はSheetStoreに集約。学習履歴は追記、設定・要求状態は更新可能。書込時にScriptLockを必須とし、Gemini呼出はロックを解放して行う。複数シートのトランザクションは存在しないため、IDと確定点で復旧する。キャッシュは世代管理し、更新判断にはfresh readを使う。
+`rpc → Application → 注入ポート → Repository / OpenAI`。Domainは純粋関数。bootstrapで組み立て、Sheets書込はSheetStoreに集約。学習履歴は追記、設定・要求状態は更新可能。書込時にScriptLockを必須とし、OpenAI呼出はロックを解放して行う。複数シートのトランザクションは存在しないため、IDと確定点で復旧する。キャッシュは世代管理し、更新判断にはfresh readを使う。
 
 ## 学習機能
 
 初期表現51件と混同ペアの静的クイズを同梱。選択肢IDのMD5生成・正規化は参照元を移植。意味/意図の成功後にformを出題し、3問以上の間隔を空けた2回成功で安定。間隔・失敗・日跨ぎ・再チェック・学習段階・直近表現の順で優先度を比較する。
 
-自由記述はrecognition、controlled_recall、free_production、slot_replacement、contrast_drill。完全一致は正規化後に決定的採点、その他は同意後にGeminiの構造化観測を取得する。意味・発話意図・明瞭さ・対象表現から5判定へ還元する。参照元で実質到達しなかったretry_formも、対象スキルに影響するissueがある場合に返す。
+自由記述はrecognition、controlled_recall、free_production、slot_replacement、contrast_drill。完全一致は正規化後に決定的採点、その他は同意後にOpenAIの構造化観測を取得する。意味・発話意図・明瞭さ・対象表現から5判定へ還元する。参照元で実質到達しなかったretry_formも、対象スキルに影響するissueがある場合に返す。
 
 `items`は出題内容のハッシュ版を追記保存する。回答はその版を参照し、教材を後から編集しても旧回答の採点対象を変えない。回答IDの異内容再利用は拒否。再判定は元回答を変えず新しいassessmentを追加する。evidenceを先に書き、assessment保存を確定点とする。未確定evidenceは出題判断に使わない。
 
@@ -47,7 +47,7 @@ teacher（先生）、learner（仲間）、free_talkの3シナリオ。開始�
 - 参照元のRPC名18個を登録するが、G4の混同ペア登録・人間観測・観測比較・trace・phase gateは`not_implemented`。同名RPCの完全な入出力互換は保証しない。
 - 今日の画面は学習件数・安定クイズ数と練習導線。記録には最新判定だけを用いた能力別の成功/回答件数を表示する。自動計画、詳細診断、教材の自動昇格、混同状態からの動的優先度は後続範囲。
 - 教材は各表現の代表例1件を使用。代表例がない教材はextra_examplesの先頭を使用し、追加例の網羅出題は未実装。
-- 表現候補抽出はGeminiの構造化出力。参照元の全会話メトリクス・freeze規則は未移植。
+- 表現候補抽出はOpenAIの構造化出力。参照元の全会話メトリクス・freeze規則は未移植。
 - 静的混同ペアはenv由来で、シート編集対象は表現教材。音声入出力・関係DBは導入しない。
 
 ## RPC境界

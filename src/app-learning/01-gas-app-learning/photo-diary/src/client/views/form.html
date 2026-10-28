@@ -162,8 +162,25 @@
 
     return {
       init() {
+        const keyStatus = $("openai-key-status")
+        const showKeyStatus = (result) => { keyStatus.textContent = result.keyConfigured ? "登録済み（" + result.model + "）" : "未登録" }
+        $("ai-settings").addEventListener("toggle", async () => {
+          if (!$("ai-settings").open) return
+          try { showKeyStatus(await App.api.getAiSettings()) } catch (error) { keyStatus.textContent = error.message }
+        })
+        async function saveKey(remove) {
+          const input = $("openai-key")
+          if (!remove && !input.value.trim()) { keyStatus.textContent = "キーを入力してください"; return }
+          if (remove && !confirm("登録したAPIキーを削除しますか？")) return
+          $("openai-key-save").disabled = $("openai-key-delete").disabled = true
+          try { showKeyStatus(await App.api.saveAiKey(remove ? "" : input.value.trim())); input.value = "" }
+          catch (error) { keyStatus.textContent = error.message }
+          finally { $("openai-key-save").disabled = $("openai-key-delete").disabled = false }
+        }
+        $("openai-key-save").addEventListener("click", () => saveKey(false))
+        $("openai-key-delete").addEventListener("click", () => saveKey(true))
         App.photoUpload.init(() => { state.dirty = true; setBusy() })
-        $("ai-description").textContent = CONFIG.aiEnabled ? "選択したキーワードとアップロード画像をGeminiへ送信し、文体設定に沿った下書きを生成します。内容を確認してから保存してください。" : "今は決まった文章を返す試作版です。"
+        $("ai-description").textContent = CONFIG.aiEnabled ? "選択したキーワードとアップロード画像をOpenAIへ送信し、文体設定に沿った下書きを生成します。内容を確認してから保存してください。" : "今は決まった文章を返す試作版です。"
         $("ai-consent-label").hidden = !CONFIG.aiEnabled
         $("f-title").maxLength = CONFIG.limits.title
         $("f-body").maxLength = CONFIG.limits.body

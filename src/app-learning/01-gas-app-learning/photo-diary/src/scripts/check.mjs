@@ -43,7 +43,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const steps = [["生成物の一致", ["scripts/build-data.mjs", "--check"]]]
     if (!args.includes("--doctor")) {
       steps.push(["単体テスト", ["--test", ...readdirSync(join(srcDir, "tests")).filter(name => name.endsWith(".test.mjs")).sort().map(name => "tests/" + name)]])
-      steps.push(["AI要求構築（外部送信なし）", ["scripts/verify-gemini.mjs", "--dry-run"]])
+      steps.push(["AI要求構築（外部送信なし）", ["scripts/verify-openai.mjs", "--dry-run"]])
       if (args.includes("--browser")) {
         steps.push(["ブラウザ受入", ["tests/browser/acceptance.mjs"]], ["画像読込", ["tests/browser/photo-loading.mjs"]])
       }

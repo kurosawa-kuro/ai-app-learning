@@ -4,7 +4,7 @@ language: ja
 timeZone: Asia/Tokyo
 distributionModel: A
 ai:
-  model: gemini-3.5-flash-lite
+  model: gpt-4.1-mini
   maxOutputTokens: 4096
   dailyLimit: 30
   runningTimeoutMinutes: 15

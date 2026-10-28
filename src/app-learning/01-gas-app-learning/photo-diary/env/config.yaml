@@ -14,13 +14,13 @@ limits:
 
 # 差し替えられる機能の提供元。本物に替えるときは、提供元のファイルを 1 本足して名前をここで切り替える
 #   photo：写真（dummy = sample-data.yaml の目録から描く絵。将来 drive）
-#   draft：AI 下書き（mock = sample-data.yaml の固定の文章。将来 gemini）
+#   draft：AI 下書き（mock = sample-data.yaml の固定の文章。将来 openai）
 providers:
   photo: drive
-  draft: gemini
+  draft: openai
 
 ai:
-  model: gemini-3.5-flash-lite
+  model: gpt-4.1-mini
   maxOutputTokens: 2048
 
 uploads:

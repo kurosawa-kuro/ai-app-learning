@@ -1,6 +1,8 @@
 # photo-diary
 
-Google Apps Script・Google Sheets・Drive・Geminiで動く、本人専用の写真日記アプリです。写真とキーワードからAI下書きを作り、手直しして保存できます。一覧・複数タグOR絞り込み・詳細表示、タグ管理・日付入力、最大3枚の写真、未添付画像と生成履歴の手動整理に対応しています。保存済み日記の編集・削除、独自ログインは対象外です。
+> 2026-10-28：AIはOpenAI APIキー方式へ変更。OAuth／GCP設定は不要です。現在の手順は[OpenAI接続](docs/openai-setup.md)、実環境の進捗は[受入記録](../../docs/tasks/gas-release-20261028.md)を参照。過去のGemini連携仕様は旧方式の記録です。
+
+Google Apps Script・Google Sheets・Drive・OpenAIで動く、本人専用の写真日記アプリです。写真とキーワードからAI下書きを作り、手直しして保存できます。一覧・複数タグOR絞り込み・詳細表示、タグ管理・日付入力、最大3枚の写真、未添付画像と生成履歴の手動整理に対応しています。保存済み日記の編集・削除、独自ログインは対象外です。
 
 ## 現在地と検証範囲
 
@@ -10,8 +12,8 @@ Google Apps Script・Google Sheets・Drive・Geminiで動く、本人専用の�
 |---|---|
 | 既存公開環境 | [移行記録](docs/tasks/03_active/本番DBv2移行_2026-10-25.md)ではDB v2移行・画像検証・公開版@18への更新が完了。現在の公開状態は別途照合する |
 | 最新のローカル修正 | 保存先・起動JSON・書込確定・文字列保存の修正に加え、画像一覧の一括読取と手動編集時のキャッシュ失効競合を修正。78ファイルpush済み。日付列追加と公開版更新は未実施 |
-| 直近のローカル検証 | `npm run check`で162件成功とAI要求構築4ケース成功。実ChromiumでPC幅・スマホ幅の操作・50件ずつの追加表示・画像表示を確認。GAS・Drive・Gemini通信は模擬 |
-| 残る受入 | 日付列追加・公開版更新、実GAS／Drive／Geminiでの保存・再表示・タグ操作 |
+| 直近のローカル検証 | `npm run check`で162件成功とAI要求構築4ケース成功。実ChromiumでPC幅・スマホ幅の操作・50件ずつの追加表示・画像表示を確認。GAS・Drive・OpenAI通信は模擬 |
+| 残る受入 | キー再発行と最終受入記録の未確認項目（公開@20、日付列追加・OpenAI画像下書き・保存・再表示は確認済み） |
 
 日付・タグ・入力上限の仕様は[基本機能の対応](docs/specs/gas-baseline.md)。配置と残作業は[5教材の実行記録](../../docs/tasks/gas-release-20261028.md)。
 
@@ -72,7 +74,7 @@ npm run test:browser
 
 - [文書索引](docs/00_index.md)：確定仕様と作業記録の案内。
 - [DB v2仕様](docs/specs/database-v2.md)・[Domain / Application設計](docs/specs/application-domain-architecture.md)：データと責務の正本。
-- [写真・Gemini連携](docs/specs/photo-gemini-integration.md)・[運用診断](docs/specs/setup-operations.md)：設定、生成、整理、障害調査。
+- [写真・OpenAI連携](docs/specs/photo-gemini-integration.md)・[運用診断](docs/specs/setup-operations.md)：設定、生成、整理、障害調査。
 - [AGENTS.md](AGENTS.md)：開発時の共通規約と再発防止。[CLAUDE.md](CLAUDE.md)：Claude Codeの入口。
 - [タスク索引](docs/tasks/README.md)：経緯・残作業。過去の構想を現在の実装と混同しない。
 

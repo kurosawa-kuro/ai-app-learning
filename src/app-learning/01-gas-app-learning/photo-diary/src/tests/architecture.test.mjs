@@ -50,7 +50,7 @@ test("写真・AI 下書きの中身を知っているのは、それぞれの�
 })
 
 test("GAS のサービスはそれぞれ 1 か所から", () => {
-  onlyIn(/UrlFetchApp/, ["server/services/draft/gemini-client.js"], "Gemini通信はGeminiClientに閉じる")
+  onlyIn(/UrlFetchApp/, ["server/services/draft/openai-client.js"], "OpenAI通信はOpenAIClientに閉じる")
   onlyIn(/HtmlService/, ["server/controllers/web.js"], "画面の配信は controllers/web.js")
   onlyIn(/LockService/, ["server/core/lock.js"], "ロックは withLock_")
   onlyIn(/CacheService/, ["server/services/diary-service.js", "server/db/table-cache.js"], "二重登録の防止は DiaryService.create、表のキャッシュは TableCache")

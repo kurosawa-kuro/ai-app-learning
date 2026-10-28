@@ -8,7 +8,7 @@
     "doctor": "node scripts/check.mjs --doctor",
     "check": "node scripts/check.mjs",
     "benchmark:db": "node scripts/benchmark-db.mjs",
-    "verify:gemini": "node scripts/verify-gemini.mjs",
+    "verify:openai": "node scripts/verify-openai.mjs",
     "test": "npm run build:data && node --test \"tests/*.test.mjs\"",
     "test:browser": "npm run build:data && node tests/browser/acceptance.mjs && node tests/browser/photo-loading.mjs",
     "push": "npm run build:data && clasp push --force",

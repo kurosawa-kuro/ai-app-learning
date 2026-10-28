@@ -206,7 +206,7 @@ try {
       path: "test-results/trainer-" + width + ".png",
       fullPage: true,
     });
-    outcomes.push({ width, passed: true, scope: "実Chromium・模擬GAS/Gemini" });
+    outcomes.push({ width, passed: true, scope: "実Chromium・模擬GAS/OpenAI" });
     await context.close();
   }
   writeFileSync(

@@ -78,7 +78,7 @@ test("コピー先初期設定は保存先を再登録して旧コピーのキ�
   g.props.set("ET_SPREADSHEET_ID", "source-sheet");
   g.run("Seeder.initialize()");
   assert.equal(g.props.get("ET_SPREADSHEET_ID"), "test-sheet");
-  assert.equal(g.props.has("GEMINI_API_KEY"), false);
+  assert.equal(g.props.has("OPENAI_API_KEY"), false);
 });
 test("数式風の回答とAI応答を文字列のまま保存して再送できる", () => {
   const g = setup();

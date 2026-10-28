@@ -4,9 +4,9 @@ import { createGas } from "./gas-mock.mjs"
 
 function ready(response = { title: "休日", body: "散歩の時間を振り返る。" }) {
   const gas = createGas()
-  gas.run('Seeder.ensure(); APP_CONFIG.providers.draft = "gemini"')
+  gas.run('Seeder.ensure(); APP_CONFIG.providers.draft = "openai"')
   gas.context.response = response
-  gas.run('GeminiClient.generateText = (request) => { globalThis.sent = request; return { ok: true, text: JSON.stringify(response) } }')
+  gas.run('OpenAIClient.generateText = (request) => { globalThis.sent = request; return { ok: true, text: JSON.stringify(response) } }')
   return gas
 }
 test("G3a：キーワード生成→編集→保存→詳細を通す", () => {
@@ -29,7 +29,7 @@ test("G3a：同意なし・写真のみ・不正形式・長すぎる下書き�
 })
 test("G3a：利用枠失敗は手入力保存を妨げず、モックへ戻せる", () => {
   const gas = ready()
-  gas.run('GeminiClient.generateText = () => ({ok:false,code:"quota_exceeded"})')
+  gas.run('OpenAIClient.generateText = () => ({ok:false,code:"quota_exceeded"})')
   assert.equal(gas.call("generateDraft", { requestId: "test-gen-5", tagIds: ["11"], aiConsent: true }).error.code, "ai_failed")
   assert.equal(gas.call("create", { title: "手入力", body: "保存する" }, "manual").ok, true)
   gas.run('APP_CONFIG.providers.draft = "mock"')

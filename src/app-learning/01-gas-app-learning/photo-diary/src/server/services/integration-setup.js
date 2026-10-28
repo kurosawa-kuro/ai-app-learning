@@ -30,15 +30,15 @@ const IntegrationSetup = {
     }
   },
 
-  checkGemini() {
-    const configured = IntegrationSettings.geminiKeyConfigured()
+  checkOpenAI() {
+    const configured = IntegrationSettings.openaiKeyConfigured()
     return {
       ok: configured,
       code: configured ? "key_configured_not_validated" : "missing_api_key",
       keyConfigured: configured,
       apiAuthenticationVerified: false,
       inferenceExecuted: false,
-      message: configured ? "APIキーの設定有無だけ確認しました。有効性・プロジェクト・課金・推論は未確認です。" : "Script Properties に GEMINI_API_KEY を設定してください。キーをチャットやログへ貼らないでください。",
+      message: configured ? "APIキーの設定有無だけ確認しました。有効性・プロジェクト・課金・推論は未確認です。" : "Script Properties に OPENAI_API_KEY を設定してください。キーをチャットやログへ貼らないでください。",
     }
   },
 }

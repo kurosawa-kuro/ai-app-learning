@@ -54,7 +54,7 @@ export function buildData({ configText, dataText, csvText }) {
   const ai = config.ai
   const uploads = config.uploads
   if (!uploads || !Number.isInteger(uploads.maxImages) || uploads.maxImages < 1 || uploads.maxImages > 3 || uploads.maxBytes !== 1048576 || uploads.maxTotalBytes !== 3145728 || uploads.maxEdge !== 1600 || !Number.isInteger(uploads.retentionHours) || uploads.retentionHours < 24) fail("config.yaml：uploads の上限を確認してください")
-  if (!ai || !/^gemini-[a-z0-9.-]+$/.test(ai.model) || !Number.isInteger(ai.maxOutputTokens) || ai.maxOutputTokens < 256 || ai.maxOutputTokens > 8192) fail("config.yaml：ai のモデル・出力上限を確認してください")
+  if (!ai || !/^gpt-[a-z0-9.-]+$/.test(ai.model) || !Number.isInteger(ai.maxOutputTokens) || ai.maxOutputTokens < 256 || ai.maxOutputTokens > 8192) fail("config.yaml：ai のモデル・出力上限を確認してください")
   ;["photo", "draft"].forEach((k) => { if (typeof providers[k] !== "string" || !providers[k]) fail(`config.yaml：providers.${k} がありません`) })
   const retiredSheets = config.retiredSheets || []
   if (!Array.isArray(retiredSheets)) fail("config.yaml：retiredSheets は一覧にしてください")

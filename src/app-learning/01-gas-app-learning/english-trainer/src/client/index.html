@@ -89,7 +89,7 @@
           </select></label
         >
         <p class="privacy">
-          個人情報を含めず、架空の場面で練習してください。会話はGeminiへ送信されます。
+          個人情報を含めず、架空の場面で練習してください。会話はOpenAIへ送信されます。
         </p>
         <label
           ><input type="checkbox" id="talk-consent" />
@@ -140,7 +140,7 @@
             max="1000"
             value="30" /></label
         ><label
-          >Gemini APIキー（空欄なら現在のキーを維持）<input
+          >OpenAI APIキー（空欄なら現在のキーを維持）<input
             id="api-key"
             type="password"
             autocomplete="new-password"
@@ -150,11 +150,10 @@
           ><button id="delete-key">キーを削除</button>
         </div>
         <p>
-          各自のGoogle AI
-          Studioでキーを発行してください。無料枠を利用する場合は課金を有効にしないでください。課金状態はこのアプリでは判定できません。
+          OpenAIのAPI管理画面でキーを発行してください。API利用料金はChatGPTの契約とは別です。利用枠と課金状態はOpenAI側で確認してください。
         </p>
         <p>
-          無料枠では入出力が製品改善に利用される場合があります。キーはサーバーのScript
+          送信する内容を確認してからAIを使ってください。キーはサーバーのScript
           Propertiesに保存されます。
         </p>
         <details>

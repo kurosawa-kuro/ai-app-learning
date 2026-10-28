@@ -10,7 +10,7 @@ const config = YAML.parse(
 if (
   config.distributionModel !== "A" ||
   config.timeZone !== "Asia/Tokyo" ||
-  !/^gemini-[a-z0-9.-]+$/.test(config.ai?.model)
+  !/^gpt-[a-z0-9.-]+$/.test(config.ai?.model)
 )
   throw Error("設定値が不正です");
 for (const value of [

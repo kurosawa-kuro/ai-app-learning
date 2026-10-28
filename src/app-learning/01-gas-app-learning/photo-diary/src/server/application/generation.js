@@ -34,12 +34,12 @@ function createGenerationApplication_(ports) {
           throw new AppError("invalid", "写真かキーワードを1つ以上選んでください。")
         const provider = this.provider_(),
           name = ports.settings.providers().draft
-        if (name === "gemini" && source.aiConsent !== true)
-          throw new AppError("consent_required", "Geminiへ送る内容を確認してください。")
+        if (name === "openai" && source.aiConsent !== true)
+          throw new AppError("consent_required", "OpenAIへ送る内容を確認してください。")
         ports.photos.validateAttachment(imageIds)
         const assets = imageIds.map((id) => ports.assets.find(id, true)),
           tags = tagIds.map((id) => tagsById.get(id))
-        if (name === "gemini" && !tags.length && !assets.some((a) => a.storage_kind === "drive"))
+        if (name === "openai" && !tags.length && !assets.some((a) => a.storage_kind === "drive"))
           throw new AppError("invalid", "キーワードかアップロードした写真を選んでください。")
         const now = ports.clock.date(),
           id = ports.ids.next()
@@ -50,7 +50,7 @@ function createGenerationApplication_(ports) {
           model: ports.settings.ai().model,
           maxOutputTokens: ports.settings.ai().maxOutputTokens,
           limits: ports.settings.limits(),
-          promptTemplate: name === "gemini" ? provider.promptTemplate() : "mock-v1",
+          promptTemplate: name === "openai" ? provider.promptTemplate() : "mock-v1",
         }
         const json = JSON.stringify(snapshot)
         if (utf8Bytes_(json) > 24000) throw new AppError("invalid", "生成入力が長すぎます。")
@@ -66,8 +66,8 @@ function createGenerationApplication_(ports) {
             state: "pending",
             created_at: now,
             updated_at: now,
-            consent_at: name === "gemini" ? now : "",
-            consent_version: name === "gemini" ? "2026-10-24" : "",
+            consent_at: name === "openai" ? now : "",
+            consent_version: name === "openai" ? "2026-10-24" : "",
           },
           assets
         )

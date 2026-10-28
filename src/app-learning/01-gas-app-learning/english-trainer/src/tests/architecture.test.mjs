@@ -13,24 +13,24 @@ test("Domain/Applicationは具体的GAS・Repository実装に依存しない", (
   for (const f of [...files("server/domain"), ...files("server/application")])
     assert.doesNotMatch(
       read(f),
-      /SpreadsheetApp|PropertiesService|CacheService|LockService|UrlFetchApp|Utilities\.|TrainingRepository|SheetStore|GeminiClient/,
+      /SpreadsheetApp|PropertiesService|CacheService|LockService|UrlFetchApp|Utilities\.|TrainingRepository|SheetStore|OpenAIClient/,
       f,
     );
 });
-test("外部送信はGemini窓口のみ、DB経路を持ち込まない", () => {
+test("外部送信はOpenAI窓口のみ、DB経路を持ち込まない", () => {
   for (const f of files("server")) {
     assert.doesNotMatch(
       read(f),
       /\bJdbc\b|api\.anthropic\.com|supabase\.co/,
       f,
     );
-    if (f !== "server/services/ai/gemini-client.js")
+    if (f !== "server/services/ai/openai-client.js")
       assert.doesNotMatch(read(f), /UrlFetchApp/, f);
   }
-  const transport = read("server/services/ai/gemini-client.js");
-  assert.match(transport, /generativelanguage\.googleapis\.com/);
+  const transport = read("server/services/ai/openai-client.js");
+  assert.match(transport, /api\.openai\.com/);
   assert.match(transport, /followRedirects: false/);
-  assert.match(transport, /x-goog-api-key/);
+  assert.match(transport, /Authorization/);
 });
 test("Sheets書込・クライアントRPCの窓口を集約", () => {
   for (const f of files("server"))

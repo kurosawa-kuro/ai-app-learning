@@ -13,7 +13,7 @@ const APP_CONFIG = {
     "tags": 5
   },
   "ai": {
-    "model": "gemini-3.5-flash-lite",
+    "model": "gpt-4.1-mini",
     "maxOutputTokens": 2048
   },
   "uploads": {
@@ -25,7 +25,7 @@ const APP_CONFIG = {
   },
   "providers": {
     "photo": "drive",
-    "draft": "gemini"
+    "draft": "openai"
   },
   "requestCacheSeconds": 600,
   "lockWaitMs": 10000,

@@ -3,7 +3,7 @@
 `src/` で `npm test` を実行する。設定を生成してから全 `*.test.mjs` を実行する。
 生成物を書き換えずに一括検証したい場合は `npm run check`、画面のブラウザ検証は `npm run test:browser`。
 特定の障害テストだけなら `node --test tests/resilience.test.mjs`。
-通常のテストでは実Gemini・Drive・Sheetsへ接続しない。
+通常のテストでは実OpenAI・Drive・Sheetsへ接続しない。
 
 ## 何を検証するか
 
@@ -13,7 +13,7 @@ Domain / Applicationの独立テストは `domain-application.test.mjs`。GAS模
 |---|---|---|
 | DB・移行 | database-v2.test.mjs | 要求の照合、部分保存の回復、移行中断・再開、旧データ保全 |
 | 障害・再送 | resilience.test.mjs | 台帳・子・親の書込前後8パターン、部分保存の中止、競合時の無変更、Drive作成の応答喪失 |
-| AI | gemini-*.test.mjs / resilience.test.mjs | 応答形式・失敗分類、ロック外の生成、処理中の同一要求、結果保存失敗後の再課金防止 |
+| AI | openai-*.test.mjs / resilience.test.mjs | 応答形式・失敗分類、ロック外の生成、処理中の同一要求、結果保存失敗後の再課金防止 |
 | 保持期間・キャッシュ | resilience.test.mjs | 15分・30日・6時間の境界、手動整理後の採用済み日記保全、キャッシュ停止時の読書き |
 | 画像 | uploads.test.mjs / resilience.test.mjs | 添付順序・上限、再送、参照中の整理拒否、アップロード後の共有状態・所属・削除の再検証 |
 | 画面 | ui.test.mjs / upload-ui.test.mjs | 入力保持、古い応答の排除、保存・生成の応答喪失、失敗画像の再送 |

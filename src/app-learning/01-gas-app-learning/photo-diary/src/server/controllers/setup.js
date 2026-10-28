@@ -4,7 +4,7 @@
  * 読取のみ：inspect* / check*（checkColdListPerformanceはキャッシュを失効）
  * 新規準備：initializeDatabaseV2 / resumeInitializeDatabaseV2
  * 旧版移行：audit → migrate（繰返し）→ verifyFiles（繰返し）→ activate
- * 実データ作成・外部推論：testPhotoDiaryFlow / testGeminiHello（個別に実行）
+ * 実データ作成・外部推論：testPhotoDiaryFlow / testOpenAIHello（個別に実行）
  *
  * 計測はGAS内の処理時間。ブラウザ往復・画像デコード・スマホ速度を含まない。
  * ログには本文・画像バイト・APIキーを出さない。処理本体はservice/modelに置く。
@@ -34,8 +34,8 @@ function checkDriveSetup() {
   checkDriveSetup_()
 }
 /** [設定確認のみ] キーの有無。有効性や課金・推論成功は検証しない。 */
-function checkGeminiSetup() {
-  checkGeminiSetup_()
+function checkOpenAISetup() {
+  checkOpenAISetup_()
 }
 
 /** [計測] 表ごとの直接読取＋通常一覧3回。DB書込・AI推論なし。 */
@@ -104,8 +104,8 @@ function inspectCleanupCandidates() {
 }
 
 /** [外部推論] 固定の挨拶を1回送信。利用枠を消費する。 */
-function testGeminiHello() {
-  logSetupResult_("testGeminiHello", () => GeminiProbe.hello())
+function testOpenAIHello() {
+  logSetupResult_("testOpenAIHello", () => OpenAIProbe.hello())
 }
 /** [Drive/DB書込] 固定1px画像2枚・日記2件を作成し、再送・順序を検証する。 */
 function testPhotoDiaryFlow() {
@@ -123,8 +123,8 @@ function cancelPendingSave_(requestId) {
 function checkDriveSetup_() {
   return logSetupResult_("checkDriveSetup", () => IntegrationSetup.checkDrive())
 }
-function checkGeminiSetup_() {
-  return logSetupResult_("checkGeminiSetup", () => IntegrationSetup.checkGemini())
+function checkOpenAISetup_() {
+  return logSetupResult_("checkOpenAISetup", () => IntegrationSetup.checkOpenAI())
 }
 
 /** 想定外例外の生本文をログへ出さず、GAS実行自体は失敗として終了する。 */

@@ -134,11 +134,20 @@
                     <div id="tag-picker" class="app-chips" aria-label="キーワード"></div>
                   </fieldset>
 
-                  <div class="admin-note admin-note--neutral app-draft">
+                  <details id="ai-settings">
+              <summary>AI接続設定（OpenAI）</summary>
+              <p>OpenAI APIキーを登録します。ChatGPTの契約とは別にAPI利用料がかかります。保存したキーは表示しません。</p>
+              <label for="openai-key">OpenAI APIキー</label>
+              <input id="openai-key" type="password" autocomplete="new-password" placeholder="sk-…">
+              <button id="openai-key-save" type="button">キーを保存</button>
+              <button id="openai-key-delete" type="button" class="secondary">登録を解除</button>
+              <p id="openai-key-status" role="status"></p>
+            </details>
+            <div class="admin-note admin-note--neutral app-draft">
                     <div>
                       <strong>AI下書き</strong>
                       <div id="ai-description"></div>
-                      <label id="ai-consent-label" hidden><input id="ai-consent" type="checkbox">Geminiへ送る内容に個人情報・機密情報が含まれないことを確認しました（無料枠の検証用）</label>
+                      <label id="ai-consent-label" hidden><input id="ai-consent" type="checkbox">OpenAIへ送る内容に個人情報・機密情報が含まれないことを確認しました</label>
                     </div>
                     <button id="draft" class="secondary" type="button">AI下書きを作る</button>
                     <button id="new-generation" class="secondary" type="button">新しい生成を開始</button>

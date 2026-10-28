@@ -41,7 +41,7 @@ const PerformanceService = {
       complete: tables.length === Object.keys(TABLES).length,
       totalMs: Date.now() - started,
       tables,
-      note: "readMsはgetValuesと行変換。serializedBytesの計算時間はtotalMsだけに含みます。実ファイル・Gemini・ブラウザ通信は計測しません。",
+      note: "readMsはgetValuesと行変換。serializedBytesの計算時間はtotalMsだけに含みます。実ファイル・OpenAI・ブラウザ通信は計測しません。",
     }
   },
   list() {

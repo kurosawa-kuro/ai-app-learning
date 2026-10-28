@@ -26,7 +26,7 @@ const SetupService = {
         "inspectCleanupCandidates",
       ],
       explicitSideEffects: {
-        testGeminiHello: "Geminiへ固定入力を送る",
+        testOpenAIHello: "OpenAIへ固定入力を送る",
         testPhotoDiaryFlow: "画像2枚と日記2件を作る",
         clearDatabaseCache: "キャッシュ世代だけ更新",
       },
@@ -70,16 +70,16 @@ const SetupService = {
       providers.photo === "drive"
         ? IntegrationSetup.checkDrive()
         : { ok: true, skipped: true, reason: "新規写真提供元がDriveではありません" }
-    const gemini =
-      providers.draft === "gemini"
-        ? IntegrationSetup.checkGemini()
+    const openai =
+      providers.draft === "openai"
+        ? IntegrationSetup.checkOpenAI()
         : { ok: true, skipped: true, reason: "下書き提供元がmockです" }
     return {
-      readyForVerification: database.ok && drive.ok && gemini.ok,
+      readyForVerification: database.ok && drive.ok && openai.ok,
       providers,
       database,
       drive: { ok: drive.ok, code: drive.code, skipped: drive.skipped, writeVerified: false },
-      gemini,
+      openai,
       inferenceExecuted: false,
       note: "設定の準備状況です。公開画面・書込・推論の成功は別途確認してください。",
     }

@@ -1,5 +1,7 @@
 # Spring Boot・Thymeleaf・Render・SupabaseによるWebアプリ支援戦略
 
+> 2026-10-28 方針更新：受講者のコード質問・改造依頼はDevin、プログラムからのAI呼び出しはOpenAI API、業務自動化の質問・作業はCursorとする。教材アプリのGemini採用は廃止。アカウント準備と接続案内はこの区分に合わせ、移行・実通信・公開先の確認状況を分けて記録する。 判断の正本は[AIの役割分担（ADR 0003）](../../../docs/adr/0003-ai-service-roles.md)。
+
 ## 制作順と受講順
 
 受講者は **01 GAS → 02 Web**、提供者のコード・解説作成は **02 Web → 01 GAS** の順とする。提供者はWeb側のローカル起動・PostgreSQL・自動テストで動作を先に確認し、仕様・サンプル・期待結果・解説をGAS教材へ展開する。GAS側の保存・権限・公開等は別途実装・検証する。横断設計の正本は[app-learning/docs](../docs/README.md)。

@@ -8,7 +8,7 @@ function setup(properties = {}, options = {}) {
   let reads = 0
   const code = ["config/integration-settings.js", "services/integration-setup.js", "controllers/setup.js"]
     .map((name) => readFileSync(new URL(`../server/${name}`, import.meta.url), "utf8")).join("\n")
-  const result = runInNewContext(`${code}\n({ drive: checkDriveSetup_, gemini: checkGeminiSetup_, runDrive: checkDriveSetup, runGemini: checkGeminiSetup })`, {
+  const result = runInNewContext(`${code}\n({ drive: checkDriveSetup_, openai: checkOpenAISetup_, runDrive: checkDriveSetup, runOpenAI: checkOpenAISetup })`, {
     PropertiesService: { getScriptProperties: () => ({ getProperty: (key) => properties[key] ?? null }) },
     Session: { getEffectiveUser: () => ({ getEmail: () => "owner@example.test" }) },
     DriveApp: {
@@ -32,9 +32,9 @@ function setup(properties = {}, options = {}) {
 }
 
 test("エディタ用入口は診断結果をログに出し、クライアントへ返さない", () => {
-  const app = setup({ PHOTO_FOLDER_ID: "folder", GEMINI_API_KEY: "test-secret" })
+  const app = setup({ PHOTO_FOLDER_ID: "folder", OPENAI_API_KEY: "test-secret" })
   assert.equal(app.runDrive(), undefined)
-  assert.equal(app.runGemini(), undefined)
+  assert.equal(app.runOpenAI(), undefined)
   assert.equal(JSON.parse(app.logs[0]).code, "drive_read_verified")
   assert.equal(JSON.parse(app.logs[1]).code, "key_configured_not_validated")
   assert.equal(app.logs.join().includes("test-secret"), false)
@@ -63,12 +63,12 @@ test("認証準備：Driveの例外詳細を診断ログに露出しない", () 
 
 test("認証準備：キーの存在だけを返し、キー値や認証成功を出さない", () => {
   const secret = "test-only-private-value"
-  const app = setup({ GEMINI_API_KEY: secret })
-  const result = app.gemini()
+  const app = setup({ OPENAI_API_KEY: secret })
+  const result = app.openai()
   assert.equal(result.keyConfigured, true)
   assert.equal(result.apiAuthenticationVerified, false)
   assert.equal(result.inferenceExecuted, false)
   assert.equal(JSON.stringify(result).includes(secret), false)
   assert.equal(app.logs.join().includes(secret), false)
-  assert.equal(setup({ GEMINI_API_KEY: "  " }).gemini().keyConfigured, false)
+  assert.equal(setup({ OPENAI_API_KEY: "  " }).openai().keyConfigured, false)
 })

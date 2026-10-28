@@ -1,4 +1,4 @@
-/** Geminiの形を業務の観測・会話結果に変換する唯一のアダプター。 */
+/** OpenAIの形を業務の観測・会話結果に変換する唯一のアダプター。 */
 const EnglishAiProvider = {
   call(feature, snapshot) {
     const input = snapshot.input;
@@ -82,7 +82,7 @@ const EnglishAiProvider = {
         required: ["reply", "feedback"],
       };
     }
-    const response = GeminiClient.generateText({
+    const response = OpenAIClient.generateText({
       model: snapshot.model,
       text: instruction + "\ndata: " + JSON.stringify(input),
       maxOutputTokens: snapshot.maxOutputTokens,

@@ -1,14 +1,16 @@
 # english-trainer
 
-GAS・Google Sheets・Geminiで動く、個人用の英語訓練アプリです。自由記述クイズのAI採点、短い自由会話、振り返り、学習記録を基本導線とします。[基本配布範囲](docs/specs/educational-baseline.md)を正本とし、旧G3の能力一覧・候補承認・再学習リセットを基本画面へ並べません。
+> 2026-10-28：AIはOpenAI APIキー方式へ変更。OAuth／GCP設定は不要です。現在の手順は[OpenAI接続](docs/openai-setup.md)、実環境の進捗は[受入記録](../../docs/tasks/gas-release-20261028.md)を参照。過去のGemini連携仕様は旧方式の記録です。
 
-配布モデルA（1人1コピー・本人限定公開・各自のGeminiキー）。永続化はSheets、秘密はScript Properties。音声入出力・関係DB・自動計画は対象外です。既存の教材・履歴・再送処理は保持します。
+GAS・Google Sheets・OpenAIで動く、個人用の英語訓練アプリです。自由記述クイズのAI採点、短い自由会話、振り返り、学習記録を基本導線とします。[基本配布範囲](docs/specs/educational-baseline.md)を正本とし、旧G3の能力一覧・候補承認・再学習リセットを基本画面へ並べません。
+
+配布モデルA（1人1コピー・本人限定公開・各自のOpenAIキー）。永続化はSheets、秘密はScript Properties。音声入出力・関係DB・自動計画は対象外です。既存の教材・履歴・再送処理は保持します。
 
 ## 現在地と検証範囲
 
-2026-10-28：`npm run check`で76件成功、生成物と整形確認も成功。PlaywrightでPC1440px／スマホ390pxの基本操作・履歴・失敗後の入力保持を確認し、スクショを目視しました。GASへ31ファイルをpushし、本人限定@1を作成しています。**初期化・実Sheets／Gemini受入は未完了**。進捗・配置URLは[5教材の実行記録](../../docs/tasks/gas-release-20261028.md)。
+2026-10-28：`npm run check`で76件成功、生成物と整形確認も成功。PlaywrightでPC1440px／スマホ390pxの基本操作・履歴・失敗後の入力保持を確認し、スクショを目視しました。GASへ31ファイルをpushし、本人限定@3へ更新しています。**初期化・OpenAI実採点／会話／振り返り／履歴・再読込・PC／スマホは確認済み。キー再発行の進捗は下記記録を参照**。進捗・配置URLは[5教材の実行記録](../../docs/tasks/gas-release-20261028.md)。
 
-ローカルは実Chromiumと模擬GAS／Geminiです。GAS配置時に検出した未対応構文を直しましたが、配置成功だけで実画面の保存やAI応答まで確認できたとは扱いません。
+ローカルは実Chromiumと模擬GAS／OpenAIです。GAS配置時に検出した未対応構文を直しましたが、配置成功だけで実画面の保存やAI応答まで確認できたとは扱いません。
 
 ## ローカル開発
 
@@ -39,7 +41,7 @@ npm run test:browser
 
 | 場所 | 役割 |
 |---|---|
-| `src/server/` | Domain、Application、依存の組立、Sheets、Geminiアダプター |
+| `src/server/` | Domain、Application、依存の組立、Sheets、OpenAIアダプター |
 | `src/client/` | HTML Serviceの5タブ画面 |
 | `env/config.yaml` | 非機密の初期設定 |
 | `env/expressions/` | 初期教材51件。利用開始後の教材正本は`et_expressions`シート |

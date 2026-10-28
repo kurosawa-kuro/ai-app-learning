@@ -15,7 +15,7 @@ const SheetStore = {
     const props = PropertiesService.getScriptProperties();
     const previous = props.getProperty("ET_SPREADSHEET_ID");
     if (previous && previous !== active.getId())
-      props.deleteProperty("GEMINI_API_KEY");
+      props.deleteProperty("OPENAI_API_KEY");
     props.setProperty("ET_SPREADSHEET_ID", active.getId());
     this.ss_ = active;
     TableCache.clear();

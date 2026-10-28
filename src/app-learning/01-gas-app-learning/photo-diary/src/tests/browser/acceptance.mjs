@@ -1,4 +1,4 @@
-// 実Chromiumの画像デコード・Canvas・DOMを検証する。GAS/Drive/Gemini通信は模擬。
+// 実Chromiumの画像デコード・Canvas・DOMを検証する。GAS/Drive/OpenAI通信は模擬。
 import assert from 'node:assert/strict'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { chromium } from '@playwright/test'
@@ -10,7 +10,7 @@ const results = []
 try {
   for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844 }]) {
     const gas = driveGas(), calls = [], errors = []
-    gas.run('APP_CONFIG.providers.photo="drive"; APP_CONFIG.providers.draft="gemini"; GeminiClient.generateText=()=>({ok:true,text:JSON.stringify({title:"作例の日記",body:"画像をもとにした作例です。"})})')
+    gas.run('APP_CONFIG.providers.photo="drive"; APP_CONFIG.providers.draft="openai"; OpenAIClient.generateText=()=>({ok:true,text:JSON.stringify({title:"作例の日記",body:"画像をもとにした作例です。"})})')
     const context = await browser.newContext({ viewport, isMobile: viewport.width < 500, hasTouch: viewport.width < 500 })
     const page = await context.newPage()
     let uploadCount = 0
@@ -156,6 +156,6 @@ try {
     await context.close()
   }
   mkdirSync('test-results', { recursive: true })
-  writeFileSync('test-results/browser-acceptance.json', JSON.stringify({ scope: '実Chromium・模擬GAS/Drive/Gemini。スマホ幅はエミュレーション。', results }, null, 2) + '\n')
+  writeFileSync('test-results/browser-acceptance.json', JSON.stringify({ scope: '実Chromium・模擬GAS/Drive/OpenAI。スマホ幅はエミュレーション。', results }, null, 2) + '\n')
   console.log(JSON.stringify(results, null, 2))
 } finally { await browser.close() }

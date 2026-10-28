@@ -2,18 +2,20 @@
 import { readFileSync } from "node:fs"
 import { pathToFileURL } from "node:url"
 import { parse } from "yaml"
-import { driveGas, png } from "../tests/drive-mock.mjs"
+import { driveGas } from "../tests/drive-mock.mjs"
+
+const png = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAKklEQVR4nO3NQQkAAAgEsMtkWyuY0hQ+hMH+S/WcikAgEAgEAoFAIPgSLH4b1EwmPfsfAAAAAElFTkSuQmCC"
 
 export const cases = ["G3a_text", "G3b_preferences", "G4a_one_image", "G4b_two_images"]
 
-export async function verifyGemini({ names = cases, dryRun = false, key, fetchImpl = fetch } = {}) {
+export async function verifyOpenAI({ names = cases, dryRun = false, key, fetchImpl = fetch } = {}) {
   if (!names.length || names.some(name => !cases.includes(name))) throw Error("検証ケースが不正です")
   if (!dryRun && (typeof key !== "string" || !key.trim())) throw Error("APIキー未設定")
   const reports = []
   for (const name of names) {
     const gas = driveGas()
-    gas.props.set("GEMINI_API_KEY", dryRun ? "dry-run-placeholder" : key.trim())
-    gas.run('APP_CONFIG.providers.draft="gemini"; APP_CONFIG.providers.photo="drive"')
+    gas.props.set("OPENAI_API_KEY", dryRun ? "dry-run-placeholder" : key.trim())
+    gas.run('APP_CONFIG.providers.draft="openai"; APP_CONFIG.providers.photo="drive"')
     const count = name === "G4b_two_images" ? 2 : name === "G4a_one_image" ? 1 : 0
     const ids = Array.from({ length: count }, (_, i) => {
       const result = gas.call("uploadPhoto", { uploadId: "smoke-photo-000" + i, mimeType: "image/png", base64: png })
@@ -54,13 +56,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const args = process.argv.slice(2)
     if (args.includes("--help") || args.includes("--list")) {
       if (args.length !== 1) throw Error("引数不正")
-      console.log("verify-gemini.mjs [--dry-run] [ケース名 ...]\n" + cases.join("\n"))
+      console.log("verify-openai.mjs [--dry-run] [ケース名 ...]\n" + cases.join("\n"))
     } else {
       const dryRun = args.includes("--dry-run")
       const names = args.filter(arg => arg !== "--dry-run")
       if (names.some(name => !cases.includes(name))) throw Error("引数不正")
-      const key = dryRun ? undefined : parse(readFileSync(new URL("../../env/secret.yaml", import.meta.url), "utf8"))?.gemini?.api_key
-      const reports = await verifyGemini({ names: names.length ? names : cases, dryRun, key })
+      const key = dryRun ? undefined : parse(readFileSync(new URL("../../env/secret.yaml", import.meta.url), "utf8"))?.openai?.api_key
+      const reports = await verifyOpenAI({ names: names.length ? names : cases, dryRun, key })
       console.log(JSON.stringify(reports, null, 2))
       if (reports.some(report => !report.ok)) process.exitCode = 1
     }

@@ -70,3 +70,11 @@ _まだ判断は記録されていません。`log-decision` が末尾に追記�
 - 影響範囲 (blast radius): sampleディレクトリと関連案内。移植済みのsrc・envは保持。
 - 撤退条件 (stop/revert): 未移植機能の比較が必要なら削除前のGit履歴を参照する。
 - 結果 (outcome): sampleを削除。削除後の検証結果は作業応答に記録。
+
+## 2026-10-28 — 全体のAI役割分担とGemini廃止を反映
+
+- type: approach-choice
+- 根拠 (why): ユーザー指定により、コード質問・改造＝Devin、コードからの問い合わせ＝OpenAI API、業務自動化＝Cursorに統一。
+- 影響範囲 (blast radius): 共通規約、Claude用案内、G3仕様の接続先表記。既存のOpenAI実装に合わせ、旧Gemini宛先・ヘッダ指定を修正。
+- 結果 (outcome): 方針と文書を更新。今回の作業は実装・設定・公開先を変更せず、実通信も再実施していない。過去のGemini検証は当時の記録として保持。
+- link: [ADR 0003](../../../../../../docs/adr/0003-ai-service-roles.md)

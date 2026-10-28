@@ -121,7 +121,7 @@ test("v2：資産作成後・転送完了前に停止しても再送でDriveを�
 test("v2：AI成功応答を再取得し、採用元と利用量を保存する", () => {
   const gas = ready()
   gas.run(
-    'APP_CONFIG.providers.draft="gemini";globalThis.calls=0;GeminiClient.generateText=()=>{calls++;return {ok:true,text:JSON.stringify({title:"AI",body:"生成文"}),usage:{totalTokenCount:42},elapsedMs:12}}'
+    'APP_CONFIG.providers.draft="openai";globalThis.calls=0;OpenAIClient.generateText=()=>{calls++;return {ok:true,text:JSON.stringify({title:"AI",body:"生成文"}),usage:{totalTokenCount:42},elapsedMs:12}}'
   )
   const input = { requestId: "ai-v2", tagIds: ["11"], aiConsent: true }
   const a = ok(gas.call("generateDraft", input)),

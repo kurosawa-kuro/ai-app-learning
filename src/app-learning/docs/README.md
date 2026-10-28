@@ -1,5 +1,7 @@
 # アプリ学習の横断設計
 
+> 2026-10-28 方針更新：コードについての質問・改造はDevin、コードからのAI問い合わせはOpenAI API、業務自動化はCursor。Geminiは教材アプリの接続先として廃止する。全アプリ・公開先の移行状況は各教材の正本で確認する。 判断の正本は[AIの役割分担（ADR 0003）](../../../docs/adr/0003-ai-service-roles.md)。
+
 内部管理資料です。外向きの3出口の設計・名義・運用は[publication](publication/README.md)、公開原稿・素材の許可設定は[publishing](../publishing/README.md)で管理します。本書を含む全体資料をそのまま公開・配布しません。
 
 [アプリ学習の入口](../README.md) · [01 GAS](../01-gas-app-learning/README.md) · [02 Web](../02-web-app-learning/README.md) · [Webスタックの採用判断](../../../docs/adr/0001-web-app-stack.md)

@@ -8,13 +8,13 @@
 - 製品方針は[GAS版構想](docs/GAS版AI英会話訓練アプリ構想_ai-english-trainer.md)、実装の事実はコード・テストと[G3仕様](docs/specs/gas-trainer-v1.md)。構想の古い未着手・未決を現状として扱わない。
 - 基本UIはローカル検証済み、本人限定デプロイ作成済み。初期化・実環境受入は未完了。配布モデルA（本人限定・1人1コピー・各自のキー）を採用する。B/Cへの共有運用変更は別の判断を要する。
 - 中核はAI採点とテキスト会話。選択式クイズが動くだけで製品完成としない。音声入出力とG4は対象外。
-- 永続化はSheets、実行時の秘密はPropertiesService。関係DB・`Jdbc`は禁止。`UrlFetchApp`の宛先は`generativelanguage.googleapis.com`のみ。キーは`x-goog-api-key`ヘッダで送り、URL・画面・ログへ出さない。
+- 永続化はSheets、実行時の秘密はPropertiesService。関係DB・`Jdbc`は禁止。AI用`UrlFetchApp`の宛先は`api.openai.com`、現行の接続先は`/v1/responses`。キーは`Authorization: Bearer`ヘッダで送り、URL・画面・ログへ出さない。Geminiは廃止し、フォールバックしない。[全体の役割分担](../../../../docs/adr/0003-ai-service-roles.md)に従い、コード質問・改造はDevin、業務自動化はCursorと区別する。
 - `sample/`は削除済み。依存を復活させずGit履歴を参照する。ユーザーが明示した日記基盤の参照・コピーは例外として認められているが、それ以外の他リポジトリ探索や、他プロジェクトの接続先・秘密・計画の持込みはしない。
 
 ## 責務とデータ
 
 - 配布コードは`src/`、非機密設定・初期教材は`env/`。利用開始後の教材正本はSheets。envの再生成で利用者の教材を上書きしない。
-- Domainは純粋な業務判断、Applicationは注入ポートによる処理順序、bootstrapは依存の組立。具体的GAS・Gemini依存をDomain / Applicationへ入れない。
+- Domainは純粋な業務判断、Applicationは注入ポートによる処理順序、bootstrapは依存の組立。具体的GAS・OpenAI依存をDomain / Applicationへ入れない。
 - Sheets書込は`db/sheet-store.js`へ集約し、`requireWriteLock_`でロック保持を検査する。公開入口はcontrollers、内部の大域関数は末尾`_`。GASの読込順に依存しない。
 - 回答・採点・能力証拠は追記台帳。要求IDと入力を照合し、同ID異内容を拒否する。証拠を先に書き、assessmentを確定点にする。最新判定と教材版を維持する。
 - キャッシュは表示の高速化用。更新判断・重複照合はfresh読取。スキーマ欠損を初期化で隠さず、バックアップと列定義を照合する。
@@ -41,7 +41,7 @@
 - 実装変更は関連テストと`npm run check`、画面変更は`npm run test:browser`。変更ファイルをPrettierで整形する。env変更後は`npm run build:data`と生成差分確認を行う。
 - 文書だけの変更はリンク・コマンド・実装との整合を確認する。過去のテスト件数を今回の実行結果として報告しない。
 - 本人限定の公開・配布・更新は[Runbook](docs/08_release_runbook.md)に従う。`npm run push`は検証と配置を行うが、Webアプリの公開版は更新しない。コピー配布は実環境受入後。
-- ローカル単体テスト、実Chromium＋模擬GAS/Gemini、実GAS/Sheets/Geminiを区別して報告する。未実行・失敗・未反映を隠さない。文書更新をpush/deployの依頼と解釈しない。
+- ローカル単体テスト、実Chromium＋模擬GAS/OpenAI、実GAS/Sheets/OpenAIを区別して報告する。未実行・失敗・未反映を隠さない。文書更新をpush/deployの依頼と解釈しない。
 - 作業開始時のGit差分を確認し、既存変更を破棄しない。コード・文書・生成物へ秘密情報を出さない。
 
 ## 文書とツール固有設定

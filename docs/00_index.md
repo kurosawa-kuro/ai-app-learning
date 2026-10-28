@@ -8,6 +8,8 @@
 
 ## 権威順位
 
+AIの役割分担とGemini廃止は[ADR 0003](adr/0003-ai-service-roles.md)で管理する。コードの質問・改造はDevin、コードからのAI呼び出しはOpenAI API、業務自動化はCursor。2026-10-28の[関連文書更新記録](tasks/05_done/2026-10-28-ai-service-roles.md)を参照。
+
 | 判断する内容 | 基準にする資料 |
 |---|---|
 | 対象者・目的・初回成功・支援の終了・全体構成 | ルートの[README.md](../README.md) |

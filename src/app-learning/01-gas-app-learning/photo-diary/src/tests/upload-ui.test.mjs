@@ -9,7 +9,7 @@ const wait = (ms = 80) => new Promise((r) => setTimeout(r, ms))
 const jpeg = Buffer.from([255,216,255,192,0,17,8,0,1,0,1,3,1,17,0,2,17,0,3,17,0,255,218,0,12,3,1,0,2,17,3,17,0,63,0,0,255,217]).toString("base64")
 async function boot() {
   const gas = driveGas()
-  gas.run('APP_CONFIG.providers.photo="drive"; APP_CONFIG.providers.draft="gemini"; GeminiClient.generateText=()=>({ok:true,text:JSON.stringify({title:"下書き",body:"本文の作例"})})')
+  gas.run('APP_CONFIG.providers.photo="drive"; APP_CONFIG.providers.draft="openai"; OpenAIClient.generateText=()=>({ok:true,text:JSON.stringify({title:"下書き",body:"本文の作例"})})')
   const ctl = { uploads: 0, failSecond: true, calls: [] }
   const dom = new JSDOM(renderIndex(gas.run("clientConfig_()")), { runScripts: "dangerously", pretendToBeVisual: true, beforeParse(w) {
     w.scrollTo = () => {}; w.confirm = () => true; w.alert = () => {}

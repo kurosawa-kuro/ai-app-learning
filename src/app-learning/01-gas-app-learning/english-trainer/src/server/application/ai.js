@@ -122,7 +122,7 @@ function createAiApplication_(p) {
               s.aiReason,
               {
                 setting_off: "設定でAIを有効にしてください。",
-                key_missing: "設定画面でGeminiキーを登録してください。",
+                key_missing: "設定画面でOpenAIキーを登録してください。",
                 limit_reached: "今日のAI利用上限に達しました。",
               }[s.aiReason],
             );

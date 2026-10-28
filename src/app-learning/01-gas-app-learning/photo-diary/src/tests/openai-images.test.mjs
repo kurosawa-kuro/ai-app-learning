@@ -10,7 +10,7 @@ test("G3b：文体と内容ルールだけを採用し、空設定・上限を�
 })
 test("G4a/G4b：実画像のみを順番どおり送信し、取得失敗は黙って省かない", () => {
   const gas = driveGas()
-  gas.run('APP_CONFIG.providers.photo="drive"; APP_CONFIG.providers.draft="gemini"; GeminiClient.generateText = (r) => {globalThis.sent=r;return {ok:true,text:JSON.stringify({title:"作例",body:"確認用"})}}')
+  gas.run('APP_CONFIG.providers.photo="drive"; APP_CONFIG.providers.draft="openai"; OpenAIClient.generateText = (r) => {globalThis.sent=r;return {ok:true,text:JSON.stringify({title:"作例",body:"確認用"})}}')
   const ids = [1, 2].map((n) => gas.call("uploadPhoto", { uploadId: `image-ai-000${n}`, mimeType: "image/png", base64: png }).data.file_id)
   assert.equal(gas.call("generateDraft", { requestId: "test-gen-1", imageIds: [ids[0]], aiConsent: true }).ok, true)
   assert.equal(gas.context.sent.images.length, 1)
