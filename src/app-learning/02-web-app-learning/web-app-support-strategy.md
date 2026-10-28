@@ -40,7 +40,7 @@ Java資格の取得やプログラマーへの転職を、この取り組みの�
 | 永続データ | SupabaseのPostgreSQL |
 | DBアクセス | サーバー側からJDBC／Spring JDBC等で接続。SQL実習を残し、JPAは必要に応じて扱う |
 | 画像・添付 | 必要な教材でSupabase Storageを利用 |
-| 認証・認可 | 教材の利用者・公開範囲に応じて設計。Supabase Auth等の採否は個別に決める |
+| 認証・認可 | **Supabase Authを採用予定**（2026-10-28決定・未実装）。利用者本人がログインし、サーバー側で利用者を確認して認可する。GAS版は学習用の簡易版のまま。[ADR 0004](../../../docs/adr/0004-auth-gas-simple-web-supabase.md) |
 
 ```text
 ブラウザ（HTML / CSS / 必要なJavaScript）
