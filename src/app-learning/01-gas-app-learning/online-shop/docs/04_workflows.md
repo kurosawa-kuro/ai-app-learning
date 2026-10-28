@@ -1,50 +1,10 @@
-# 04 ワークフロー
+# CR版の作業手順
 
-## セットアップ
+1. README・AGENTS・現行CR仕様を確認し、Create／Readの範囲を固定する。
+2. `npm ci`、`npm test`で保存と業務ルールを確認する。
+3. `npm run dev`でローカル確認。ブラウザテスト時は停止する。
+4. 初回だけ`npx playwright install chromium`。`npm run test:browser`でPC／スマホを確認し、test-resultsのスクリーンショットを開く。
+5. `npm run format`、`npm run format:check`とGit差分を確認する。
+6. [公開手順](08_release_runbook.md)で実GASへ配置し、ローカルとは別に受入する。
 
-```bash
-make help
-make setup
-```
-
-初回は[AIコーディング環境](runbooks/ai-coding.md)で、生成済みのCodex探索Skillと任意のRTK / Serenaの利用経路を確認する。Serenaは既定無効。効果を評価するときは[計測書式](templates/ai-coding-measurement.md)をtaskへコピーする。
-
-## 作業開始
-
-```bash
-git status --short
-```
-
-1. [tasks/README.md](tasks/README.md) を見る。
-2. `docs/tasks/03_active/` から今日の task を選ぶ。
-3. task に Scope / Plan / Acceptance Criteria があることを確認する。
-4. 中規模以上なら Skeleton を固定してから実装する。
-
-## ローカル実行
-
-```bash
-make run
-```
-
-または:
-
-```bash
-make dev
-```
-
-## テスト
-
-```bash
-make test
-```
-
-## 作業終了
-
-```bash
-git diff --check
-git status --short
-```
-
-- 実行した検証を task の `Verification` に残す。
-- 未解決事項は task の `Notes` または `backlog/` に移す。
-- 確定した仕様・手順・判断は docs 本体、runbook、ADR へ昇格する。
+Makefileは雛形。Node/npmは開発検証専用。GASにnode_modulesやテストをアップロードしない。

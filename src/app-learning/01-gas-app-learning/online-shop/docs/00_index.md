@@ -2,6 +2,8 @@
 
 このディレクトリは、プロジェクトの要件・設計・ワークフロー・テスト・リリース運用の正本。`AGENTS.md` は Codex / 他エージェント向けの repo ガイド、`CLAUDE.md` は Claude Code の司令塔、`docs/tasks/` は毎日の作業計画・実装タスク・調査ログの実行ハブ、`.claude/skills/` は Claude Code で繰り返し使う作業手順。
 
+現行の教材範囲は[基本仕様](<tasks/01_idea/ec-shop-gasのアイディア.md>)の先頭「先行するCreate／Read版」。旧構想や雛形より優先する。実装列は[データ設計](05_data_model.md)、配置は[公開手順](08_release_runbook.md)。
+
 ## 権威順位
 
 ```text

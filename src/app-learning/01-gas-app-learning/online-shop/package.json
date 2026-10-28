@@ -5,9 +5,12 @@
   "scripts": {
     "test": "node --test tests/application.test.cjs",
     "dev": "node scripts/dev-server.cjs 8194",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "format": "prettier --write \"src/*.{js,html,json}\" \"scripts/*.cjs\" \"tests/**/*.cjs\" playwright.config.cjs package.json",
+    "format:check": "prettier --check \"src/*.{js,html,json}\" \"scripts/*.cjs\" \"tests/**/*.cjs\" playwright.config.cjs package.json"
   },
   "devDependencies": {
-    "@playwright/test": "1.64.1"
+    "@playwright/test": "1.64.1",
+    "prettier": "3.6.2"
   }
 }

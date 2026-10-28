@@ -1,67 +1,19 @@
-# 05 データモデル
+# Create／Read版のデータ設計
 
-根拠: [基本仕様・設計 v0.3.0（Draft）](<tasks/01_idea/Cast Evaluation System — 基本仕様・設計.md>) §5〜7、§10〜11。この文書は正本からの派生文書であり、矛盾時は正本を優先する。記載は設計・受入基準であり、実装・検証済みを意味しない。
-
-## 保存方針
-
-Google Sheetsを初期データストアとし、1シートを1テーブルとして3シートだけを使う。評価結果テーブル・ルール履歴テーブル・伝票明細テーブルは設けない。行番号を業務IDに使用しない。
-
-## members
-
-| カラム | 型 | 意味・制約 |
+| シート | 列（順序固定） | 関係・制約 |
 |---|---|---|
-| member_id | string | PK。一意のメンバーIDをシステムで自動発行 |
-| name | string | キャスト名。本名など不要な個人情報は管理しない |
-| status | string | ACTIVE / INACTIVE |
+| members | id, name, active, created_at | 名前1〜60字。アプリからの追加はactive=true |
+| daily_records | id, member_id, business_date, drinks, bottles, nominations, accompaniments, sales, created_at | membersへの参照。1人1営業日1行。数量0〜100万、売上0〜10億円の整数 |
+| evaluation_rules | category, unit, points, enabled | DRINK/BOTTLE/NOMINATION/ACCOMPANIMENT/SALESの各1行。unitは正数、pointsは0以上、いずれも小数2桁まで |
 
-退店時は無効化し、レコードと過去実績を保持する。IDの発行方式・名前の文字数などは未決定。
+評価結果は保存しない。現在の配点で月合計から計算する。数量は `月合計 × points / unit`、売上は `floor(月合計 / unit) × points`。表示は小数2桁、順位は計算値→売上の降順。同点同売上は1・1・3位。同順位内は名前・IDで表示順を固定する。数量4項目は有効、売上配点は初期無効。日付は2000〜2100年の暦日。ルール変更で過去の月も再計算される。
 
-## daily_records
+営業日の自動判定・締め処理は持たず、入力者が日付を指定する。旧案のACTIVE/INACTIVEはCR実装では文字列true/falseとし、状態変更画面は後続範囲。
 
-| カラム | 型 | 意味・制約 |
-|---|---|---|
-| record_id | string | PK。行番号と独立したレコードID |
-| business_date | date | 営業日 |
-| member_id | string | 対象メンバーのID |
-| drink_count | integer | 0以上のドリンク杯数 |
-| bottle_count | integer | 0以上のボトル本数 |
-| nomination_count | integer | 0以上の指名件数 |
-| accompaniment_count | integer | 0以上の同伴件数 |
-| personal_sales | integer | 0以上の個人売上（円） |
+## 保存方式
 
-一意制約は **business_date + member_id**。既存会計・POS等で確定した日次金額を保存する。販売明細や共同売上按分は保存しない。
+1シート＝1表。各列は文字列として保存し、読込み時に数量・価格・配点を検証して数値化する。日付もYYYY-MM-DDの文字列。Sheetsの自動日付変換・表示桁区切りによるズレを避ける。`setRichTextValues`で名称が`=`から始まっても数式として実行しない。文字列の数値列へSUMをそのまま使う教材ではなく、アプリ側で集計する設計。
 
-Sheetsを使う場合も、サーバー側の検証・排他制御で重複防止を保証する設計とする。過去実績の編集を認める。存在しないmember_id、更新時の営業日・キャスト変更、record_idの生成方式、日付の物理表現は詳細設計で確定する。
+初期化はアプリごとに新しいSheetsから行い、APP_SPREADSHEET_IDとAPP_KINDをScript Propertiesへ保存する。再実行は列の検査のみ。列が違う・表が消えた場合は停止し、データを再作成しない。IDは行番号に依存しない。
 
-## evaluation_rules
-
-| カラム | 型 | 意味 |
-|---|---|---|
-| category | string | 評価対象。下記の固定値 |
-| unit | number | ポイント計算単位 |
-| points | number | 付与ポイント |
-| enabled | boolean | 有効・無効 |
-
-| category | 対応する実績カラム | 仮のunit | 仮のpoints | 初期enabled |
-|---|---|---:|---:|---|
-| DRINK | drink_count | 1 | 1 | true |
-| BOTTLE | bottle_count | 1 | 5 | true |
-| NOMINATION | nomination_count | 1 | 3 | true |
-| ACCOMPANIMENT | accompaniment_count | 1 | 5 | true |
-| SALES | personal_sales | 10000 | 2 | false |
-
-数値は設計確認用の仮設定であり、業界標準ではない。Sheetsで管理者が直接設定する。専用UIは設けない。
-
-正本はunit・pointsの許容範囲、category重複・欠損時の扱いを定義していない。ゼロ除算を防ぐunitの検証等は必要な詳細設計事項として扱い、確定前に独自ルールを仕様化しない。
-
-## 派生データ・変更
-
-評価結果はmembers・daily_records・evaluation_rulesから都度算出する。対象月の数量・売上を集計してから計算する。式と順位は [03_domain_model.md](03_domain_model.md) に従う。
-
-ルール変更は過去期間へ遡って反映される。運用開始後の変更は管理者が影響を確認する。ルール履歴や過去評価を固定する機能はMVP対象外。
-
-## 環境設定との区別
-
-業務ルールの保存先はevaluation_rules。開発環境の `env/config.yaml`、`doppler.yaml` 等を評価ルールの正本にしない。GASとの設定・秘密情報連携は未整備。秘密情報・実データをリポジトリに記録しない。
-
-スプレッドシートID、スクリプトID、公開先、共有範囲、日付形式等は実装・公開時に決定する。スキーマ変更は対象データ・既存値への影響・復旧方法を記録し、保存済み実績を失わないことを確認する。
+[Range公式仕様](https://developers.google.com/apps-script/reference/spreadsheet/range#setRichTextValues(RichTextValue))を2026-10-28に確認。実Sheetsでの保存受入は未実施。
