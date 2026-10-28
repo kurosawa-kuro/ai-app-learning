@@ -66,3 +66,7 @@ AI固定応答の確認と、実Geminiへの接続結果は区別する。Render
 公開先：https://learning-cast-evaluation.onrender.com/evaluation 。3名の架空データで、同点順位・実績編集・再集計・DB接続確認・PC／スマホを確認。表の改行、入力と保存操作の配置、画面内移動、日付表記を修正。
 
 最新の状態と検証記録：[5教材の横展開記録](../../docs/rollout-status.md)。
+
+## 2026-10-28 DB再設計の公開受入
+
+コード `734bd17` を既存Renderへ反映済み。移行前の既存データを保持し、この教材の主要操作・保存・再表示とPC／スマホの画面を公開先で再確認した。設計は[DB設計](database-design.md)、移行・テスト・公開の証拠は[5教材DB再設計記録](../../docs/tasks/db-redesign-20261028.md)を参照。以前の公開コミットは当時の履歴。

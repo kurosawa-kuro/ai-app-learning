@@ -66,3 +66,7 @@ AI固定応答の確認と、実Geminiへの接続結果は区別する。Render
 ローカルのAI固定下書き・手直し採用・対戦・履歴・ユーザー切替・PC／スマホ確認済み。実AI接続は前回確認済み。Renderの枠確保後、[公開先](https://learning-skill-janken-game.onrender.com/janken)で受入済み。公開コード `8e2bcd0`。PC／スマホ、CSS、手動DB確認を含む結果は[公開受入記録](../../docs/tasks/remaining-publication-20261028.md)を参照。
 
 最新の状態と検証記録：[5教材の横展開記録](../../docs/rollout-status.md)。
+
+## 2026-10-28 DB再設計の公開受入
+
+コード `734bd17` を既存Renderへ反映済み。移行前の既存データを保持し、この教材の主要操作・保存・再表示とPC／スマホの画面を公開先で再確認した。設計は[DB設計](database-design.md)、移行・テスト・公開の証拠は[5教材DB再設計記録](../../docs/tasks/db-redesign-20261028.md)を参照。以前の公開コミットは当時の履歴。
