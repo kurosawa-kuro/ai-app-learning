@@ -38,6 +38,8 @@ AIの役割分担とGemini廃止は[ADR 0003](adr/0003-ai-service-roles.md)で�
 
 ## 命名規則
 
+例外：`src/解説/記事/` の文書は、ユーザー指定により日本語の `対象読者_内容.md` とする。受講者向けと作成者向けを区別し、[解説記事の命名規則](../src/解説/記事/README.md#ファイルの命名規則)に従う。
+
 - プロジェクトのフォルダー名は英小文字・数字・ハイフンの `kebab-case` とし、対象と用途が分かる名詞で表す。
 - アプリ名は `photo-diary`、`english-trainer`、`skill-janken-game` のように機能を表す。AIの利用やGAS等の実装技術はREADMEで説明し、アプリ名の接頭辞・接尾辞へ一律に付けない。
 - `game`・`shop`・`diary`・`trainer` はアプリの種類を表すため使う。意味を増やさない `system`・`app` の付加は避ける。上位フォルダーの `learning`・`starter` は学習分野・導入支援の役割を表す。
