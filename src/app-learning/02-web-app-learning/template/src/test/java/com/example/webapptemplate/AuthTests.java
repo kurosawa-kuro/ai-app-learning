@@ -42,16 +42,18 @@ class AuthTests {
     private static final String ADMIN = "auth-test-admin@example.com";
     private static final String STRANGER = "auth-test-stranger@example.com";
     private static final ECKey KEY;
+    private static final com.nimbusds.jose.jwk.RSAKey RSA_KEY;
     private static final java.util.Map<String, String> CODES = new java.util.concurrent.ConcurrentHashMap<>();
     private static volatile String logoutQuery;
     private static final HttpServer AUTH;
     static {
         try {
+            RSA_KEY = new com.nimbusds.jose.jwk.gen.RSAKeyGenerator(2048).keyID("rsa-test").generate();
             KEY = new ECKeyGenerator(Curve.P_256).keyID("test-key").generate();
             AUTH = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         } catch (Exception failure) { throw new ExceptionInInitializerError(failure); }
         AUTH.createContext("/auth/v1/.well-known/jwks.json", exchange ->
-            send(exchange, 200, "{\"keys\":[" + KEY.toPublicJWK().toJSONString() + "]}"));
+            send(exchange, 200, "{\"keys\":[" + KEY.toPublicJWK().toJSONString() + "," + RSA_KEY.toPublicJWK().toJSONString() + "]}"));
         AUTH.createContext("/auth/v1/token", AuthTests::token);
         AUTH.createContext("/auth/v1/logout", exchange -> { logoutQuery = exchange.getRequestURI().getQuery(); send(exchange, 204, ""); });
         AUTH.start();
@@ -203,6 +205,23 @@ class AuthTests {
         try { return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(
             java.security.MessageDigest.getInstance("SHA-256").digest(verifier.getBytes(StandardCharsets.US_ASCII))); }
         catch (Exception failure) { throw new IllegalStateException(failure); }
+    }
+
+    @Test void acceptsRsaSigningKeysAsWellAsEcKeys() throws Exception {
+        var claims = SignedJWT.parse(jwt(ADMIN, Instant.now().plusSeconds(3600))).getJWTClaimsSet();
+        var token = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(RSA_KEY.getKeyID()).build(), claims);
+        token.sign(new com.nimbusds.jose.crypto.RSASSASigner(RSA_KEY));
+        assertThat(decoder.decode(token.serialize()).getSubject()).isEqualTo(claims.getSubject());
+    }
+
+    @Test void callbackUrlDoesNotTrustForwardedHost() throws Exception {
+        var response = HttpClient.newHttpClient().send(HttpRequest.newBuilder(
+            URI.create("http://localhost:" + port + "/auth/google"))
+            .header("X-Forwarded-Host", "attacker.example").header("X-Forwarded-Proto", "https").GET().build(),
+            HttpResponse.BodyHandlers.discarding());
+        assertThat(response.headers().firstValue("location").orElseThrow())
+            .contains("redirect_to=http://localhost:8080/auth/callback").doesNotContain("attacker.example");
+        assertThat(response.headers().allValues("set-cookie")).anyMatch(c -> c.contains("HttpOnly") && c.contains("SameSite=Lax"));
     }
 
     private HttpRequest get(String path) { return HttpRequest.newBuilder(URI.create("http://localhost:" + port + path)).GET().build(); }

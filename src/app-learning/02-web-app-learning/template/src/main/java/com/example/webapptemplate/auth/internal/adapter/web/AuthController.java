@@ -30,7 +30,7 @@ public class AuthController {
         "denied", "このGoogleアカウントには利用権限がありません。管理者に追加を依頼してください。",
         "failed", "ログインできませんでした。もう一度お試しください。",
         "unavailable", "ログインの確認ができませんでした。時間をおいて再試行してください。",
-        "logout", "ログアウトしました。");
+        "logout", "このブラウザーからログアウトしました。");
     private static final SecureRandom RANDOM = new SecureRandom();
     private final SupabaseAuthGateway gateway;
     private final JwtDecoder decoder;
@@ -83,9 +83,21 @@ public class AuthController {
     @PostMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
         String access = SessionCookies.read(request, SessionCookies.ACCESS);
-        if (access != null) {
-            try { gateway.logout(access); } catch (RestClientException unavailable) { /* cookies are cleared anyway */ }
-        }
+        try {
+            if (access != null) {
+                try { decoder.decode(access); }
+                catch (JwtException expired) { access = null; }
+            }
+            if (access == null) {
+                String refresh = SessionCookies.read(request, SessionCookies.REFRESH);
+                var session = refresh == null ? null : gateway.refresh(refresh);
+                if (session != null) {
+                    decoder.decode(session.accessToken());
+                    access = session.accessToken();
+                }
+            }
+            if (access != null) gateway.logout(access);
+        } catch (RestClientException | JwtException unavailable) { /* local sign-out still completes */ }
         cookies.clear(request, response);
         return "redirect:/login?logout";
     }

@@ -30,7 +30,7 @@ public class AuthProperties {
         boolean local = url.matches("http://(127\\.0\\.0\\.1|localhost)(:\\d+)?");
         if (!(url.matches("https://[a-z0-9.-]+") || local))
             throw new IllegalStateException("APP_AUTH_ENABLED=true needs SUPABASE_AUTH_URL (https://<project>.supabase.co).");
-        if (publishableKey == null || publishableKey.isBlank() || publishableKey.contains("\n"))
+        if (publishableKey == null || publishableKey.isBlank() || publishableKey.contains("\n") || publishableKey.contains("\r") || publishableKey.startsWith("sb_secret_"))
             throw new IllegalStateException("APP_AUTH_ENABLED=true needs SUPABASE_AUTH_PUBLISHABLE_KEY.");
         if (callbackUrl == null || !callbackUrl.matches("https://[a-zA-Z0-9.-]+(?::[0-9]+)?/auth/callback|http://(?:localhost|127\\.0\\.0\\.1)(?::[0-9]+)?/auth/callback"))
             throw new IllegalStateException("APP_AUTH_CALLBACK_URL must be the fixed public HTTPS /auth/callback URL (HTTP only on localhost).");
