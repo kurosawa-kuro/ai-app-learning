@@ -28,8 +28,16 @@ test("直接注文1800円、明細・再表示・ユーザー切替とPC/スマ�
   await page.getByLabel("学びのノートの数量", { exact: true }).fill("1");
   await expect(page.locator("#total")).toHaveText("合計 1,800 円");
   await page
-    .getByRole("button", { name: "この内容で注文する", exact: true })
+    .getByRole("button", { name: "注文内容を確認する", exact: true })
     .click();
+  await expect(page.locator("#confirmation")).toContainText("合計 1,800 円");
+  await screenshot(page, testInfo, "shop-confirmation");
+  await page.locator("#back-order").click();
+  await expect(
+    page.getByLabel("学習カードセットの数量", { exact: true }),
+  ).toHaveValue("1");
+  await page.locator("#submit-order").click();
+  await page.locator("#confirm-order").click();
   await expect(page.locator("#status")).toContainText("注文を保存しました");
   await expect(page.locator("#detail")).toContainText("合計 1,800 円");
   await page.reload();
@@ -57,7 +65,7 @@ test("空の注文・通信失敗で入力保持、応答消失後の再送で�
   await page.locator("#user").selectOption("user-sora");
   await ready(page);
   await page
-    .getByRole("button", { name: "この内容で注文する", exact: true })
+    .getByRole("button", { name: "注文内容を確認する", exact: true })
     .click();
   await expect(page.locator("#status")).toContainText("商品と数量を指定");
   const before = await page.locator("#history article").count();
@@ -71,14 +79,17 @@ test("空の注文・通信失敗で入力保持、応答消失後の再送で�
     } else await route.continue();
   });
   await page
-    .getByRole("button", { name: "この内容で注文する", exact: true })
+    .getByRole("button", { name: "注文内容を確認する", exact: true })
     .click();
+  await page.locator("#confirm-order").click();
   await expect(page.locator("#status")).toContainText("通信できません");
   await expect(
     page.getByLabel("小さなペンケースの数量", { exact: true }),
   ).toHaveValue("2");
+  await expect(page.locator("#back-order")).toBeDisabled();
+  await expect(page.locator("#order-state")).toContainText("注文済みの可能性");
   await page
-    .getByRole("button", { name: "この内容で注文する", exact: true })
+    .getByRole("button", { name: "この内容で注文を確定する", exact: true })
     .click();
   await expect(page.locator("#status")).toContainText("注文を保存しました");
   await expect(page.locator("#detail")).toContainText("合計 1,600 円");

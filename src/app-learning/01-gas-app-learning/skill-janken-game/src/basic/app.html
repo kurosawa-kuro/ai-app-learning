@@ -2,6 +2,8 @@
   const $ = (s) => document.querySelector(s),
     hands = { rock: "グー", scissors: "チョキ", paper: "パー" },
     results = { win: "あなたの勝ち！", draw: "あいこ", lose: "今回は負け" };
+  let current = null,
+    completed = false;
   function describe(r) {
     return `${hands[r.player_hand]} 対 ${hands[r.cpu_hand]}：${results[r.result]}（+${r.points}点）`;
   }
@@ -18,20 +20,55 @@
     if (!data.rounds.length)
       $("#history").append(Ui.node("p", "最初の対戦をしてみよう。"));
   }
-  $("#play-form").onsubmit = (e) => {
+  $("#play-form").onsubmit = async (e) => {
     e.preventDefault();
-    const payload = { hand: $("#hand").value },
+    if (Ui.busy || completed) return;
+    if (!current) current = { hand: $("#hand").value };
+    const payload = current,
       requestId = Ui.pending("round", payload);
-    Ui.run(
+    await Ui.run(
       e.submitter,
       async () => {
         const r = await Ui.rpc("play", { ...payload, requestId });
         Ui.clear("round");
+        completed = true;
+        current = null;
         $("#result").textContent = describe(r);
-        await refresh();
+        $("#again").hidden = false;
+        $("#result").focus();
+        try {
+          await refresh();
+        } catch {
+          throw new Error(
+            "対戦は記録済みです。合計・履歴を取得できませんでした。「記録を再読込する」で確認してください。",
+          );
+        }
       },
-      "対戦を記録しました。別の手でも試せます。",
+      "対戦を記録しました。「もう一度遊ぶ」で次へ進めます。",
     );
+    $("#hand").disabled = completed || Boolean(current);
+    $("#play").disabled = completed;
+    $("#play").textContent = current
+      ? "同じ手で結果を確認する"
+      : "この手で対戦する";
   };
+  $("#refresh-history").onclick = (e) => Ui.run(e.currentTarget, refresh);
+  $("#again").onclick = () => {
+    if (Ui.busy || !completed) return;
+    completed = false;
+    $("#hand").disabled = false;
+    $("#hand").value = "";
+    $("#play").disabled = false;
+    $("#again").hidden = true;
+    $("#result").textContent = "";
+    $("#status").textContent = "次の手を選んでください。";
+    $("#hand").focus();
+  };
+  window.addEventListener("beforeunload", (event) => {
+    if (Ui.busy || current) {
+      event.preventDefault();
+      event.returnValue = "";
+    }
+  });
   Ui.run(null, refresh, "準備できました。");
 </script>

@@ -15,9 +15,12 @@ try {
     const page = await context.newPage()
     let uploadCount = 0
     page.on('pageerror', error => errors.push(error.message))
-    page.on('dialog', dialog => dialog.accept())
-    await page.exposeFunction('testRpc', (name, args) => {
+    let acceptDialog = true
+    page.on('dialog', dialog => acceptDialog ? dialog.accept() : dialog.dismiss())
+    let releaseDraft = null, delayDraft = false
+    await page.exposeFunction('testRpc', async (name, args) => {
       calls.push(name)
+      if (delayDraft && name === 'generateDraft') await new Promise(resolve => { releaseDraft = resolve })
       if (name === 'uploadPhoto' && ++uploadCount === 2) throw Error('検証用の一時的な通信失敗')
       return gas.call(name, ...args)
     })
@@ -111,7 +114,25 @@ try {
     await page.locator('#draft').click()
     await page.locator('#form-error').waitFor({ state: 'visible' })
     await page.locator('#ai-consent').check()
+    await page.locator('#f-title').fill('本人のタイトル')
+    await page.locator('#f-body').fill('生成前に書いた文章')
+    delayDraft = true
     await page.locator('#draft').click()
+    await page.waitForFunction(() => document.querySelector('#draft').disabled)
+    await page.locator('#f-body').fill('生成待ちに手直しした文章')
+    while (!releaseDraft) await new Promise(resolve => setTimeout(resolve, 10))
+    delayDraft = false
+    releaseDraft()
+    await page.locator('#draft-preview').waitFor({state:'visible'})
+    assert.equal(await page.locator('#f-body').inputValue(), '生成待ちに手直しした文章')
+    acceptDialog = false
+    await page.locator('#apply-draft').click()
+    assert.equal(await page.locator('#f-body').inputValue(), '生成待ちに手直しした文章')
+    assert.equal(await page.locator('#draft-preview').isVisible(), true)
+    await page.locator('#draft-preview').scrollIntoViewIfNeeded()
+    await page.screenshot({path:`test-results/uiux-draft-${viewport.width}.png`, fullPage:false})
+    acceptDialog = true
+    await page.locator('#apply-draft').click()
     await page.waitForFunction(() => document.querySelector('#f-title').value === '作例の日記')
     await page.locator('#f-body').fill('手直しした本文を保存します。')
     await page.locator('#save').click()

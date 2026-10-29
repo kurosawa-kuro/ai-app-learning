@@ -18,10 +18,18 @@ try {
     const page = await context.newPage();
     const errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
-    page.on("dialog", (d) => d.accept());
-    await page.exposeFunction("testRpc", (name, request) =>
-      gas.call("rpc", name, request),
-    );
+    let acceptDialog = true,
+      releaseGrade = null,
+      delayGrade = false;
+    page.on("dialog", (d) => (acceptDialog ? d.accept() : d.dismiss()));
+    await page.exposeFunction("testRpc", async (name, request) => {
+      if (delayGrade && name === "skill_trainer_submit_attempt_v2") {
+        await new Promise((resolve) => {
+          releaseGrade = resolve;
+        });
+      }
+      return gas.call("rpc", name, request);
+    });
     await page.addInitScript(() => {
       const run = (ok, fail) =>
         new Proxy(
@@ -59,13 +67,43 @@ try {
     await page.getByRole("button", { name: "練習", exact: true }).click();
     await page.locator("#next").click();
     await page.locator("#answer").fill("Hello, nice to meet you.");
+    const prompt = await page.locator("#prompt").textContent();
+    acceptDialog = false;
+    await page.locator("#next").click();
+    assert.equal(
+      await page.locator("#answer").inputValue(),
+      "Hello, nice to meet you.",
+    );
+    assert.equal(await page.locator("#prompt").textContent(), prompt);
+    acceptDialog = true;
     await page.locator("#grade-consent").check();
+    delayGrade = true;
     await page.locator("#submit").click();
+    await page.waitForFunction(
+      () => document.querySelector("#answer").readOnly,
+    );
+    assert.equal(await page.locator("#next").isDisabled(), true);
+    assert.equal(await page.locator('[data-tab="talk"]').isDisabled(), true);
+    assert.equal(await page.locator("#notice").isVisible(), true);
+    while (!releaseGrade)
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    delayGrade = false;
+    releaseGrade();
     await page.waitForFunction(() =>
       document
         .querySelector("#feedback")
         .textContent.includes("意味が伝わります"),
     );
+    assert.equal(await page.locator("#answer").getAttribute("readonly"), "");
+    assert.match(
+      await page.locator("#feedback").textContent(),
+      /あなたの回答：Hello, nice to meet you\./,
+    );
+    mkdirSync("test-results", { recursive: true });
+    await page.screenshot({
+      path: `test-results/uiux-answer-${width}.png`,
+      fullPage: true,
+    });
     await page.locator("#mode").selectOption("free_production");
     await page.locator("#next").click();
     await page.locator("#answer").fill("A different phrase.");

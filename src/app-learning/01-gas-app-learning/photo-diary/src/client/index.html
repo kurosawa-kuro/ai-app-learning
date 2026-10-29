@@ -92,7 +92,7 @@
             <div>
               <div class="admin-eyebrow">日記</div>
               <h1>日記を書く</h1>
-              <p>写真とキーワードを選んで「AI下書きを作る」を押すと、下書きが入ります。自由に直してから保存してください。</p>
+              <p>写真とキーワードからAI案を作り、確認して本文へ反映できます。自分で文章を書いて保存することもできます。</p>
             </div>
             <div class="admin-header__actions">
               <button id="back" class="secondary" type="button">一覧へ戻る</button>
@@ -104,12 +104,7 @@
               <div class="admin-card__body">
                 <form id="form" class="admin-stack" novalidate>
                   <div id="form-error" class="admin-note" role="alert" hidden></div>
-                  <details>
-                    <summary>30日経過したAI生成履歴の整理</summary>
-                    <p>入力と生成文を消去します。保存済み日記は残ります。</p>
-                    <button id="generation-refresh" type="button" class="secondary">履歴の整理候補を確認</button>
-                    <div id="generation-list" aria-live="polite"></div>
-                  </details>
+
 
                   <fieldset class="app-fieldset">
                     <legend>写真 <span class="app-hint">選んだ順に並びます（複数可）</span></legend>
@@ -134,15 +129,7 @@
                     <div id="tag-picker" class="app-chips" aria-label="キーワード"></div>
                   </fieldset>
 
-                  <details id="ai-settings">
-              <summary>AI接続設定（OpenAI）</summary>
-              <p>OpenAI APIキーを登録します。ChatGPTの契約とは別にAPI利用料がかかります。保存したキーは表示しません。</p>
-              <label for="openai-key">OpenAI APIキー</label>
-              <input id="openai-key" type="password" autocomplete="new-password" placeholder="sk-…">
-              <button id="openai-key-save" type="button">キーを保存</button>
-              <button id="openai-key-delete" type="button" class="secondary">登録を解除</button>
-              <p id="openai-key-status" role="status"></p>
-            </details>
+
             <div class="admin-note admin-note--neutral app-draft">
                     <div>
                       <strong>AI下書き</strong>
@@ -154,6 +141,14 @@
                     <button id="clear-generation" class="secondary" type="button">AI採用元の関連を解除</button>
                   </div>
 
+                  <section id="draft-preview" class="admin-note" hidden aria-label="AI下書きの確認">
+                    <h2>AI案を確認する</h2>
+                    <p>まだ本文への反映・日記の保存はしていません。</p>
+                    <h3 id="draft-title"></h3>
+                    <p id="draft-body" style="white-space:pre-wrap"></p>
+                    <button id="apply-draft" type="button">この案を本文へ反映する</button>
+                    <button id="discard-draft" type="button" class="secondary">この案を閉じる</button>
+                  </section>
                   <label for="f-date">日記の日付<span class="app-req">必須</span><input id="f-date" type="date" min="2000-01-01" max="2100-12-31" required></label>
                   <label for="f-title">タイトル<span class="app-req">必須</span>
                     <input id="f-title" name="title" type="text" autocomplete="off" enterkeyhint="next">
@@ -161,6 +156,21 @@
                   <label for="f-body">本文<span class="app-req">必須</span>
                     <textarea id="f-body" name="body" rows="8"></textarea>
                   </label>
+                  <details id="ai-settings">
+              <summary>AI接続設定（OpenAI）</summary>
+              <p>OpenAI APIキーを登録します。ChatGPTの契約とは別にAPI利用料がかかります。保存したキーは表示しません。</p>
+              <label for="openai-key">OpenAI APIキー</label>
+              <input id="openai-key" type="password" autocomplete="new-password" placeholder="sk-…">
+              <button id="openai-key-save" type="button">キーを保存</button>
+              <button id="openai-key-delete" type="button" class="secondary">登録を解除</button>
+              <p id="openai-key-status" role="status"></p>
+            </details>
+                  <details>
+                    <summary>30日経過したAI生成履歴の整理</summary>
+                    <p>入力と生成文を消去します。保存済み日記は残ります。</p>
+                    <button id="generation-refresh" type="button" class="secondary">履歴の整理候補を確認</button>
+                    <div id="generation-list" aria-live="polite"></div>
+                  </details>
                 </form>
               </div>
               <footer class="app-form-footer">

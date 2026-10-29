@@ -17,7 +17,7 @@
       <p id="status" class="notice" role="status" tabindex="-1">
         読み込んでいます…
       </p>
-      <nav aria-label="ページ内メニュー">
+      <nav aria-label="作業の切替">
         <a href="#summary">月次結果</a><a href="#record">実績入力</a
         ><a href="#members">メンバー</a><a href="#rules">配点</a>
       </nav>
@@ -33,13 +33,23 @@
               required /></label
           ><button>結果を見る</button>
         </form>
-        <div id="scores" class="result-grid"></div>
+        <p id="summary-context" class="help"></p>
+        <div
+          id="scores"
+          class="scroll"
+          role="region"
+          aria-label="月次比較表"
+          tabindex="0"
+        ></div>
+        <p class="help">
+          表は横にスクロールできます。実績と現在の配点から計算しています。
+        </p>
         <details>
           <summary>この月の入力済み実績</summary>
           <div id="records" class="stack"></div>
         </details>
       </section>
-      <section id="record" class="form-panel">
+      <section id="record" class="form-panel" hidden>
         <h2>実績を記録する</h2>
         <p class="help">
           1人・1営業日につき1件。今回は登録と確認を体験します。
@@ -111,7 +121,7 @@
           <button>実績を保存する</button>
         </form>
       </section>
-      <section id="members" class="form-panel">
+      <section id="members" class="form-panel" hidden>
         <h2>メンバー</h2>
         <form id="member-form">
           <label
@@ -124,11 +134,10 @@
         </form>
         <ul id="member-list"></ul>
       </section>
-      <section id="rules">
+      <section id="rules" hidden>
         <h2>現在の配点</h2>
         <p class="help">
-          月内の数量を合計してから計算します。売上の配点は初期状態では無効です。変更はSheetsの
-          evaluation_rules で行います。
+          月内の数量を合計してから計算します。売上の配点は初期状態では無効です。配点を変更すると過去月の表示にも反映されます。この画面では確認のみできます。
         </p>
         <div id="rule-list" class="result-grid"></div>
       </section>

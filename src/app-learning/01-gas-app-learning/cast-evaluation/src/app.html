@@ -9,6 +9,39 @@
   };
   $("#month").value = Ui.localDate().slice(0, 7);
   $("#date").value = Ui.localDate();
+  const panels = ["summary", "record", "members", "rules"];
+  function showPanel(id, focus = true) {
+    if (!panels.includes(id)) id = "summary";
+    panels.forEach((key) => {
+      $("#" + key).hidden = key !== id;
+    });
+    document.querySelectorAll("nav a").forEach((a) => {
+      if (a.hash === "#" + id) a.setAttribute("aria-current", "page");
+      else a.removeAttribute("aria-current");
+    });
+    if (focus) {
+      const heading = $("#" + id + " h2");
+      heading.tabIndex = -1;
+      heading.focus();
+    }
+  }
+  const forms = [$("#record-form"), $("#member-form")];
+  const snapshot = (form) =>
+    JSON.stringify(
+      [...form.querySelectorAll("input,select")].map((el) => [
+        el.name,
+        el.value,
+      ]),
+    );
+  // 名前欄も離脱時の未保存判定へ含める。
+  $("#name").name = "name";
+  const saved = new Map(forms.map((form) => [form, snapshot(form)]));
+  window.addEventListener("beforeunload", (event) => {
+    if (Ui.busy || forms.some((form) => snapshot(form) !== saved.get(form))) {
+      event.preventDefault();
+      event.returnValue = "";
+    }
+  });
   async function refresh() {
     const data = await Ui.rpc("overview", { month: $("#month").value });
     Ui.options(
@@ -18,17 +51,44 @@
     $("#member-list").replaceChildren(
       ...data.members.map((m) => Ui.node("li", m.name)),
     );
-    $("#scores").replaceChildren(
-      ...data.results.map((row) => {
-        const card = Ui.node("article");
-        card.append(
-          Ui.node("h3", `${row.rank}位　${row.name}`),
-          Ui.node("p", `${row.pointsLabel} pt`, "total"),
-          Ui.node("p", `売上 ${Number(row.sales).toLocaleString("ja-JP")} 円`),
-        );
-        return card;
-      }),
-    );
+    $("#summary-context").textContent =
+      `${data.month} の月次結果 · 現在の配点で集計`;
+    const table = Ui.node("table"),
+      head = Ui.node("thead"),
+      header = Ui.node("tr"),
+      body = Ui.node("tbody");
+    table.append(Ui.node("caption", `${data.month} の実績・点数・順位`));
+    [
+      "順位",
+      "メンバー",
+      "点数",
+      "ドリンク（杯）",
+      "ボトル（本）",
+      "指名（件）",
+      "同伴（件）",
+      "売上（円）",
+    ].forEach((label) => {
+      const cell = Ui.node("th", label);
+      cell.scope = "col";
+      header.append(cell);
+    });
+    head.append(header);
+    data.results.forEach((row) => {
+      const tr = Ui.node("tr");
+      [
+        row.rank + "位",
+        row.name,
+        row.pointsLabel + " pt",
+        row.drinks,
+        row.bottles,
+        row.nominations,
+        row.accompaniments,
+        Number(row.sales).toLocaleString("ja-JP") + " 円",
+      ].forEach((value) => tr.append(Ui.node("td", String(value))));
+      body.append(tr);
+    });
+    table.append(head, body);
+    $("#scores").replaceChildren(table);
     if (!data.results.length)
       $("#scores").append(
         Ui.node("p", "メンバーを追加すると月次結果が表示されます。"),
@@ -54,7 +114,7 @@
       $("#records").append(
         Ui.node(
           "p",
-          "この月の実績はまだありません。下のフォームから記録できます。",
+          "この月の実績はまだありません。「実績入力」から記録できます。",
         ),
       );
     $("#rule-list").replaceChildren(
@@ -75,43 +135,85 @@
     e.preventDefault();
     Ui.run(e.submitter, refresh);
   };
-  $("#member-form").onsubmit = (e) => {
+  const pendingForms = new Map();
+  async function saveRecord(form, operation, payload, key) {
+    const request = pendingForms.get(form) || {
+      ...payload,
+      requestId: Ui.pending(key, payload),
+    };
+    try {
+      const row = await Ui.rpc(operation, request);
+      pendingForms.delete(form);
+      Ui.clear(key);
+      return row;
+    } catch (error) {
+      if (error.uncertain) {
+        pendingForms.set(form, request);
+        error.message +=
+          " 保存済みの可能性があるため入力を固定しています。同じ保存ボタンで結果を確認してください。";
+      }
+      throw error;
+    }
+  }
+  function lockPending(form) {
+    form.querySelectorAll("input,select").forEach((input) => {
+      input.disabled = pendingForms.has(form);
+    });
+  }
+  $("#member-form").onsubmit = async (e) => {
     e.preventDefault();
+    if (Ui.busy) return;
     const payload = { name: $("#name").value };
-    const requestId = Ui.pending("member", payload);
-    Ui.run(
+    await Ui.run(
       e.submitter,
       async () => {
-        const row = await Ui.rpc("createMember", { ...payload, requestId });
-        Ui.clear("member");
+        await saveRecord(e.target, "createMember", payload, "member");
         $("#name").value = "";
-        await refresh();
-        $("#member").value = row.id;
+        saved.set($("#member-form"), snapshot($("#member-form")));
+        try {
+          await refresh();
+        } catch {
+          throw new Error(
+            "メンバーは保存済みです。一覧の再取得に失敗しました。月次結果の「結果を見る」で表示を更新してください。",
+          );
+        }
+        showPanel("members");
       },
-      "メンバーを追加しました。実績入力で選択しています。",
+      "メンバーを追加しました。「実績入力」で選択できます。",
     );
+    lockPending(e.target);
   };
-  $("#record-form").onsubmit = (e) => {
+  $("#record-form").onsubmit = async (e) => {
     e.preventDefault();
-    const payload = Object.fromEntries(new FormData(e.target)),
-      requestId = Ui.pending("record", payload);
-    Ui.run(
+    if (Ui.busy) return;
+    const payload =
+      pendingForms.get(e.target) || Object.fromEntries(new FormData(e.target));
+    await Ui.run(
       e.submitter,
       async () => {
-        await Ui.rpc("createRecord", { ...payload, requestId });
-        Ui.clear("record");
+        await saveRecord(e.target, "createRecord", payload, "record");
+        saved.set(e.target, snapshot(e.target));
         $("#month").value = payload.businessDate.slice(0, 7);
-        await refresh();
+        try {
+          await refresh();
+        } catch {
+          throw new Error(
+            "実績は保存済みです。集計の再取得に失敗しました。月次結果の「結果を見る」で表示を更新してください。",
+          );
+        }
+        showPanel("summary");
       },
       "実績を保存しました。月次結果へ反映しました。",
     );
+    lockPending(e.target);
   };
   document.querySelectorAll("nav a").forEach(
     (a) =>
       (a.onclick = (e) => {
         e.preventDefault();
-        document.querySelector(a.getAttribute("href")).scrollIntoView();
+        if (!Ui.busy) showPanel(a.hash.slice(1));
       }),
   );
+  showPanel("summary", false);
   Ui.run(null, refresh, "準備できました。実績を1件記録してみましょう。");
 </script>

@@ -77,6 +77,9 @@
       state.busy = true;
       ++state.seq;
       const originTab = state.tab;
+      $("notice").hidden = false;
+      $("notice").textContent =
+        "処理しています。入力と結果を確認するまで、この画面でお待ちください。";
       sync();
       button.disabled = true;
       $("error").hidden = true;
@@ -86,6 +89,8 @@
         if (state.tab === originTab) error(e);
       } finally {
         state.busy = false;
+        if ($("notice").textContent.startsWith("処理しています。"))
+          $("notice").hidden = true;
         button.disabled = false;
         sync();
         persist();
@@ -95,7 +100,8 @@
       $("next").disabled = state.busy || Boolean(state.attempt);
       $("mode").disabled = state.busy || Boolean(state.attempt);
       $("submit").disabled = state.busy || !state.item;
-      $("answer").readOnly = Boolean(state.attempt);
+      $("answer").readOnly =
+        state.busy || Boolean(state.attempt) || !state.item;
       document
         .querySelectorAll('input[name="option"]')
         .forEach((n) => (n.disabled = Boolean(state.attempt)));
@@ -113,11 +119,20 @@
       $("start-talk").disabled =
         state.busy || Boolean(state.session && !state.start);
       $("new-talk").hidden = !state.session || state.session.state !== "closed";
-      $("message").readOnly = Boolean(state.turn);
+      $("message").readOnly = state.busy || Boolean(state.turn);
+      document
+        .querySelectorAll("[data-tab], [data-jump]")
+        .forEach((n) => (n.disabled = state.busy));
+      document
+        .querySelector("main")
+        .setAttribute("aria-busy", String(state.busy));
       $("scenario").disabled =
         state.busy || Boolean(state.start) || Boolean(state.session);
     }
     async function switchTab(tab, history = true) {
+      if (state.busy) return;
+      if (!["today", "train", "talk", "records", "settings"].includes(tab))
+        tab = "today";
       state.tab = tab;
       const seq = ++state.seq;
       ["today", "train", "talk", "records", "settings"].forEach(
@@ -201,6 +216,9 @@
     }
     function showResult(result) {
       $("feedback").textContent =
+        "あなたの回答：" +
+        (state.attempt?.answer_text || $("answer").value || state.choiceDraft) +
+        "\n\n" +
         result.feedback +
         "\n回答例：" +
         result.expected +
@@ -215,8 +233,14 @@
       persist();
       sync();
     }
-    $("next").onclick = () =>
-      action($("next"), async () => {
+    $("next").onclick = () => {
+      if (state.busy) return;
+      if (
+        (state.draftAnswer.trim() || state.choiceDraft) &&
+        !confirm("未送信の回答を破棄して次の問題へ進みますか？")
+      )
+        return;
+      return action($("next"), async () => {
         const mode = $("mode").value,
           seq = state.seq;
         const result = await api(
@@ -239,6 +263,7 @@
             result.message || "この練習方法の教材がありません。";
         } else $("notice").hidden = true;
       });
+    };
     $("submit").onclick = () =>
       action($("submit"), async () => {
         const choice = Boolean(state.item.options);
@@ -396,6 +421,13 @@
       });
     $("end-talk").onclick = () =>
       action($("end-talk"), async () => {
+        if (
+          state.draftMessage.trim() &&
+          !confirm(
+            "まだ送っていないメッセージがあります。残したまま会話を終了しますか？",
+          )
+        )
+          return;
         state.end ??= {
           session_id: state.session.sessionId,
           request_id: TrainerApi.id(),
@@ -432,6 +464,11 @@
       });
     $("new-talk").onclick = () => {
       if (state.busy) return;
+      if (
+        state.draftMessage.trim() &&
+        !confirm("未送信のメッセージを破棄して別の会話を始めますか？")
+      )
+        return;
       state.draftMessage = "";
       $("message").value = "";
       state.session = null;

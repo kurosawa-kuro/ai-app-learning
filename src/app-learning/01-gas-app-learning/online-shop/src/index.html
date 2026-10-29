@@ -12,12 +12,12 @@
       <header>
         <p class="eyebrow">GASで、保存して読み返す</p>
         <h1>学びのショップ</h1>
-        <p>商品と数量を選ぶ → 注文を保存する → 明細を読み返す。</p>
+        <p>商品と数量を選ぶ → 内容を確認する → 注文を確定する → 明細を読む。</p>
       </header>
       <p id="status" class="notice" role="status" tabindex="-1">
         読み込んでいます…
       </p>
-      <section class="form-panel">
+      <section id="selection-section" class="form-panel">
         <h2>商品を選んで注文する</h2>
         <p class="help">
           カートは使いません。注文する商品の数量を入れ、この画面から直接注文します。決済・配送は行いません。
@@ -27,10 +27,24 @@
           <p class="help">数量は0〜99個。注文しない商品は0のままにします。</p>
           <div id="products" class="stack"></div>
           <p id="total" class="total" aria-live="polite">合計 0 円</p>
-          <button id="submit-order">この内容で注文する</button>
+          <button id="submit-order">注文内容を確認する</button>
         </form>
         <button id="reload" class="secondary outline" type="button">
           商品・注文を再読込
+        </button>
+      </section>
+      <section id="confirmation-section" class="form-panel" hidden>
+        <h2 tabindex="-1">注文内容の確認</h2>
+        <p>
+          まだ注文は確定していません。注文する人・商品・数量・金額を確認してください。
+        </p>
+        <div id="confirmation"></div>
+        <p id="order-state" role="status"></p>
+        <button id="confirm-order" type="button">
+          この内容で注文を確定する
+        </button>
+        <button id="back-order" class="secondary" type="button">
+          数量を変更する
         </button>
       </section>
       <section id="detail-section" hidden>

@@ -1,5 +1,7 @@
 # english-trainer
 
+> 2026-10-29：思想別UIUX改善を本人限定@4へ公開更新。単体・ローカル操作受入と公開コードの一致は確認済み、今回の実GAS画面操作は接続待ち。[最新の改善・受入記録](../../docs/tasks/gas-uiux-20261029.md)。以下の過去の版番号・実操作記録とは区別する。
+
 > 2026-10-28：AIはOpenAI APIキー方式へ変更。OAuth／GCP設定は不要です。現在の手順は[OpenAI接続](docs/openai-setup.md)、実環境の進捗は[受入記録](../../docs/tasks/gas-release-20261028.md)を参照。過去のGemini連携仕様は旧方式の記録です。
 
 GAS・Google Sheets・OpenAIで動く、個人用の英語訓練アプリです。自由記述クイズのAI採点、短い自由会話、振り返り、学習記録を基本導線とします。[基本配布範囲](docs/specs/educational-baseline.md)を正本とし、旧G3の能力一覧・候補承認・再学習リセットを基本画面へ並べません。

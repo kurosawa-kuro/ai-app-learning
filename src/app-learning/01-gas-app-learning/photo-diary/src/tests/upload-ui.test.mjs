@@ -55,6 +55,8 @@ test("P3画面：2枚目だけ失敗→保存を止める→再送→順序変�
     assert.match(ui.$("upload-list").querySelector("p").textContent, /two.jpg/)
     ui.$("ai-consent").checked = true
     ui.$("draft").click(); await wait(100)
+    assert.equal(ui.$("f-title").value, "")
+    ui.$("apply-draft").click()
     assert.equal(ui.$("f-title").value, "下書き")
     ui.$("f-body").value = "手直しした本文"
     ui.$("form").dispatchEvent(new ui.window.Event("submit", { cancelable: true })); await wait(150)

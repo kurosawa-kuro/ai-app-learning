@@ -1,6 +1,9 @@
 <script>
   const $ = (selector) => document.querySelector(selector);
   let products = [];
+  let confirmed = null,
+    unresolved = false,
+    activeUser = "";
   const yen = (amount) => `${amount.toLocaleString("ja-JP")} 円`;
   function selectedItems() {
     return products
@@ -111,8 +114,16 @@
     total();
     await history();
   }
-  $("#user").onchange = () =>
-    Ui.run(null, async () => {
+  $("#user").onchange = () => {
+    if (
+      selectedItems().length &&
+      !confirm("選択中の数量を破棄して注文する人を切り替えますか？")
+    ) {
+      $("#user").value = activeUser;
+      return;
+    }
+    activeUser = $("#user").value;
+    return Ui.run(null, async () => {
       $("#detail-section").hidden = true;
       document
         .querySelectorAll("[data-quantity]")
@@ -121,26 +132,102 @@
       total();
       await history();
     });
+  };
   $("#reload").onclick = (e) => Ui.run(e.currentTarget, catalog);
   $("#order-form").onsubmit = (e) => {
     e.preventDefault();
-    const payload = { userId: $("#user").value, items: selectedItems() },
+    if (Ui.busy || unresolved) return;
+    const items = selectedItems();
+    if (!items.length) {
+      $("#status").textContent = "注文する商品と数量を指定してください。";
+      $("#status").focus();
+      return;
+    }
+    confirmed = { userId: $("#user").value, items };
+    $("#confirmation").replaceChildren(
+      Ui.node("h3", "注文する人：" + $("#user").selectedOptions[0].textContent),
+    );
+    items.forEach((i) =>
+      $("#confirmation").append(
+        Ui.node(
+          "p",
+          `${products.find((p) => p.id === i.productId).name}：${yen(i.price)} × ${i.quantity} 個 = ${yen(i.price * i.quantity)}`,
+        ),
+      ),
+    );
+    $("#confirmation").append(
+      Ui.node(
+        "p",
+        "合計 " + yen(items.reduce((sum, i) => sum + i.price * i.quantity, 0)),
+        "total",
+      ),
+    );
+    $("#order-state").textContent =
+      "未確定です。「注文を確定する」を押すと保存します。";
+    $("#selection-section").hidden = true;
+    $("#confirmation-section").hidden = false;
+    $("#history-section").hidden = true;
+    $("#detail-section").hidden = true;
+    $("#confirmation-section h2").focus();
+  };
+  $("#back-order").onclick = () => {
+    if (Ui.busy || unresolved) return;
+    confirmed = null;
+    $("#confirmation-section").hidden = true;
+    $("#selection-section").hidden = false;
+    $("#history-section").hidden = false;
+    $("#submit-order").focus();
+  };
+  $("#confirm-order").onclick = async (e) => {
+    if (Ui.busy || !confirmed) return;
+    const payload = confirmed,
       requestId = Ui.pending("order", payload);
-    Ui.run(
-      e.submitter,
+    await Ui.run(
+      e.currentTarget,
       async () => {
-        const order = await Ui.rpc("createOrder", { ...payload, requestId });
+        $("#order-state").textContent = "注文を保存しています…";
+        let order;
+        try {
+          order = await Ui.rpc("createOrder", { ...payload, requestId });
+        } catch (error) {
+          unresolved = Boolean(error.uncertain);
+          $("#order-state").textContent = unresolved
+            ? "注文済みの可能性があります。同じ内容のまま「注文を確定する」で結果を確認してください。二重には登録しません。"
+            : error.message +
+              " 数量を変更する画面へ戻り、必要なら商品・注文を再読込してください。";
+          throw error;
+        }
+        unresolved = false;
+        confirmed = null;
         showDetail(order);
         Ui.clear("order");
+        $("#confirmation-section").hidden = true;
+        $("#selection-section").hidden = false;
+        $("#history-section").hidden = false;
+        $("#detail-section h2").tabIndex = -1;
+        $("#detail-section h2").focus();
         document
           .querySelectorAll("[data-quantity]")
           .forEach((el) => (el.value = "0"));
         total();
-        await history();
+        try {
+          await history();
+        } catch {
+          throw new Error(
+            "注文は保存済みです。注文一覧を取得できませんでした。「商品・注文を再読込」で確認してください。",
+          );
+        }
       },
       "注文を保存しました。明細と注文一覧で確認できます。",
     );
+    $("#back-order").disabled = unresolved;
   };
+  window.addEventListener("beforeunload", (event) => {
+    if (Ui.busy || unresolved || selectedItems().length) {
+      event.preventDefault();
+      event.returnValue = "";
+    }
+  });
   Ui.run(
     null,
     catalog,

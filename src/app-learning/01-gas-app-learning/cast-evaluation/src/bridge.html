@@ -5,12 +5,21 @@
       return new Promise((resolve, reject) =>
         google.script.run
           .withSuccessHandler((result) =>
-            result.ok ? resolve(result.data) : reject(new Error(result.error)),
+            result.ok
+              ? resolve(result.data)
+              : reject(
+                  Object.assign(new Error(result.error), {
+                    uncertain: result.uncertain,
+                  }),
+                ),
           )
           .withFailureHandler(() =>
             reject(
-              new Error(
-                "通信できませんでした。入力を残しています。同じ内容で再試行してください。",
+              Object.assign(
+                new Error(
+                  "通信できませんでした。入力を残しています。同じ内容で再試行してください。",
+                ),
+                { uncertain: true },
               ),
             ),
           )

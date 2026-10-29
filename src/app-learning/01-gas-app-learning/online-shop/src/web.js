@@ -28,6 +28,7 @@ function rpc(operation, input) {
   } catch (error) {
     return {
       ok: false,
+      uncertain: !error.userFacing,
       error: error.userFacing
         ? error.message
         : "保存・読込できませんでした。入力を残しています。同じ内容で再試行してください。",

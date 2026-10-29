@@ -232,6 +232,8 @@ test("作成：写真とキーワードを選び、AI 下書きを入れ、保�
   assert.equal(ui.chip("tag-picker", "旅行").getAttribute("aria-pressed"), "true")
 
   ui.$("draft").click(); await wait(60)
+  assert.equal(ui.$("f-title").value, "")
+  ui.$("apply-draft").click(); await wait()
   assert.equal(ui.$("f-title").value, "ゆったり過ごした一日")
   assert.ok(ui.$("f-body").value.length > 10)
 
@@ -323,6 +325,7 @@ test("v2画面：生成の応答喪失は同じ要求で再取得し、採用元
     ui.$("draft").click(); await wait(80)
     ui.$("draft").click(); await wait(80)
     assert.equal(ui.gas.run('GenerationRepository.list().length'), 1)
+    ui.$("apply-draft").click(); await wait()
     ui.$("clear-generation").click()
     ui.submit(); await wait(80)
     assert.equal(ui.gas.call("getAll").data.posts[0].source_generation_id, "")

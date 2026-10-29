@@ -7,7 +7,7 @@
     let state = blank()
 
     function blank() {
-      return { imageIds: [], tagIds: [], requestId: null, sent: null, generationRequest: null, sourceGenerationId: "", dirty: false, saving: false, drafting: false }
+      return { imageIds: [], tagIds: [], requestId: null, sent: null, generationRequest: null, preview: null, sourceGenerationId: "", dirty: false, saving: false, drafting: false }
     }
 
     function renderPhotoPicker() {
@@ -54,8 +54,10 @@
       $("draft").disabled = saving || drafting || blocked
       App.photoUpload.setDisabled(saving || drafting)
       $("f-date").disabled = saving || drafting
-      $("f-title").disabled = saving || drafting
-      $("f-body").disabled = saving || drafting
+      $("f-title").disabled = saving
+      $("f-body").disabled = saving
+      $("apply-draft").disabled = saving || drafting
+      $("discard-draft").disabled = saving || drafting
       $("new-generation").disabled = saving || drafting
       $("clear-generation").disabled = saving || drafting
       $("draft").setAttribute("aria-busy", drafting ? "true" : "false")
@@ -81,8 +83,7 @@
         showError("写真かキーワードを1つ以上選んでください。")
         return
       }
-      const hasText = $("f-title").value.trim() !== "" || $("f-body").value.trim() !== ""
-      if (hasText && !confirm("入力中のタイトルと本文を、下書きで置き換えますか？")) return
+      if (state.preview && !confirm("表示中のAI案を新しい案に置き換えますか？ 日記本文は変わりません。")) return
       hideError()
       const mine = state
       mine.drafting = true
@@ -96,12 +97,13 @@
         if (!mine.generationRequest) mine.generationRequest = { id: App.api.newRequestId(), input }
         const draft = await App.api.generateDraft({ ...mine.generationRequest.input, requestId: mine.generationRequest.id })
         if (App.router.seq() !== at) return
-        $("f-title").value = draft.title
-        $("f-body").value = draft.body
-        mine.sourceGenerationId = draft.generationId || ""
+        mine.preview = draft
+        $("draft-title").textContent = draft.title
+        $("draft-body").textContent = draft.body
+        $("draft-preview").hidden = false
         mine.generationRequest = null
         mine.dirty = true
-        App.ui.toast("下書きを入れました。自由に直してください")
+        App.ui.toast("AI案ができました。内容を確認して本文へ反映できます。まだ保存していません")
       } catch (err) {
         if (["invalid", "consent_required", "invalid_image"].includes(err.code)) mine.generationRequest = null
         if (App.router.seq() === at) showError(err.message)
@@ -162,6 +164,30 @@
 
     return {
       init() {
+        window.addEventListener("beforeunload", event => {
+          if (App.ui.current() === "form" && (state.dirty || state.saving || state.drafting || App.photoUpload.busy())) {
+            event.preventDefault(); event.returnValue = ""
+          }
+        })
+        $("apply-draft").addEventListener("click", () => {
+          if (!state.preview || state.saving || state.drafting) return
+          const hasText = $("f-title").value.trim() || $("f-body").value.trim()
+          if (hasText && !confirm("入力中のタイトルと本文をAI案に置き換えますか？ キャンセルすると今の文章を残します。")) return
+          $("f-title").value = state.preview.title
+          $("f-body").value = state.preview.body
+          state.sourceGenerationId = state.preview.generationId || ""
+          state.preview = null
+          state.dirty = true
+          $("draft-preview").hidden = true
+          $("f-body").focus()
+          App.ui.toast("本文へ反映しました。手直ししてから保存してください")
+        })
+        $("discard-draft").addEventListener("click", () => {
+          if (state.saving || state.drafting) return
+          state.preview = null
+          $("draft-preview").hidden = true
+          $("draft").focus()
+        })
         const keyStatus = $("openai-key-status")
         const showKeyStatus = (result) => { keyStatus.textContent = result.keyConfigured ? "登録済み（" + result.model + "）" : "未登録" }
         $("ai-settings").addEventListener("toggle", async () => {
@@ -231,6 +257,7 @@
         $("f-date").value = new Date().toLocaleDateString("sv-SE")
         $("f-title").value = ""
         $("f-body").value = ""
+        $("draft-preview").hidden = true
         $("ai-consent").checked = false
         renderPhotoPicker()
         renderTagPicker()

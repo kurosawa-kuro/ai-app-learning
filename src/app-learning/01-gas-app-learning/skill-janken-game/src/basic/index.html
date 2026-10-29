@@ -29,14 +29,21 @@
           ><button id="play">この手で対戦する</button>
         </form>
         <p class="help">
-          勝ち2点、あいこ・負け1点。スキルとAIはWeb版で体験します。
+          勝ち2点、あいこ・負け1点。手を選んで一回遊んでみよう。
         </p>
-        <div id="result" aria-live="polite"></div>
+        <div id="result" aria-live="polite" tabindex="-1"></div>
+        <button id="again" type="button" hidden>もう一度遊ぶ</button>
       </section>
       <section>
         <h2>対戦の記録</h2>
         <p id="total" class="total"></p>
-        <div id="history" class="stack"></div>
+        <button id="refresh-history" class="secondary" type="button">
+          記録を再読込する
+        </button>
+        <details>
+          <summary>これまでの対戦を見る</summary>
+          <div id="history" class="stack"></div>
+        </details>
       </section>
     </main>
     <?!= include_('bridge'); ?><?!= include_('app'); ?>
