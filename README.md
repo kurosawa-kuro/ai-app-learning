@@ -37,7 +37,7 @@ GAS・Webの**両版で完成版を配布するのは、写真日記・キャス
 | 取り組み・誰に | 本人のゴール | スタートの支援 | AIで横展開するもの |
 |---|---|---|---|
 | [GASアプリ教材](src/app-learning/01-gas-app-learning/README.md)：遊び・英語・写真・店舗業務などに関心や課題がある人 | 自分に身近な題材を通じてITを理解し、目的に合う小さな変更ができる。対象者別の違いは次節を参照 | 本人に合う題材を選び、動作確認済みの体験環境、説明、設定・改修の伴走を用意する | 身近な対象をデータとルールで捉える経験を、同じ題材の別の変更へ応用する |
-| [Webアプリを作って使う支援](src/app-learning/02-web-app-learning/web-app-support-strategy.md)：自分用・業務用のアプリが欲しい非エンジニア | 自分の用途に合うアプリを使い、必要に応じて改善できる | 要望を小さく整理し、ひな形・環境準備・最初の公開までのつまずきを減らす | 動いたアプリと仕様を土台に、項目・画面・処理を用途に合わせて変え、別の身近な業務にも応用する |
+| [Webアプリ制作の案内](src/app-learning/02-web-app-learning/README.md)：自分用・業務用のアプリが欲しい非エンジニア | 自分の用途に合うアプリを使い、必要に応じて改善できる | 要望を小さく整理し、ひな形・環境準備・最初の公開までのつまずきを減らす | 動いたアプリと仕様を土台に、項目・画面・処理を用途に合わせて変え、別の身近な業務にも応用する |
 | [Java・Oracle Bronze × Devin](<src/java-career-learning/java-career-learning-strategy.md>)：Java・Oracle系の仕事を目指すIT未経験者 | 資格と実習成果で基礎技能を示し、開発・保守の仕事に近づく | 学習範囲を絞り、実行環境、最初のJava課題、SQL実習、成果の残し方を支援する | 学んだ文法・SQL・テストを別の課題へ応用し、一つのアプリをDB連携・Web化・運用へ育てる |
 | [Cursor業務効率化](src/office-automation-starter/README.md)：Windowsを使う非エンジニア、特にIT人材・SES営業担当者 | 日々の事務処理の手間やミスを減らす | Cursor導入、サンプルデータ、コピーして使えるプロンプトで、最初の1業務を試せるようにする | 成功した依頼の入力・条件・出力を変え、別の集計、資料整理、文面作成などへ応用する |
 
@@ -69,7 +69,7 @@ AIには、本人の業務の説明を仕様や画面・データの案にする
 
 成功は、本人の用途で主要操作が完了すること、変更した結果を確かめられること、問題が起きたときに復旧・相談できることで確認します。
 
-[Webアプリ支援戦略](src/app-learning/02-web-app-learning/web-app-support-strategy.md)に従い、画面・業務処理はSpring Boot＋Thymeleaf、アプリの実行・公開はRender、DBはSupabaseのPostgreSQLに統一します。画像保存などに必要な場合はSupabase Storageを扱います。Java・SQLの知識やひな形を再利用し、導入・AI改修・検証の支援を蓄積します。具体的な環境設定・料金・運用条件は実装時に確認します。
+[Webアプリ制作の案内](src/app-learning/02-web-app-learning/README.md)に従い、画面・業務処理はSpring Boot＋Thymeleaf、アプリの実行・公開はRender、DBはSupabaseのPostgreSQLに統一します。画像保存などに必要な場合はSupabase Storageを扱います。Java・SQLの知識やひな形を再利用し、導入・AI改修・検証の支援を蓄積します。具体的な環境設定・料金・運用条件は実装時に確認します。
 
 [GAS資料](src/app-learning/01-gas-app-learning/README.md)の発展版も同じSpring Boot構成に揃えます。GAS版とSpring Boot版を共通の業務要件・受入条件で比較し、既存5教材を1題材ずつ整備します。基盤を揃えても、本人のゴール・スタート支援・AIで横展開する範囲は取り組みごとに分けます。GAS修了やJava資格の取得をWebアプリ利用の条件にはしません。
 

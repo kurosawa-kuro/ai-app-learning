@@ -191,7 +191,7 @@ JavaとOracleを単体の人気や技術的な優劣で選ぶのではなく、�
 
 ### 2026-10-27：Web教材との接続方針
 
-リポジトリのWebアプリとGAS教材の発展版は、[採用判断](../../docs/adr/0001-web-app-stack.md)により **Spring Boot＋Thymeleaf＋Render＋Supabase** に統一する。Next.js＋Vercel案は廃止した。[Webアプリ支援戦略](../app-learning/02-web-app-learning/web-app-support-strategy.md)とJava・SQLの知識、実装例、テストを共有できるようにする。
+リポジトリのWebアプリとGAS教材の発展版は、[採用判断](../../docs/adr/0001-web-app-stack.md)により **Spring Boot＋Thymeleaf＋Render＋Supabase** に統一する。Next.js＋Vercel案は廃止した。[Webアプリ制作の案内](../app-learning/02-web-app-learning/README.md)とJava・SQLの知識、実装例、テストを共有できるようにする。
 
 本ルートの目的は引き続きJava・Oracle系の仕事へ近づくこと。Oracle Databaseの管理・固有SQLの実習は維持し、Web教材のSupabase PostgreSQLと区別する。Spring Boot段階では共通Web教材を活用し、Linux・AWSは志望する仕事に応じた発展学習として扱う。Web教材の標準公開先はRenderとする。
 

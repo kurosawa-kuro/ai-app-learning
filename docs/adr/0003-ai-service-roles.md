@@ -33,7 +33,7 @@
 
 この決定と文書更新だけで、全アプリ・公開環境のOpenAI移行完了とはしない。Gemini用のコード・設定名・手順が残る場合は移行対象として扱い、対象版ごとにコード、設定、実疎通、公開先での動作を確認する。Geminiでの過去の試験成功はOpenAIの検証証拠にならない。
 
-2026-10-28の文書更新時点で、GASの英語訓練・写真日記とWeb共通テンプレートにOpenAI実装を確認した。GASの実通信については既存の[受入記録](../../src/app-learning/docs/tasks/gas-release-20261028.md)がある。Webの現行設定・進捗は[OpenAI移行記録](../../src/app-learning/02-web-app-learning/docs/tasks/openai-migration-20261028.md)を参照する。[横展開記録](../../src/app-learning/02-web-app-learning/docs/rollout-status.md)にはGemini使用時点の記録が含まれる。今回の作業で実通信や公開先の再検証は行わない。
+2026-10-28の文書更新時点で、GASの英語訓練・写真日記とWeb共通テンプレートにOpenAI実装を確認した。GASの実通信については既存の[受入記録](../../src/app-learning/docs/tasks/gas-release-20261028.md)がある。Webの現行設定・進捗は[公開・検証状況](../../src/app-learning/02-web-app-learning/docs/rollout-status.md)を参照する。整理前のGemini検証の詳細はGit履歴で参照し、OpenAIの受入結果と混同しない。この方針文書の更新だけで実通信や公開先を再検証済みとはしない。
 
 提供者が教材を開発するためのCodex・Claude Code等の利用方針や、汎用ハーネス設計にあるツール例は、受講者向けの役割分担とは別に扱う。過去資料のファイル名に残る `gemini` も、現行採用を意味しない。
 

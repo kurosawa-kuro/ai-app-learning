@@ -1,6 +1,6 @@
 # Googleログインの設定と確認
 
-更新日：2026-10-28。対象はtemplateとWeb版5教材。コードは共通化済み、実Google／Renderの受入は未実施。[実施記録](tasks/web-auth-rollout-20261028.md)と[ADR 0004](../../../../docs/adr/0004-auth-gas-simple-web-supabase.md)を参照。
+更新日：2026-10-29。対象はtemplateとWeb版5教材。コードは共通化済み、既定無効。実Google／Renderの受入・公開先の有効化は未実施。[ADR 0004](../../../../docs/adr/0004-auth-gas-simple-web-supabase.md)を参照。
 
 ## 先に理解する境界
 
@@ -68,3 +68,11 @@ ON CONFLICT (email) DO NOTHING;
 - [ ] PC1440px／ブラウザー390pxで表示・操作・画像取得を確認。物理スマホの実機確認は別途記録。
 
 Authプロジェクトを順送りで削除する場合、削除前に対象Renderの閉じ方を決めて記録する。既存Authプロジェクト・Google設定・公開環境を、コード修正の一環として自動削除しない。
+
+## ローカル検証の記録
+
+2026-10-28、6アプリのAuth関連Java試験は各20件・計120件成功。PKCE、JWTの署名・iss・aud・role・期限、管理者許可、Cookie、期限更新、ログアウト、CSRF、保存要求の401を模擬Authと専用テストDBで確認した。
+
+templateの認証切れ回復ブラウザー試験は画像OFF／ONで各2件成功。入力・選択ファイル・要求IDを保持し、本人の再送で保存できることを確認。Render設定反映は模擬HTTPで6アプリ×2条件成功。実Google・実Renderへの認証通信や各教材の認証有効時のPC／狭幅受入を完了した記録ではない。
+
+再確認は各アプリの`run-local.ps1 -Action test`でAuth関連テスト、templateの`tests/e2e/auth-recovery.spec.js`と`tests/auth-deployment.test.ps1`を使う。実環境で残る確認は上の受入チェックに集約する。

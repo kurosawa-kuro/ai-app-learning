@@ -18,7 +18,7 @@
 | 対象 | 手順の所在・扱い |
 |---|---|
 | GAS | [教材一覧](../src/app-learning/01-gas-app-learning/README.md)から個別README・公開手順へ。push・公開版更新・実環境受入を区別 |
-| Web | [支援戦略](../src/app-learning/02-web-app-learning/web-app-support-strategy.md)と[採用判断](adr/0001-web-app-stack.md)。Render・Supabaseの具体手順は実装時に確定 |
+| Web | [Webアプリ制作の案内](../src/app-learning/02-web-app-learning/README.md)と[採用判断](adr/0001-web-app-stack.md)。Render・Supabaseの具体手順は実装時に確定 |
 | Java | [学習戦略](../src/java-career-learning/java-career-learning-strategy.md)。資格学習やローカル課題にWeb公開を一律に課さない |
 | 事務処理 | [教材README](../src/office-automation-starter/README.md)。元ファイルを保全して出力を確認し、不要な公開を増やさない |
 

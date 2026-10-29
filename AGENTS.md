@@ -20,7 +20,7 @@ Codex は作業前にこのファイルを読むため、ここには repo 共�
 | 対象 | 参照先 | 作業に反映する方針 |
 |---|---|---|
 | 身近なアプリからのIT入門 | [src/app-learning/01-gas-app-learning/README.md](src/app-learning/01-gas-app-learning/README.md) | 子供、英語学習者、写真日記の利用者、店舗運営者などでゴールと支援を分ける。6工程はGAS教材内の指導枠組み |
-| 非エンジニアのアプリ実利用 | [Spring Boot・Render・Supabase戦略](src/app-learning/02-web-app-learning/web-app-support-strategy.md) | 自分用・業務用アプリを使いたい人が対象。採用済みの共通基盤で、ひな形・導入・公開・AI改修を支援する。サービス条件や検証結果は根拠を確認する |
+| 非エンジニアのアプリ実利用 | [Webアプリ制作の案内](src/app-learning/02-web-app-learning/README.md) | 自分用・業務用アプリを使いたい人が対象。採用済みの共通基盤で、ひな形・導入・公開・AI改修を支援する。サービス条件や検証結果は根拠を確認する |
 | 資格と実務の接続 | [Java・Oracle Bronze × Devin 学習戦略](<src/java-career-learning/java-career-learning-strategy.md>) | 末尾の追記を含めて読む。Java Bronzeは優先取得、Oracle Bronzeは学習先行・受験保留・必要時取得。SQL実習と本人の自力修正を重視する |
 | 非エンジニアの業務効率化 | [Cursor業務効率化スターター](src/office-automation-starter/README.md) | Windows、追加ランタイム不要、元ファイルを保全するコピー操作、単独で使えるプロンプトという教材前提を守る |
 

@@ -30,7 +30,7 @@ git status --short
 | 対象 | 手順を確認する入口 |
 |---|---|
 | GAS | [教材一覧](../src/app-learning/01-gas-app-learning/README.md)から一つを選び、個別のREADME・AGENTS.mdへ |
-| Web | [支援戦略](../src/app-learning/02-web-app-learning/web-app-support-strategy.md)。実装時に環境・検証・公開手順を確定 |
+| Web | [Webアプリ制作の案内](../src/app-learning/02-web-app-learning/README.md)。実装時に環境・検証・公開手順を確定 |
 | Java | [学習戦略](../src/java-career-learning/java-career-learning-strategy.md)。選んだ課題に必要な環境だけ準備 |
 | 事務処理 | [教材README](../src/office-automation-starter/README.md)とクイックスタート |
 

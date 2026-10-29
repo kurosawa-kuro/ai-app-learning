@@ -30,7 +30,7 @@ AIの役割分担とGemini廃止は[ADR 0003](adr/0003-ai-service-roles.md)で�
 | 入口 | 優先して読む資料 |
 |---|---|
 | 身近な題材でITに触れる | [GASアプリ集](../src/app-learning/01-gas-app-learning/README.md) |
-| 自分用・業務用アプリを作って使う | [Webアプリ支援戦略](../src/app-learning/02-web-app-learning/web-app-support-strategy.md) |
+| 自分用・業務用アプリを作って使う | [Webアプリ制作の案内](../src/app-learning/02-web-app-learning/README.md) |
 | Java・Oracleの資格と実習を仕事につなげる | [Javaキャリア学習戦略](../src/java-career-learning/java-career-learning-strategy.md) |
 | 日々の事務処理の手間を減らす | [業務効率化スターター](../src/office-automation-starter/README.md) |
 
@@ -55,7 +55,7 @@ AIの役割分担とGemini廃止は[ADR 0003](adr/0003-ai-service-roles.md)で�
 | `cast-evaluation-system` | `cast-evaluation` |
 | `ai-photo-diary` | `photo-diary` |
 | `ai-english-trainer` | `english-trainer` |
-| `GASではなくSpringBoot-render-supabase戦略.md` | `web-app-support-strategy.md` |
+| `GASではなくSpringBoot-render-supabase戦略.md` | Web版READMEへ統合 |
 | `Java・Oracle Bronze × Devin 実務直結型学習戦略.md` | `java-career-learning-strategy.md` |
 
 ## 毎日使う入口

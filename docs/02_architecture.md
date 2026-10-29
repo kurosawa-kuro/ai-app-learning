@@ -9,7 +9,7 @@
 | 場所 | 責務 |
 |---|---|
 | [gas-app-learning](../src/app-learning/01-gas-app-learning/README.md) | 既存5教材、対象者別の学習設計、体験と改善の支援 |
-| [web-app-starter](../src/app-learning/02-web-app-learning/web-app-support-strategy.md) | 非エンジニアが自分用・業務用アプリを使うための支援戦略 |
+| [Webアプリ制作の案内](../src/app-learning/02-web-app-learning/README.md) | 非エンジニアが自分用・業務用アプリを使うための支援戦略 |
 | [java-career-learning](../src/java-career-learning/java-career-learning-strategy.md) | Java・Oracleの資格と実習を仕事へつなぐ戦略 |
 | [office-automation-starter](../src/office-automation-starter/README.md) | Windowsでの事務処理教材・プロンプト・サンプル |
 | [docs](00_index.md) | 共通の要件・作業・検証・支援終了の具体化 |
@@ -28,7 +28,7 @@ GASの5教材はそれぞれ独立している。ゲームのポイントと店�
   → 必要な場合のみSupabase Storage
 ```
 
-これは採用方針であり、接続・公開済みの構成図ではない。認証、サービスプラン、環境変数、公開・復旧手順は対象アプリの実装時に確定・検証する。詳細は[Webアプリ支援戦略](../src/app-learning/02-web-app-learning/web-app-support-strategy.md)に従う。
+これは採用方針であり、接続・公開済みの構成図ではない。認証、サービスプラン、環境変数、公開・復旧手順は対象アプリの実装時に確定・検証する。詳細は[Webアプリ制作の案内](../src/app-learning/02-web-app-learning/README.md)に従う。
 
 Java・SQL、ひな形、AIへの指示、検証・復旧手順は提供者側で再利用する。利用者にすべての構成技術の習得を要求しない。既存GAS版は維持し、発展版は同じ題材の要件と受入条件で1題材ずつ整備する。
 

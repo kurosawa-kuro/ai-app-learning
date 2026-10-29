@@ -1,6 +1,6 @@
 # 教育用Webアプリスターター
 
-AI接続はOpenAIへ移行。設定・移行・公開確認は[OpenAI移行記録](../docs/tasks/openai-migration-20261028.md)を参照。過去のGemini検証記録は旧版の証跡です。
+AI接続はOpenAIへ移行。設定・移行・公開確認は[公開・検証状況](../docs/rollout-status.md)を参照。過去のGemini検証記録は旧版の証跡です。
 
 一つの題材で、AIへ依頼し、動かし、結果を確認するためのSpring Bootアプリです。実務向け運用基盤の全部入りにはしません。
 

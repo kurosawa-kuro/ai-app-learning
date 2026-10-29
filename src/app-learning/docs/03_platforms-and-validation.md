@@ -16,7 +16,7 @@
 
 ## 題材を固定し技術レベルを広げる
 
-2026-10-27の[採用決定](../../../docs/adr/0001-web-app-stack.md)により、発展版のNext.js＋Vercel案は廃止し、Spring Boot＋Thymeleaf＋Render＋Supabaseに統一した。[Webアプリ支援戦略](../02-web-app-learning/web-app-support-strategy.md)の構成と検証方針に従う。DBはPostgreSQL、Storageは必要時に利用する。既存GAS版の詳細仕様を参照し、新方針と異なるじゃんけんのスキル・AI、ショップのカートは個別に差分を管理する。
+2026-10-27の[採用決定](../../../docs/adr/0001-web-app-stack.md)により、発展版のNext.js＋Vercel案は廃止し、Spring Boot＋Thymeleaf＋Render＋Supabaseに統一した。[Webアプリ制作の案内](../02-web-app-learning/README.md)の構成と検証方針に従う。DBはPostgreSQL、Storageは必要時に利用する。既存GAS版の詳細仕様を参照し、新方針と異なるじゃんけんのスキル・AI、ショップのカートは個別に差分を管理する。
 
 サーバー側の認可、DB接続ロール、データの公開範囲を設計し、必要なRLSが実際の接続経路で有効かを検証する。技術の共通化と、利用者のゴール・スタート支援・成功条件の共通化は分ける。Oracle固有の実習は資格学習側で行う。
 

@@ -3,7 +3,7 @@
 - 決定日：2026-10-28
 - 状態：採用（ユーザー指定）。**Web版6アプリのコード実装済み。既定は認証無効、実Google・Render受入は未実施**
 - 根拠：ownerの「GAS版は引き続きユーザー認証機能は学習用途で簡易版。Web版はSupabase Authを使った本格版に変更していく」という指示。
-- 関連：[Webスタック（ADR 0001）](0001-web-app-stack.md)、[Webアプリ支援戦略](../../src/app-learning/02-web-app-learning/web-app-support-strategy.md)、[教育用の最小構成](../../src/app-learning/02-web-app-learning/template/docs/educational-baseline.md)、[認証を外した経緯](../../src/app-learning/02-web-app-learning/template/docs/education-scope-incident.md)
+- 関連：[Webスタック（ADR 0001）](0001-web-app-stack.md)、[Webアプリ制作の案内](../../src/app-learning/02-web-app-learning/README.md)、[教育用の最小構成](../../src/app-learning/02-web-app-learning/template/docs/educational-baseline.md)、[認証を外した経緯](../../src/app-learning/02-web-app-learning/template/docs/education-scope-incident.md)
 
 ## 決定
 
@@ -26,12 +26,12 @@
 
 当初の「templateで方式を確定してから5教材へ」を、ownerの指定で次の順番に改めた。
 
-1. **キャスト評価で先に実装・受入する**：管理者限定の要件がある教材のため。調査と決定の詳細は[事前調査](../../src/app-learning/02-web-app-learning/docs/tasks/cast-evaluation-auth-research-20261028.md)。
+1. **キャスト評価で先に実装・受入する**：管理者限定の要件がある教材のため。現在の方式と受入条件は[認証の設定と確認](../../src/app-learning/02-web-app-learning/docs/Googleログインの設定と確認.md)。
 2. **確定した差分をtemplateへ戻す**：横展開の必須ルール（共通修正はtemplateへ戻す）を守る。
 3. **他の教材へ1教材ずつ反映する**：検証用のAuthプロジェクトは「1教材で疎通したら削除し、次の教材で作り直す」順送りで使う。
 4. **公開先受入**：Renderで1教材ずつ受入する。公開先を一括で切り替えない。
 
-本番運用の構成（プロジェクトの持ち方、利用者の管理、障害時の対応）は、この検証の順送りとは別に決める。
+同日の後続指示により、コード差分は受入に先行してtemplateと5教材へ反映済み。上記は当初の段取りであり、現在の未実施項目は実Google・Renderの受入と公開先での有効化。本番運用の構成（プロジェクトの持ち方、利用者の管理、障害時の対応）は、この検証の順送りとは別に決める。
 
 ## 決定事項（2026-10-28）
 
@@ -40,14 +40,14 @@
 | ログイン方式 | **Googleログイン**（Supabase AuthのGoogleプロバイダー） |
 | 利用者の作成 | 新規登録を無効にし、管理者がSupabaseの管理画面で作成したユーザーだけを通す。招待メールは使わない |
 | 権限 | 「管理者」1種類 |
-| ログイン状態の保持 | サーバー経由でログインし、トークンをHttpOnly Cookieに保存して、サーバーでJWKSにより検証する（事前調査の方式A） |
+| ログイン状態の保持 | サーバー経由でログインし、トークンをHttpOnly Cookieに保存して、サーバーでJWKSにより検証する（サーバー側PKCE） |
 | テンプレート由来のユーザー選択 | ログインとは別の「投稿者データ」として残し、画面上でログイン中の利用者と区別して表示する |
 | Supabaseプロジェクト | 検証は教材ごとのAuth用プロジェクトを順送りで使う。本番運用の構成は別に決める |
 
-## 未決事項（実装時に決める）
+## 実環境で残る確認
 
 - 検証用プロジェクトを削除した後の、その教材の公開先の扱い。
-- 期限切れ時の入力保持：保存時にトークンの更新にも失敗した場合の入力の残し方。
+- 期限切れ時の入力保持は実装・模擬試験済み。実Google再ログイン後の再送は各教材の実環境受入で確認する。
 - 模擬Authサーバーによる自動試験は実装・検証済み。実Googleログインの手動受入とRenderの確認は残る。
 - 教材としての見せ方：初回体験でのGoogleアカウント・管理画面操作の負担と、子供・非エンジニアへの伴走範囲。
 

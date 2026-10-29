@@ -15,7 +15,7 @@ AIの利用先は[ADR 0003](adr/0003-ai-service-roles.md)に従う。プログ�
 | 入口 | 対象者・本人のゴール | 最初の支援 | AIで広げる方向 |
 |---|---|---|---|
 | [GAS教材](../src/app-learning/01-gas-app-learning/README.md) | 遊び・英語・写真・店舗業務等を通じて、身近な仕組みを理解・活用したい人 | 本人に合う題材、体験環境、小さな設定・変更 | データ・ルールの考え方を次の変更へ使う |
-| [Webアプリ](../src/app-learning/02-web-app-learning/web-app-support-strategy.md) | 自分用・業務用アプリを作って使いたい非エンジニア | 要望を絞り、ひな形・環境・必要な公開範囲を整える | 項目・画面・処理を用途に合わせて変える |
+| [Webアプリ制作の案内](../src/app-learning/02-web-app-learning/README.md) | 自分用・業務用アプリを作って使いたい非エンジニア | 要望を絞り、ひな形・環境・必要な公開範囲を整える | 項目・画面・処理を用途に合わせて変える |
 | [Javaキャリア](../src/java-career-learning/java-career-learning-strategy.md) | Java・Oracle系の仕事を目指すIT未経験者 | 仕事に必要な学習範囲、環境、最初のJava・SQL課題 | 例題・解説・レビューを使い、別課題や必要な技術へ進む |
 | [業務効率化](../src/office-automation-starter/README.md) | 事務処理の手間やミスを減らしたい非エンジニア、特にIT人材・SES営業 | Windows・Cursor・サンプル・単独で使えるプロンプト | 入力・条件・出力を変えて別業務へ使う |
 

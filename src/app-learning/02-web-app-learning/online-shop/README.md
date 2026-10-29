@@ -1,10 +1,10 @@
 # online-shop — Web版
 
-AI接続はOpenAIへ移行。設定・移行・公開確認は[OpenAI移行記録](../docs/tasks/openai-migration-20261028.md)を参照。過去のGemini検証記録は旧版の証跡です。
+AI接続はOpenAIへ移行。設定・移行・公開確認は[公開・検証状況](../docs/rollout-status.md)を参照。過去のGemini検証記録は旧版の証跡です。
 
 コピー元：`../template`、基準コミット：`1e56304db211ec16d3dee971c093778ff81584b8`。
 2026-10-27、固有編集前に412ファイルのSHA256一致を確認。
-[コピー照合記録](../docs/tasks/copy-baseline-20261027.json)。除外：`.env`（秘密値）、`.local`（実データ・作業記録）、`node_modules`・`target`・`playwright-report`・`test-results`（再生成可能）。
+[公開・検証状況](../docs/rollout-status.md#コピー元と検証方法)。除外：`.env`（秘密値）、`.local`（実データ・作業記録）、`node_modules`・`target`・`playwright-report`・`test-results`（再生成可能）。
 
 開発DB：`online_shop`、JavaテストDB：`online_shop_test`（各統合試験は同接頭辞の専用DBスキーマ）、ポート：8094。画像バケット：`online-shop-images-dev`。秘密値は複製していない。設定ひな形は`.env.example`。
 コピー元の過去の検証・公開記録はこのアプリの完了を意味しない。教材固有の現在の範囲・起動・確認方法は[実装・検証記録](docs/lesson-implementation.md)を参照。入口は `/shop`。

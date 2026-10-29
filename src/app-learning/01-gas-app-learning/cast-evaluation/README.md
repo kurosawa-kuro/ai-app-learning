@@ -66,4 +66,4 @@ npm run format:check
 - [データ設計](docs/05_data_model.md)
 - [検証方針](docs/07_test_strategy.md)
 - [GAS配置・実環境受入](docs/08_release_runbook.md)
-- [GAS全体の対応表・作業順](../README.md#進める順番と完了の見方)
+- [GAS全体の対応表・作業順](../README.md#始め方と改修の進め方)
